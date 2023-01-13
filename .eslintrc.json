@@ -1,0 +1,63 @@
+{
+  "root": true,
+  "plugins": ["@typescript-eslint", "import", "promise", "svelte3"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:promise/recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "promise/always-return": [
+      "warn",
+      {
+        "ignoreLastCallback": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*"],
+      "rules": {}
+    },
+    {
+      "files": ["**/*.ts"],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:import/typescript",
+        "prettier"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      },
+      "settings": {
+        "import/extensions": [".js", ".json"],
+        "import/parsers": {
+          "@typescript-eslint/parser": [".ts", ".d.ts"]
+        }
+      },
+      "rules": {}
+    },
+    {
+      "files": ["**/*.d.ts"],
+      "rules": {}
+    },
+    {
+      "files": ["**/*.svelte"],
+      "processor": "svelte3/svelte3",
+      "rules": {}
+    }
+  ]
+}

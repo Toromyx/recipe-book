@@ -1,0 +1,50 @@
+[package]
+name = "recipe-app"
+version = "0.0.1"
+description = "Recipe App"
+authors = ["Thomas Gauges <thomas.gauges@gmail.com>"]
+repository = "https://github.com/Toromyx/recipe-app"
+edition = "2021"
+rust-version = "1.66"
+
+[build-dependencies.tauri-build]
+version = "^1.2"
+features = []
+
+[dependencies.log]
+version = "^0.4"
+
+[dependencies.sea-orm]
+version = "^0.10"
+features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"]
+
+[dependencies.sea-orm-migration]
+version = "^0.10"
+
+[dependencies.serde]
+version = "^1.0"
+
+[dependencies.serde_json]
+version = "^1.0"
+
+[dependencies.serde_with]
+version = "^2.2"
+
+[dependencies.tauri]
+version = "^1.2"
+features = []
+
+[dependencies.thiserror]
+version = "^1.0"
+
+[dependencies.tokio]
+version = "^1.24"
+features = ["full"]
+
+[features]
+# by default Tauri runs in production mode
+# when `tauri dev` runs, it is executed with `cargo run --no-default-features` if `devPath` is an URL
+default = ["custom-protocol"]
+# this feature is used used for production builds where `devPath` points to the filesystem
+# DO NOT remove this
+custom-protocol = ["tauri/custom-protocol"]

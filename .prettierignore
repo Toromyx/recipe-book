@@ -1,0 +1,16 @@
+# ignore every file
+*.*
+
+# except these file types
+!*.json
+!*.yml
+!*.svelte
+!*.md
+!*.ts
+!*.js
+
+# but ignore these patterns
+dist
+node_modules
+src/**/*.js
+src-tauri/target

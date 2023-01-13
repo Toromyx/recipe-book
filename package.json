@@ -1,0 +1,51 @@
+{
+  "name": "recipe-app",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev:typescript": "tsc --build tsconfig.json -w --pretty --preserveWatchOutput",
+    "dev:bundle": "vite -c vite.config.js",
+    "dev": "concurrently -c cyan,magenta \"npm:dev:*\"",
+    "build:typescript": "tsc --build tsconfig.json",
+    "build:bundle": "vite build -c vite.config.js",
+    "build": "npm run build:typescript && npm run build:bundle",
+    "lint:backend": "cd src-tauri && cargo clippy -- --deny warnings",
+    "lint:frontend": "eslint ./**/*.* --max-warnings 0",
+    "lint": "concurrently -c yellow,blue \"npm:lint:*\"",
+    "fix:lint:backend": "cd src-tauri && cargo clippy --fix --allow-dirty --allow-staged",
+    "fix:lint:frontend": "eslint ./**/*.* --fix",
+    "fix:lint": "concurrently -c yellow,blue \"npm:fix:lint:*\"",
+    "format:backend": "cd src-tauri && cargo +nightly fmt -- --check",
+    "format:frontend": "prettier -c **/*.*",
+    "format": "concurrently -c yellow,blue \"npm:format:*\"",
+    "fix:format:backend": "cd src-tauri && cargo +nightly fmt",
+    "fix:format:frontend": "prettier -w **/*.*",
+    "fix:format": "concurrently -c yellow,blue \"npm:fix:format:*\"",
+    "fix": "npm run fix:lint && npm run fix:format",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.2.0",
+    "intl-messageformat": "^10.2.5",
+    "svelte-spa-router": "^3.3.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.0",
+    "@tauri-apps/cli": "^1.2.2",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "concurrently": "^7.6.0",
+    "eslint": "^8.32.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.4",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "prettier": "^2.8.3",
+    "prettier-plugin-svelte": "^2.9.0",
+    "svelte": "^3.54.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.0"
+  }
+}
