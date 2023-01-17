@@ -9,12 +9,11 @@ pub fn app_data_dir() -> PathBuf {
         Some(some) => some,
         None => panic!("Could not get data directory."),
     };
-    #[cfg(any(debug_assertions, test))]
-    {
-        #[cfg(test)]
-        let env = ".TEST";
-        #[cfg(not(test))]
-        let env = ".DEVELOPMENT";
+    if cfg!(debug_assertions) || cfg!(test) {
+        let env = match cfg!(test) {
+            true => ".TEST",
+            false => ".DEVELOPMENT",
+        };
         dir.push(env);
     }
     if let Err(err) = create_dir_all(&dir) {
