@@ -16,6 +16,9 @@ features = []
 [dependencies.log]
 version = "^0.4"
 
+[dependencies.log4rs]
+version = "^1.2"
+
 [dependencies.sea-orm]
 version = "^0.10"
 features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"]

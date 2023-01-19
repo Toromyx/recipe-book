@@ -31,6 +31,7 @@ mod database;
 mod entity;
 mod event;
 mod fs;
+mod log;
 mod migrator;
 mod path;
 mod window;
@@ -51,6 +52,7 @@ async fn main() {
             unsafe {
                 APP_HANDLE = Some(app.handle());
             }
+            log::init();
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
