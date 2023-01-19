@@ -22,7 +22,6 @@
         orderBy: [
           {
             column: "order",
-            order: "asc",
           },
         ],
       },

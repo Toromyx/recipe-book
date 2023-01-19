@@ -121,7 +121,13 @@ export interface EntityRepositoryInterface<
 }
 
 export function stringifyFilter(filter: object): string {
-  return JSON.stringify(filter, Object.keys(filter).sort());
+  const allKeys: Set<string> = new Set();
+  JSON.stringify(filter, (key, value) => {
+    allKeys.add(key);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return value;
+  });
+  return JSON.stringify(filter, [...allKeys].sort());
 }
 
 export class EntityRepository<
