@@ -1,4 +1,4 @@
-import { EventChannel } from "./event-channel.js";
+import type { EventChannel } from "./event-channel.js";
 
 type EventAnswerMap = {
   [EventChannel.ENTITY_ACTION_CREATED_INGREDIENT]: void;

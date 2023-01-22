@@ -48,7 +48,9 @@
           "@typescript-eslint/parser": [".ts", ".d.ts"]
         }
       },
-      "rules": {}
+      "rules": {
+        "@typescript-eslint/consistent-type-imports": "warn"
+      }
     },
     {
       "files": ["**/*.d.ts"],

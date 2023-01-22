@@ -1,10 +1,8 @@
-import {
-  EntityRepository,
-  EntityRepositoryInterface,
-} from "./entity-repository.js";
+import type { EntityRepositoryInterface } from "./entity-repository.js";
+import { EntityRepository } from "./entity-repository.js";
 import { apiClient } from "../command/entity.js";
-import { IngredientInterface } from "../../types/entity/ingredient-interface.js";
-import { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.js";
+import type { IngredientInterface } from "../../types/entity/ingredient-interface.js";
+import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.js";
 import { client } from "../event/client.js";
 import { EventChannel } from "../event/event-channel.js";
 

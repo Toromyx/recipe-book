@@ -1,4 +1,5 @@
-import { constructMessageProxy, TranslationStrings } from "./translations.js";
+import type { TranslationStrings } from "./translations.js";
+import { constructMessageProxy } from "./translations.js";
 
 const translationStrings: TranslationStrings = {
   labels: {

@@ -1,12 +1,10 @@
-import {
-  EntityRepository,
-  EntityRepositoryInterface,
-} from "./entity-repository.js";
+import type { EntityRepositoryInterface } from "./entity-repository.js";
+import { EntityRepository } from "./entity-repository.js";
 import { apiClient } from "../command/entity.js";
 import { client } from "../event/client.js";
 import { EventChannel } from "../event/event-channel.js";
-import { RecipeInterface } from "../../types/entity/recipe-interface.js";
-import { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.js";
+import type { RecipeInterface } from "../../types/entity/recipe-interface.js";
+import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.js";
 
 export const recipeRepository: EntityRepositoryInterface<
   RecipeInterface,

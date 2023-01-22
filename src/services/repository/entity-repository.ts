@@ -1,5 +1,5 @@
 import { equalArray } from "../util/compare.js";
-import { IdentifiableInterface } from "../../types/identifiable-interface.js";
+import type { IdentifiableInterface } from "../../types/identifiable-interface.js";
 
 type EntityRepositorySubscriber<Entity> = (entity: Entity | undefined) => void;
 

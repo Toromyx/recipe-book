@@ -1,14 +1,14 @@
 import { client } from "./client.js";
 import { Command } from "./command.js";
-import { CommandAnswer } from "./command-answer.js";
-import { IngredientInterface } from "../../types/entity/ingredient-interface.js";
-import { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.js";
-import { RecipeInterface } from "../../types/entity/recipe-interface.js";
-import { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.js";
-import { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.js";
-import { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.js";
-import { RecipeStepInterface } from "../../types/entity/recipe-step-interface.js";
-import { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.js";
+import type { CommandAnswer } from "./command-answer.js";
+import type { IngredientInterface } from "../../types/entity/ingredient-interface.js";
+import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.js";
+import type { RecipeInterface } from "../../types/entity/recipe-interface.js";
+import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.js";
+import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.js";
+import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.js";
+import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.js";
+import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.js";
 
 type ChannelEntityRead =
   | Command.ENTITY_READ_INGREDIENT

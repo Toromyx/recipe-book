@@ -1,8 +1,8 @@
-import { Command } from "./command.js";
-import { IngredientInterface } from "../../types/entity/ingredient-interface.js";
-import { RecipeInterface } from "../../types/entity/recipe-interface.js";
-import { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.js";
-import { RecipeStepInterface } from "../../types/entity/recipe-step-interface.js";
+import type { Command } from "./command.js";
+import type { IngredientInterface } from "../../types/entity/ingredient-interface.js";
+import type { RecipeInterface } from "../../types/entity/recipe-interface.js";
+import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.js";
+import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.js";
 
 type CommandAnswerMap = {
   [Command.ENTITY_CREATE_INGREDIENT]: number;
