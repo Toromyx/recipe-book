@@ -1,6 +1,7 @@
 use sea_orm::{
     entity::prelude::*,
-    ActiveValue::{Set, Unchanged},
+    prelude::async_trait::async_trait,
+    ActiveValue::{NotSet, Set, Unchanged},
 };
 use serde::Serialize;
 
@@ -57,8 +58,9 @@ impl Related<super::recipe_step::Entity> for Entity {
     }
 }
 
+#[async_trait]
 impl ActiveModelBehavior for ActiveModel {
-    fn after_save(model: Model, insert: bool) -> Result<Model, DbErr> {
+    async fn after_save<C>(model: Model, _db: &C, insert: bool) -> Result<Model, DbErr> {
         if insert {
             get_window()
                 .emit(ENTITY_ACTION_CREATED_RECIPE_INGREDIENT, ())
@@ -71,9 +73,10 @@ impl ActiveModelBehavior for ActiveModel {
         Ok(model)
     }
 
-    fn after_delete(self) -> Result<Self, DbErr> {
-        let (Set(id) | Unchanged(id)) = self.id else {
-            return Ok(self);
+    async fn after_delete<C>(self, _db: &C) -> Result<Self, DbErr> {
+        let id = match self.id {
+            Set(id) | Unchanged(id) => id,
+            NotSet => return Ok(self),
         };
         get_window()
             .emit(ENTITY_ACTION_DELETED_RECIPE_INGREDIENT, id)
