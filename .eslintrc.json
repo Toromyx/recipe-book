@@ -17,6 +17,8 @@
     "es6": true
   },
   "rules": {
+    "no-console": "warn",
+
     "promise/always-return": [
       "warn",
       {
