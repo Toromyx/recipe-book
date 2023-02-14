@@ -1,8 +1,10 @@
-dist
+# node package manager
 node_modules
 
-src/**/*.js
-src/**/*.js.map
+# frontend
+/dist
+/src/**/*.js
+/src/**/*.js.map
 
-src-tauri/target
-
+# backend
+/src-tauri/target
