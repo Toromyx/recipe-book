@@ -46,7 +46,7 @@
     on:submit="{({ detail }) => {
       recipeIngredientRepository.create({
         order: list.length + 1,
-        quantity: Number(detail.quantity),
+        quantity: detail.quantity,
         unit: detail.unit,
         ingredientId: detail.ingredientId[0],
         recipeStepId,
