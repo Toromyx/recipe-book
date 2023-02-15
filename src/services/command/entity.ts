@@ -10,7 +10,7 @@ import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-
 import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
 
-type ChannelEntityRead =
+type CommandEntityRead =
   | Command.ENTITY_READ_INGREDIENT
   | Command.ENTITY_READ_RECIPE
   | Command.ENTITY_READ_RECIPE_INGREDIENT
@@ -22,8 +22,8 @@ type ChannelEntityRead =
  * this promise is deleted once resolved, this is not a cache!
  */
 const entityReadPromiseCollector: {
-  [channel in ChannelEntityRead]: {
-    [id: number]: Promise<CommandAnswer<channel>>;
+  [T in CommandEntityRead]: {
+    [id: number]: Promise<CommandAnswer<T>>;
   };
 } = {
   [Command.ENTITY_READ_INGREDIENT]: {},
@@ -32,7 +32,7 @@ const entityReadPromiseCollector: {
   [Command.ENTITY_READ_RECIPE_STEP]: {},
 };
 
-function readCollected<T extends ChannelEntityRead>(
+function readCollected<T extends CommandEntityRead>(
   command: T,
   id: number,
 ): Promise<CommandAnswer<T>> {
