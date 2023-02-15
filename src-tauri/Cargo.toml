@@ -1,6 +1,6 @@
 [package]
 name = "recipe-app"
-version = "0.0.1"
+version = "0.0.2"
 description = "Recipe App"
 authors = [
     "Thomas Gauges <thomas.gauges@gmail.com>",
