@@ -1,9 +1,9 @@
 <script>
   import { createEventDispatcher, getContext, tick } from "svelte";
+  import { messages } from "../../../services/translation/en.ts";
   import { debounce } from "../../../services/util/debounce.ts";
   import SvelteButton from "../SvelteButton.svelte";
   import { FORM } from "./SvelteForm.svelte";
-  import { messages } from "../../../services/translation/en.ts";
 
   export let label;
   export let name;

@@ -1,7 +1,7 @@
 <script>
+  import { Temporal } from "@js-temporal/polyfill";
   import { createEventDispatcher, getContext, tick } from "svelte";
   import { FORM } from "./SvelteForm.svelte";
-  import { Temporal } from "@js-temporal/polyfill";
 
   export let label;
   export let name;

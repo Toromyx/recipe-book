@@ -1,8 +1,8 @@
-import { debug } from "../log.ts";
-import type { Command } from "./command.ts";
-import type { CommandParameter } from "./command-parameter.ts";
-import type { CommandAnswer } from "./command-answer.ts";
 import { invoke } from "@tauri-apps/api/tauri";
+import { debug } from "../log.ts";
+import type { CommandAnswer } from "./command-answer.ts";
+import type { CommandParameter } from "./command-parameter.ts";
+import type { Command } from "./command.ts";
 
 type CommandClient = {
   invoke<T extends Command>(

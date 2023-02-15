@@ -1,12 +1,12 @@
-import type { Command } from "./command.ts";
 import type { IngredientInterface } from "../../types/entity/ingredient-interface.ts";
-import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
-import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
-import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.ts";
-import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
+import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
 import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
+import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
+import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
+import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
+import type { Command } from "./command.ts";
 
 type CommandParameterMap = {
   [Command.ENTITY_CREATE_INGREDIENT]: { create: Partial<IngredientInterface> };

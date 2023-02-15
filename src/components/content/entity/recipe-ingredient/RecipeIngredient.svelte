@@ -1,7 +1,7 @@
 <script>
+  import { onDestroy } from "svelte";
   import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
   import IngredientName from "../ingredient/IngredientName.svelte";
-  import { onDestroy } from "svelte";
 
   export let id;
 

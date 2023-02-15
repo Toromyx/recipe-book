@@ -19,6 +19,15 @@
   "rules": {
     "no-console": "warn",
 
+    "import/order": [
+      "warn",
+      {
+        "alphabetize": {
+          "order": "asc"
+        }
+      }
+    ],
+
     "promise/always-return": [
       "warn",
       {
