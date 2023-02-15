@@ -39,7 +39,12 @@
 <div>
   <ol>
     {#each list as id}
-      <li><RecipeIngredient id="{id}" /></li>
+      <li>
+        <RecipeIngredient id="{id}" /><SvelteButton
+          on:click="{() => recipeIngredientRepository.delete(id)}"
+          >{messages.labels.actions.delete.format()}</SvelteButton
+        >
+      </li>
     {/each}
   </ol>
   <SvelteForm

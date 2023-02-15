@@ -21,7 +21,12 @@
 
 <ol>
   {#each list as id}
-    <li><a href="#{recipeRoute(id)}"><RecipeName id="{id}" /></a></li>
+    <li>
+      <a href="#{recipeRoute(id)}"><RecipeName id="{id}" /></a><SvelteButton
+        on:click="{() => recipeRepository.delete(id)}"
+        >{messages.labels.actions.delete.format()}</SvelteButton
+      >
+    </li>
   {/each}
   <SvelteForm
     on:submit="{({ detail }) => {

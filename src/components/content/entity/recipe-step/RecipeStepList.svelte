@@ -38,7 +38,10 @@
   <ol>
     {#each list as id}
       <li>
-        <RecipeStep id="{id}" />
+        <RecipeStep id="{id}" /><SvelteButton
+          on:click="{() => recipeStepRepository.delete(id)}"
+          >{messages.labels.actions.delete.format()}</SvelteButton
+        >
       </li>
     {/each}
   </ol>
