@@ -4,10 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev:typescript": "tsc --build tsconfig.json -w --pretty --preserveWatchOutput",
+    "dev:typescript": "tsc --noEmit -p tsconfig.json -w --pretty --preserveWatchOutput",
     "dev:bundle": "vite -c vite.config.js",
     "dev": "concurrently -c cyan,magenta \"npm:dev:*\"",
-    "build:typescript": "tsc --build tsconfig.json",
+    "build:typescript": "tsc --noEmit -p tsconfig.json",
     "build:bundle": "vite build -c vite.config.js",
     "build": "npm run build:typescript && npm run build:bundle",
     "lint:backend": "cd src-tauri && cargo clippy -- --deny warnings",
@@ -46,7 +46,7 @@
     "prettier": "^2.8.3",
     "prettier-plugin-svelte": "^2.9.0",
     "svelte": "^3.54.0",
-    "typescript": "^4.9.4",
+    "typescript": "^5.0.0-beta",
     "vite": "^4.0.0"
   }
 }

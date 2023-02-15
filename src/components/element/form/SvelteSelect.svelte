@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher, getContext, tick } from "svelte";
-  import { messages } from "../../../services/translation/en.js";
+  import { messages } from "../../../services/translation/en.ts";
   import { FORM } from "./SvelteForm.svelte";
 
   /** @type {{value: unknown, label: string}[]} */

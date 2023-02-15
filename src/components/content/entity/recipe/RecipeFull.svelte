@@ -1,7 +1,7 @@
 <script>
   import { onDestroy } from "svelte";
-  import { recipeRepository } from "../../../../services/repository/recipe-repository.js";
-  import { messages } from "../../../../services/translation/en.js";
+  import { recipeRepository } from "../../../../services/repository/recipe-repository.ts";
+  import { messages } from "../../../../services/translation/en.ts";
   import RecipeStepList from "../recipe-step/RecipeStepList.svelte";
 
   export let id;

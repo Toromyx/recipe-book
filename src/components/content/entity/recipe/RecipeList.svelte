@@ -1,10 +1,10 @@
 <script>
-  import { recipeRepository } from "../../../../services/repository/recipe-repository.js";
+  import { recipeRepository } from "../../../../services/repository/recipe-repository.ts";
   import { onDestroy } from "svelte";
-  import { recipeRoute } from "../../../../services/router.js";
+  import { recipeRoute } from "../../../../services/router.ts";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
   import SvelteInput from "../../../element/form/SvelteInput.svelte";
-  import { messages } from "../../../../services/translation/en.js";
+  import { messages } from "../../../../services/translation/en.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
   import RecipeName from "./RecipeName.svelte";
 

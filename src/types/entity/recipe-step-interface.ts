@@ -1,4 +1,4 @@
-import type { IdentifiableInterface } from "../identifiable-interface.js";
+import type { IdentifiableInterface } from "../identifiable-interface.ts";
 
 export interface RecipeStepInterface extends IdentifiableInterface {
   order: number;

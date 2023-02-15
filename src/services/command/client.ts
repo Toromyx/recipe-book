@@ -1,7 +1,7 @@
-import { debug } from "../log.js";
-import type { Command } from "./command.js";
-import type { CommandParameter } from "./command-parameter.js";
-import type { CommandAnswer } from "./command-answer.js";
+import { debug } from "../log.ts";
+import type { Command } from "./command.ts";
+import type { CommandParameter } from "./command-parameter.ts";
+import type { CommandAnswer } from "./command-answer.ts";
 import { invoke } from "@tauri-apps/api/tauri";
 
 type CommandClient = {

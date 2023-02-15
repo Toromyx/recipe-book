@@ -1,10 +1,10 @@
-import type { EntityRepositoryInterface } from "./entity-repository.js";
-import { EntityRepository } from "./entity-repository.js";
-import { apiClient } from "../command/entity.js";
-import type { IngredientInterface } from "../../types/entity/ingredient-interface.js";
-import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.js";
-import { client } from "../event/client.js";
-import { EventChannel } from "../event/event-channel.js";
+import type { EntityRepositoryInterface } from "./entity-repository.ts";
+import { EntityRepository } from "./entity-repository.ts";
+import { apiClient } from "../command/entity.ts";
+import type { IngredientInterface } from "../../types/entity/ingredient-interface.ts";
+import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
+import { client } from "../event/client.ts";
+import { EventChannel } from "../event/event-channel.ts";
 
 export const ingredientRepository: EntityRepositoryInterface<
   IngredientInterface,

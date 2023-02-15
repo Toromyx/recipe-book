@@ -1,14 +1,14 @@
 <script>
   import { onDestroy } from "svelte";
-  import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.js";
+  import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
   import RecipeIngredient from "./RecipeIngredient.svelte";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
   import SvelteInput from "../../../element/form/SvelteInput.svelte";
-  import { messages } from "../../../../services/translation/en.js";
+  import { messages } from "../../../../services/translation/en.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
   import Autocomplete from "../../../element/form/Autocomplete.svelte";
   import IngredientName from "../ingredient/IngredientName.svelte";
-  import { apiClient } from "../../../../services/command/entity.js";
+  import { apiClient } from "../../../../services/command/entity.ts";
 
   export let recipeStepId;
 

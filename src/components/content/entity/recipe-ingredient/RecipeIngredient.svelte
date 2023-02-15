@@ -1,5 +1,5 @@
 <script>
-  import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.js";
+  import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
   import IngredientName from "../ingredient/IngredientName.svelte";
   import { onDestroy } from "svelte";
 

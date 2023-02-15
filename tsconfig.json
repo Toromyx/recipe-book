@@ -3,13 +3,11 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "nodenext",
-    "esModuleInterop": true,
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "strict": true,
-    "removeComments": true,
-    "sourceMap": true,
-    "preserveConstEnums": false,
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true,
     "types": ["svelte", "vite/client"]
   },
   "include": ["./src/**/*.ts"]

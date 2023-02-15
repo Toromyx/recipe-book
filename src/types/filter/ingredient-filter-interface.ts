@@ -1,4 +1,4 @@
-import type { FilterInterface } from "../filter-interface.js";
+import type { FilterInterface } from "../filter-interface.ts";
 
 type IngredientCondition = {
   name?: string;

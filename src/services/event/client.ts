@@ -1,8 +1,8 @@
 import type { Event, UnlistenFn } from "@tauri-apps/api/event";
 import { getCurrent } from "@tauri-apps/api/window";
-import { debug } from "../log.js";
-import type { EventChannel } from "./event-channel.js";
-import type { EventAnswer } from "./event-answer.js";
+import { debug } from "../log.ts";
+import type { EventChannel } from "./event-channel.ts";
+import type { EventAnswer } from "./event-answer.ts";
 
 type Client = {
   listen<T extends EventChannel>(

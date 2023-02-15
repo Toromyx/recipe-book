@@ -12,5 +12,4 @@
 # but ignore these patterns
 dist
 node_modules
-src/**/*.js
 src-tauri/target
