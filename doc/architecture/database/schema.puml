@@ -1,0 +1,34 @@
+@startuml
+
+entity "Recipe" as recipe {
+  A recipe.
+  --
+  name
+}
+
+entity "Recipe Step" as recipe_step {
+  A step in a recipe.
+  --
+  order
+  description
+  image
+}
+recipe_step }o--|| "recipe" recipe
+
+entity "Recipe Ingredient" as recipe_ingredient {
+  An recipe ingredient.
+  --
+  order
+  quantity
+  unit
+}
+recipe_ingredient }o--|| "step" recipe_step
+
+entity "Ingredient" as ingredient {
+  An ingredient.
+  --
+  name
+}
+ingredient "ingredient" ||--o{ recipe_ingredient
+
+@enduml
