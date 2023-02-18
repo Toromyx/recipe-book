@@ -2,8 +2,10 @@
   import { onDestroy } from "svelte";
   import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
   import { messages } from "../../../../services/translation/en.ts";
+  import { getDataUrl } from "../../../../services/util/file.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
+  import SvelteInput from "../../../element/form/SvelteInput.svelte";
   import SvelteTextarea from "../../../element/form/SvelteTextarea.svelte";
   import RecipeStep from "./RecipeStep.svelte";
 
@@ -46,10 +48,12 @@
     {/each}
   </ol>
   <SvelteForm
-    on:submit="{({ detail }) => {
-      recipeStepRepository.create({
+    on:submit="{async ({ detail }) => {
+      const image = detail.image ? await getDataUrl(detail.image) : null;
+      await recipeStepRepository.create({
         order: list.length + 1,
         description: detail.description,
+        image,
         recipeId,
       });
     }}"
@@ -59,6 +63,7 @@
       name="description"
       label="{messages.labels.entityFields.recipeStep.description.format()}"
     />
+    <SvelteInput type="file" name="image" accept="image/*" />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >

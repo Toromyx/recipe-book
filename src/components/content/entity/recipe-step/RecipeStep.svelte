@@ -28,4 +28,7 @@
   </h3>
   <RecipeIngredientList recipeStepId="{id}" />
   <p>{recipeStep?.description}</p>
+  {#if recipeStep?.image}
+    <img src="{recipeStep.image}" alt="" />
+  {/if}
 </div>

@@ -1,4 +1,8 @@
-import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
+import type {
+  RecipeCreateInterface,
+  RecipeInterface,
+  RecipeUpdateInterface,
+} from "../../types/entity/recipe-interface.ts";
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import { apiClient } from "../command/entity.ts";
 import { client } from "../event/client.ts";
@@ -8,6 +12,8 @@ import { EntityRepository } from "./entity-repository.ts";
 
 export const recipeRepository: EntityRepositoryInterface<
   RecipeInterface,
+  RecipeCreateInterface,
+  RecipeUpdateInterface,
   RecipeFilterInterface
 > = new EntityRepository(
   (partial) => apiClient.createRecipe(partial),

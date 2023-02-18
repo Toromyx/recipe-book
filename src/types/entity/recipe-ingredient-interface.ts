@@ -7,3 +7,17 @@ export interface RecipeIngredientInterface extends IdentifiableInterface {
   recipeStepId: number;
   ingredientId: number;
 }
+
+export interface RecipeIngredientCreateInterface {
+  order: number;
+  quantity: number;
+  unit: string;
+  recipeStepId: number;
+  ingredientId: number;
+}
+
+export interface RecipeIngredientUpdateInterface extends IdentifiableInterface {
+  order?: number;
+  quantity?: number;
+  unit?: string;
+}

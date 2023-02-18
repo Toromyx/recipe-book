@@ -6,6 +6,7 @@ use sea_orm::{
     QueryFilter, QueryOrder, QuerySelect,
 };
 use serde::Deserialize;
+use serde_with::serde_as;
 
 use crate::{
     api::entity::{get_order_by, Filter, IdColumn},
@@ -22,6 +23,7 @@ use crate::{
 pub struct RecipeStepCreate {
     pub order: i64,
     pub description: String,
+    pub image: Option<String>,
     pub recipe_id: i64,
 }
 
@@ -37,11 +39,14 @@ pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
     Ok(model)
 }
 
+#[serde_as]
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecipeStepUpdate {
     pub id: i64,
     pub order: Option<i64>,
+    #[serde(with = "::serde_with::rust::double_option")]
+    pub image: Option<Option<String>>,
     pub description: Option<String>,
 }
 
@@ -57,7 +62,10 @@ impl IntoActiveModel<ActiveModel> for RecipeStepUpdate {
                 Some(description) => Set(description),
                 _ => NotSet,
             },
-            image: NotSet,
+            image: match self.image {
+                Some(image) => Set(image),
+                _ => NotSet,
+            },
             recipe_id: NotSet,
         }
     }

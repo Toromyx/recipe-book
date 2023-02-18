@@ -5,7 +5,7 @@
 
   export let label;
   export let name;
-  export let value = "";
+  export let value = undefined;
   export let type = "text";
   export let placeholder = label;
   export let required = false;
@@ -14,6 +14,10 @@
   export let max = undefined;
 
   export let step = undefined;
+
+  export let accept = undefined;
+
+  export let multiple = undefined;
 
   const formContext = getContext(FORM);
   const dispatch = createEventDispatcher();
@@ -39,6 +43,11 @@
           return Temporal.PlainTime.from(eventTarget.value);
         case "datetime-local":
           return Temporal.PlainDateTime.from(eventTarget.value);
+        case "file":
+          if (multiple) {
+            return [...eventTarget.files];
+          }
+          return eventTarget.files.item(0) || undefined;
         default:
           return eventTarget.value;
       }
@@ -52,7 +61,6 @@
 <input
   on:input="{onInputOrChange}"
   on:change="{onInputOrChange}"
-  value="{value}"
   name="{fullName}"
   type="{type}"
   placeholder="{placeholder}"
@@ -61,4 +69,6 @@
   min="{min}"
   max="{max}"
   step="{step}"
+  accept="{accept}"
+  multiple="{multiple}"
 />

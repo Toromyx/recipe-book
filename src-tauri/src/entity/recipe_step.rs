@@ -21,7 +21,7 @@ pub struct Model {
     pub id: i64,
     pub order: i64,
     pub description: String,
-    pub image: Option<Vec<u8>>,
+    pub image: Option<String>,
     pub recipe_id: i64,
 }
 

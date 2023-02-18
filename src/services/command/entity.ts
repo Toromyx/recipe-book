@@ -1,7 +1,23 @@
-import type { IngredientInterface } from "../../types/entity/ingredient-interface.ts";
-import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.ts";
-import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
-import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
+import type {
+  IngredientCreateInterface,
+  IngredientInterface,
+  IngredientUpdateInterface,
+} from "../../types/entity/ingredient-interface.ts";
+import type {
+  RecipeIngredientCreateInterface,
+  RecipeIngredientInterface,
+  RecipeIngredientUpdateInterface,
+} from "../../types/entity/recipe-ingredient-interface.ts";
+import type {
+  RecipeCreateInterface,
+  RecipeInterface,
+  RecipeUpdateInterface,
+} from "../../types/entity/recipe-interface.ts";
+import type {
+  RecipeStepCreateInterface,
+  RecipeStepInterface,
+  RecipeStepUpdateInterface,
+} from "../../types/entity/recipe-step-interface.ts";
 import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
@@ -50,13 +66,13 @@ function readCollected<T extends CommandEntityRead>(
 }
 
 export const apiClient = {
-  createIngredient(create: Partial<IngredientInterface>): Promise<number> {
+  createIngredient(create: IngredientCreateInterface): Promise<number> {
     return client.invoke(Command.ENTITY_CREATE_INGREDIENT, { create });
   },
   readIngredient(id: number): Promise<IngredientInterface> {
     return readCollected(Command.ENTITY_READ_INGREDIENT, id);
   },
-  updateIngredient(update: Partial<IngredientInterface>): Promise<void> {
+  updateIngredient(update: IngredientUpdateInterface): Promise<void> {
     return client.invoke(Command.ENTITY_UPDATE_INGREDIENT, { update });
   },
   deleteIngredient(id: number): Promise<void> {
@@ -69,13 +85,13 @@ export const apiClient = {
     return client.invoke(Command.ENTITY_COUNT_INGREDIENT, { filter });
   },
 
-  createRecipe(create: Partial<RecipeInterface>): Promise<number> {
+  createRecipe(create: RecipeCreateInterface): Promise<number> {
     return client.invoke(Command.ENTITY_CREATE_RECIPE, { create });
   },
   readRecipe(id: number): Promise<RecipeInterface> {
     return readCollected(Command.ENTITY_READ_RECIPE, id);
   },
-  updateRecipe(update: Partial<RecipeInterface>): Promise<void> {
+  updateRecipe(update: RecipeUpdateInterface): Promise<void> {
     return client.invoke(Command.ENTITY_UPDATE_RECIPE, { update });
   },
   deleteRecipe(id: number): Promise<void> {
@@ -89,7 +105,7 @@ export const apiClient = {
   },
 
   createRecipeIngredient(
-    create: Partial<RecipeIngredientInterface>,
+    create: RecipeIngredientCreateInterface,
   ): Promise<number> {
     return client.invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT, { create });
   },
@@ -97,7 +113,7 @@ export const apiClient = {
     return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT, id);
   },
   updateRecipeIngredient(
-    update: Partial<RecipeIngredientInterface>,
+    update: RecipeIngredientUpdateInterface,
   ): Promise<void> {
     return client.invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT, { update });
   },
@@ -115,13 +131,13 @@ export const apiClient = {
     return client.invoke(Command.ENTITY_COUNT_RECIPE_INGREDIENT, { filter });
   },
 
-  createRecipeStep(create: Partial<RecipeStepInterface>): Promise<number> {
+  createRecipeStep(create: RecipeStepCreateInterface): Promise<number> {
     return client.invoke(Command.ENTITY_CREATE_RECIPE_STEP, { create });
   },
   readRecipeStep(id: number): Promise<RecipeStepInterface> {
     return readCollected(Command.ENTITY_READ_RECIPE_STEP, id);
   },
-  updateRecipeStep(update: Partial<RecipeStepInterface>): Promise<void> {
+  updateRecipeStep(update: RecipeStepUpdateInterface): Promise<void> {
     return client.invoke(Command.ENTITY_UPDATE_RECIPE_STEP, { update });
   },
   deleteRecipeStep(id: number): Promise<void> {

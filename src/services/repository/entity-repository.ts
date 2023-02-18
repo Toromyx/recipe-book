@@ -7,12 +7,16 @@ export type EntityRepositoryListSubscriber = (list: number[]) => void;
 
 export type EntityRepositoryCountSubscriber = (count: number) => void;
 
-type EntityRepositoryUpdater<Entity> = (entity: Entity) => Entity;
+type EntityRepositoryUpdater<Entity, EntityUpdate> = (
+  entity: Entity,
+) => EntityUpdate;
 
 export type EntityRepositoryUnsubscriber = () => void;
 
 export interface EntityRepositoryInterface<
   Entity extends IdentifiableInterface,
+  EntityCreate extends object,
+  EntityUpdate extends IdentifiableInterface,
   Filter extends object,
 > {
   /**
@@ -91,9 +95,9 @@ export interface EntityRepositoryInterface<
    *
    * adds the entity to the state
    *
-   * @param partial - the partial entity data
+   * @param entityCreate - the entity data for creation
    */
-  create(partial: Partial<Entity>): Promise<number>;
+  create(entityCreate: EntityCreate): Promise<number>;
 
   /**
    * call this method to update the entity with the specified identifier based on the previous entity
@@ -107,7 +111,7 @@ export interface EntityRepositoryInterface<
    */
   update(
     identifier: number,
-    updater: EntityRepositoryUpdater<Entity>,
+    updater: EntityRepositoryUpdater<Entity, EntityUpdate>,
   ): Promise<void>;
 
   /**
@@ -132,8 +136,11 @@ export function stringifyFilter(filter: object): string {
 
 export class EntityRepository<
   Entity extends IdentifiableInterface,
+  EntityCreate extends object,
+  EntityUpdate extends IdentifiableInterface,
   Filter extends object,
-> implements EntityRepositoryInterface<Entity, Filter>
+> implements
+    EntityRepositoryInterface<Entity, EntityCreate, EntityUpdate, Filter>
 {
   protected state: {
     [identifier: number]: Entity;
@@ -175,9 +182,9 @@ export class EntityRepository<
 
   protected readonly apiRead: (identifier: number) => Promise<Entity>;
 
-  protected readonly apiCreate: (partial: Partial<Entity>) => Promise<number>;
+  protected readonly apiCreate: (entityCreate: EntityCreate) => Promise<number>;
 
-  protected readonly apiUpdate: (partial: Partial<Entity>) => Promise<void>;
+  protected readonly apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>;
 
   protected readonly apiDelete: (identifier: number) => Promise<void>;
 
@@ -200,9 +207,9 @@ export class EntityRepository<
    * @param registerDelete - register callbacks for reacting to entity deletions
    */
   public constructor(
-    apiCreate: (partial: Partial<Entity>) => Promise<number>,
+    apiCreate: (entityCreate: EntityCreate) => Promise<number>,
     apiRead: (identifier: number) => Promise<Entity>,
-    apiUpdate: (partial: Partial<Entity>) => Promise<void>,
+    apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>,
     apiDelete: (identifier: number) => Promise<void>,
     apiList: (filter: Filter) => Promise<number[]>,
     apiCount: (filter: Filter) => Promise<number>,
@@ -380,13 +387,13 @@ export class EntityRepository<
     };
   }
 
-  public async create(partial: Partial<Entity>): Promise<number> {
-    return this.apiCreate(partial);
+  public async create(entityCreate: EntityCreate): Promise<number> {
+    return this.apiCreate(entityCreate);
   }
 
   public async update(
     identifier: number,
-    updater: EntityRepositoryUpdater<Entity>,
+    updater: EntityRepositoryUpdater<Entity, EntityUpdate>,
   ): Promise<void> {
     const entity = this.state[identifier];
     if (!entity) {
