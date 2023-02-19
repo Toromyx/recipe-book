@@ -1,14 +1,11 @@
 <script>
   import { onDestroy } from "svelte";
-  import { apiClient } from "../../../../services/command/entity.ts";
   import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
   import { messages } from "../../../../services/translation/en.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
-  import Autocomplete from "../../../element/form/Autocomplete.svelte";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
-  import SvelteInput from "../../../element/form/SvelteInput.svelte";
-  import IngredientName from "../ingredient/IngredientName.svelte";
   import RecipeIngredient from "./RecipeIngredient.svelte";
+  import RecipeIngredientFormFields from "./RecipeIngredientFormFields.svelte";
 
   export let recipeStepId;
 
@@ -58,34 +55,7 @@
       });
     }}"
   >
-    <SvelteInput
-      name="quantity"
-      type="number"
-      label="{messages.labels.entityFields.recipeIngredient.quantity.format()}"
-      required="{true}"
-      min="0"
-    />
-    <SvelteInput
-      name="unit"
-      label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
-      required="{true}"
-    />
-    <Autocomplete
-      name="ingredientId"
-      min="{1}"
-      max="{1}"
-      label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
-      callback="{(userInput) =>
-        apiClient.listIngredient({
-          condition: { name: userInput },
-          orderBy: [{ column: 'name' }],
-        })}"
-      createCallback="{(userInput) =>
-        apiClient.createIngredient({ name: userInput })}"
-      ><svelte:fragment let:item>
-        <IngredientName id="{item}" />
-      </svelte:fragment></Autocomplete
-    >
+    <RecipeIngredientFormFields />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >

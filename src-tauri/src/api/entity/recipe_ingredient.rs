@@ -46,6 +46,7 @@ pub struct RecipeIngredientUpdate {
     pub order: Option<i64>,
     pub quantity: Option<f64>,
     pub unit: Option<String>,
+    pub ingredient_id: Option<i64>,
 }
 
 impl IntoActiveModel<ActiveModel> for RecipeIngredientUpdate {
@@ -65,7 +66,10 @@ impl IntoActiveModel<ActiveModel> for RecipeIngredientUpdate {
                 _ => NotSet,
             },
             recipe_step_id: NotSet,
-            ingredient_id: NotSet,
+            ingredient_id: match self.ingredient_id {
+                Some(ingredient_id) => Set(ingredient_id),
+                _ => NotSet,
+            },
         }
     }
 }

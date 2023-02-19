@@ -4,8 +4,10 @@ type Translations<T> = {
   labels: {
     actions: {
       create: T;
+      edit: T;
       update: T;
       delete: T;
+      cancel: T;
     };
     entityFields: {
       ingredient: {

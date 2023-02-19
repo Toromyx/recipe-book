@@ -56,6 +56,13 @@
       dispatch(event.type, value);
     });
   }
+
+  function getValueForHtmlElement(value) {
+    if (!value || type === "file") {
+      return "";
+    }
+    return value;
+  }
 </script>
 
 <input
@@ -63,6 +70,7 @@
   on:change="{onInputOrChange}"
   name="{fullName}"
   type="{type}"
+  value="{getValueForHtmlElement(value)}"
   placeholder="{placeholder}"
   required="{required}"
   aria-label="{label}"

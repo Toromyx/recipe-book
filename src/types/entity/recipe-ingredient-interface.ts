@@ -20,4 +20,5 @@ export interface RecipeIngredientUpdateInterface extends IdentifiableInterface {
   order?: number;
   quantity?: number;
   unit?: string;
+  ingredientId?: number;
 }

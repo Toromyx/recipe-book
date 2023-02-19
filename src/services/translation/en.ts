@@ -5,8 +5,10 @@ const translationStrings: TranslationStrings = {
   labels: {
     actions: {
       create: "Create",
+      edit: "Edit",
       update: "Update",
       delete: "Delete",
+      cancel: "Cancel",
     },
     entityFields: {
       ingredient: {
