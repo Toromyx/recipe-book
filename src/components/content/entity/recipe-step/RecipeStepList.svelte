@@ -63,7 +63,12 @@
       name="description"
       label="{messages.labels.entityFields.recipeStep.description.format()}"
     />
-    <SvelteInput type="file" name="image" accept="image/*" />
+    <SvelteInput
+      type="file"
+      name="image"
+      label="{messages.labels.entityFields.recipeStep.image.format()}"
+      accept="image/*"
+    />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >

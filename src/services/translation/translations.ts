@@ -23,6 +23,7 @@ type Translations<T> = {
       };
       recipeStep: {
         description: T;
+        image: T;
       };
     };
   };

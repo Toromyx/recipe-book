@@ -24,6 +24,7 @@ const translationStrings: TranslationStrings = {
       },
       recipeStep: {
         description: "Description",
+        image: "Image",
       },
     },
   },
