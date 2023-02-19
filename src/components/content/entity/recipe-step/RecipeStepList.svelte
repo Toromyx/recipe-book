@@ -48,11 +48,11 @@
     {/each}
   </ol>
   <SvelteForm
-    on:submit="{async ({ detail }) => {
-      const image = detail.image ? await getDataUrl(detail.image) : null;
+    on:submit="{async ({ detail: { values } }) => {
+      const image = values.image ? await getDataUrl(values.image) : null;
       await recipeStepRepository.create({
         order: list.length + 1,
-        description: detail.description,
+        description: values.description,
         image,
         recipeId,
       });

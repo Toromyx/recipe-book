@@ -13,15 +13,18 @@
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
   let setValue = () => {};
+  let setChanged = () => {};
 
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
+    setChanged = () => formContext.setChanged(name);
   }
 
   $: setValue(value);
 
   function onInputOrChange(event) {
     value = event.target.value;
+    setChanged();
     void tick().then(() => {
       dispatch(event.type, value);
     });

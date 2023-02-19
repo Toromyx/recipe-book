@@ -24,13 +24,18 @@
 </script>
 
 <Editable
-  on:edit="{({ detail }) => {
-    recipeIngredientRepository.update(id, () => ({
-      id,
-      unit: detail.unit,
-      quantity: detail.quantity,
-      ingredientId: detail.ingredientId[0],
-    }));
+  on:edit="{({ detail: { values, changed } }) => {
+    const update = { id };
+    if (changed.unit) {
+      update.unit = values.unit;
+    }
+    if (changed.quantity) {
+      update.quantity = values.quantity;
+    }
+    if (changed.ingredientId) {
+      update.ingredientId = values.ingredientId[0];
+    }
+    recipeIngredientRepository.update(id, () => update);
   }}"
 >
   <span slot="display"

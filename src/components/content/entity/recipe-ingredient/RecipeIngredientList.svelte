@@ -45,12 +45,12 @@
     {/each}
   </ol>
   <SvelteForm
-    on:submit="{({ detail }) => {
+    on:submit="{({ detail: { values } }) => {
       recipeIngredientRepository.create({
         order: list.length + 1,
-        quantity: detail.quantity,
-        unit: detail.unit,
-        ingredientId: detail.ingredientId[0],
+        quantity: values.quantity,
+        unit: values.unit,
+        ingredientId: values.ingredientId[0],
         recipeStepId,
       });
     }}"

@@ -24,9 +24,11 @@
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
   let setValue = () => {};
+  let setChanged = () => {};
 
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
+    setChanged = () => formContext.setChanged(name);
   }
 
   $: setValue(value);
@@ -52,6 +54,7 @@
           return eventTarget.value;
       }
     })(event.target);
+    setChanged();
     void tick().then(() => {
       dispatch(event.type, value);
     });

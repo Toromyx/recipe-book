@@ -32,11 +32,13 @@
   };
 
   let setValue = () => {};
+  let setChanged = () => {};
   /** @type {unknown[]} */
   let results = [];
 
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
+    setChanged = () => formContext.setChanged(name);
   }
 
   $: setValue(value);
@@ -50,6 +52,7 @@
 
   function select(item) {
     value = [...value, item];
+    setChanged();
     void tick().then(() => {
       dispatch("select", value);
     });
@@ -57,6 +60,7 @@
 
   function deselect(item) {
     value = value.filter((valueItem) => valueItem !== item);
+    setChanged();
     void tick().then(() => {
       dispatch("select", value);
     });

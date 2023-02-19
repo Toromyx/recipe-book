@@ -29,8 +29,8 @@
     </li>
   {/each}
   <SvelteForm
-    on:submit="{({ detail }) => {
-      recipeRepository.create({ name: detail.name });
+    on:submit="{({ detail: { values } }) => {
+      recipeRepository.create({ name: values.name });
     }}"
   >
     <SvelteInput
