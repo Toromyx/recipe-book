@@ -17,6 +17,7 @@
     "es6": true
   },
   "rules": {
+    "eqeqeq": "warn",
     "no-console": "warn",
 
     "import/order": [
