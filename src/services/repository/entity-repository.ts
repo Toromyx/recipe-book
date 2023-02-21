@@ -142,57 +142,57 @@ export class EntityRepository<
 > implements
     EntityRepositoryInterface<Entity, EntityCreate, EntityUpdate, Filter>
 {
-  protected state: {
+  state: {
     [identifier: number]: Entity;
   } = {};
 
-  protected listState: number[] = [];
+  listState: number[] = [];
 
-  protected countState = NaN;
+  countState = NaN;
 
-  protected filteredListState: {
+  filteredListState: {
     [filterKey: string]: number[];
   } = {};
 
-  protected filteredCountState: {
+  filteredCountState: {
     [filterKey: string]: number;
   } = {};
 
-  protected subscribers: {
+  subscribers: {
     [identifier: number]: Set<EntityRepositorySubscriber<Entity>>;
   } = {};
 
-  protected listSubscribers: Set<EntityRepositoryListSubscriber> = new Set();
+  listSubscribers: Set<EntityRepositoryListSubscriber> = new Set();
 
-  protected countSubscribers: Set<EntityRepositoryCountSubscriber> = new Set();
+  countSubscribers: Set<EntityRepositoryCountSubscriber> = new Set();
 
-  protected filteredListSubscribers: {
+  filteredListSubscribers: {
     [filterKey: string]: {
       filter: Filter;
       set: Set<EntityRepositoryListSubscriber>;
     };
   } = {};
 
-  protected filteredCountSubscribers: {
+  filteredCountSubscribers: {
     [filterKey: string]: {
       filter: Filter;
       set: Set<EntityRepositoryCountSubscriber>;
     };
   } = {};
 
-  protected readonly apiRead: (identifier: number) => Promise<Entity>;
+  apiRead: (identifier: number) => Promise<Entity>;
 
-  protected readonly apiCreate: (entityCreate: EntityCreate) => Promise<number>;
+  apiCreate: (entityCreate: EntityCreate) => Promise<number>;
 
-  protected readonly apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>;
+  apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>;
 
-  protected readonly apiDelete: (identifier: number) => Promise<void>;
+  apiDelete: (identifier: number) => Promise<void>;
 
-  protected readonly apiList: (filter: Filter) => Promise<number[]>;
+  apiList: (filter: Filter) => Promise<number[]>;
 
-  protected readonly apiCount: (filter: Filter) => Promise<number>;
+  apiCount: (filter: Filter) => Promise<number>;
 
-  protected readonly defaultFilter: Filter;
+  defaultFilter: Filter;
 
   /**
    * @param apiCreate - create a new entity via the API
@@ -206,7 +206,7 @@ export class EntityRepository<
    * @param registerCreate - register callbacks for reacting to entity creations
    * @param registerDelete - register callbacks for reacting to entity deletions
    */
-  public constructor(
+  constructor(
     apiCreate: (entityCreate: EntityCreate) => Promise<number>,
     apiRead: (identifier: number) => Promise<Entity>,
     apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>,
@@ -299,7 +299,7 @@ export class EntityRepository<
     });
   }
 
-  public subscribe(
+  subscribe(
     identifier: number,
     subscriber: EntityRepositorySubscriber<Entity>,
   ): EntityRepositoryUnsubscriber {
@@ -317,7 +317,7 @@ export class EntityRepository<
     };
   }
 
-  public subscribeList(
+  subscribeList(
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
     void this.list().then(() => {
@@ -330,7 +330,7 @@ export class EntityRepository<
     };
   }
 
-  public subscribeCount(
+  subscribeCount(
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
     void this.count().then(() => {
@@ -343,7 +343,7 @@ export class EntityRepository<
     };
   }
 
-  public subscribeListFiltered(
+  subscribeListFiltered(
     filter: Filter,
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
@@ -365,7 +365,7 @@ export class EntityRepository<
     };
   }
 
-  public subscribeCountFiltered(
+  subscribeCountFiltered(
     filter: Filter,
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
@@ -387,11 +387,11 @@ export class EntityRepository<
     };
   }
 
-  public async create(entityCreate: EntityCreate): Promise<number> {
+  async create(entityCreate: EntityCreate): Promise<number> {
     return this.apiCreate(entityCreate);
   }
 
-  public async update(
+  async update(
     identifier: number,
     updater: EntityRepositoryUpdater<Entity, EntityUpdate>,
   ): Promise<void> {
@@ -402,7 +402,7 @@ export class EntityRepository<
     return this.apiUpdate(updater(entity));
   }
 
-  public async delete(identifier: number): Promise<void> {
+  async delete(identifier: number): Promise<void> {
     await this.apiDelete(identifier);
   }
 
@@ -411,7 +411,7 @@ export class EntityRepository<
    *
    * this method is to be called after the state of that entity has changed
    */
-  protected run(identifier: number): void {
+  run(identifier: number): void {
     const entity = this.state[identifier];
     this.subscribers[identifier]?.forEach((subscriber) => subscriber(entity));
   }
@@ -421,7 +421,7 @@ export class EntityRepository<
    *
    * this method is to be called after change of the list state
    */
-  protected runList(): void {
+  runList(): void {
     this.listSubscribers.forEach((subscriber) => subscriber(this.listState));
   }
 
@@ -430,7 +430,7 @@ export class EntityRepository<
    *
    * this method is to be called after change of the count state
    */
-  protected runCount(): void {
+  runCount(): void {
     this.countSubscribers.forEach((subscriber) => subscriber(this.countState));
   }
 
@@ -439,7 +439,7 @@ export class EntityRepository<
    *
    * this method is to be called after change of the filtered list state
    */
-  protected runListFiltered(filterKey: string): void {
+  runListFiltered(filterKey: string): void {
     const list = this.filteredListState[filterKey];
     if (list) {
       this.filteredListSubscribers[filterKey]?.set.forEach((subscriber) =>
@@ -453,7 +453,7 @@ export class EntityRepository<
    *
    * this method is to be called after change of the filtered count state
    */
-  protected runCountFiltered(filterKey: string): void {
+  runCountFiltered(filterKey: string): void {
     const count = this.filteredCountState[filterKey];
     if (count !== undefined) {
       this.filteredCountSubscribers[filterKey]?.set.forEach((subscriber) =>
@@ -465,7 +465,7 @@ export class EntityRepository<
   /**
    * loads the entity and adds it to the state if not already present
    */
-  private async read(identifier: number): Promise<void> {
+  async read(identifier: number): Promise<void> {
     if (!this.state[identifier]) {
       this.state[identifier] = await this.apiRead(identifier);
     }
@@ -474,7 +474,7 @@ export class EntityRepository<
   /**
    * loads the entity list and sets the state if not already present
    */
-  private async list(): Promise<void> {
+  async list(): Promise<void> {
     if (!this.listState.length) {
       this.listState = await this.apiList(this.defaultFilter);
     }
@@ -483,7 +483,7 @@ export class EntityRepository<
   /**
    * loads the entity count and sets the count state
    */
-  private async count(): Promise<void> {
+  async count(): Promise<void> {
     if (Number.isNaN(this.countState)) {
       this.countState = await this.apiCount(this.defaultFilter);
     }
@@ -492,7 +492,7 @@ export class EntityRepository<
   /**
    * loads a filtered entity list and adds them to the state and filtered state if not already present
    */
-  private async listFiltered(filter: Filter): Promise<void> {
+  async listFiltered(filter: Filter): Promise<void> {
     const filterKey = stringifyFilter(filter);
     if (!this.filteredListState[filterKey]) {
       this.filteredListState[filterKey] = await this.apiList(filter);
@@ -502,7 +502,7 @@ export class EntityRepository<
   /**
    * loads a filtered entity count and sets the filtered count state if not already present
    */
-  private async countFiltered(filter: Filter): Promise<void> {
+  async countFiltered(filter: Filter): Promise<void> {
     const filterKey = stringifyFilter(filter);
     if (!this.filteredCountState[filterKey]) {
       this.filteredCountState[filterKey] = await this.apiCount(filter);
