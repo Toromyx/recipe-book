@@ -16,9 +16,9 @@ export const recipeStepRepository: EntityRepositoryInterface<
   RecipeStepUpdateInterface,
   RecipeStepFilterInterface
 > = new EntityRepository(
-  (partial) => apiClient.createRecipeStep(partial),
+  (entityCreate) => apiClient.createRecipeStep(entityCreate),
   (identifier) => apiClient.readRecipeStep(identifier),
-  (partial) => apiClient.updateRecipeStep(partial),
+  (entityUpdate) => apiClient.updateRecipeStep(entityUpdate),
   (identifier) => apiClient.deleteRecipeStep(identifier),
   (filter) => apiClient.listRecipeStep(filter),
   (filter) => apiClient.countRecipeStep(filter),
