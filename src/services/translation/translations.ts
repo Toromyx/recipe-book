@@ -27,6 +27,12 @@ type Translations<T> = {
       };
     };
   };
+  validity: {
+    autocomplete: {
+      max: T;
+      min: T;
+    };
+  };
   imperatives: {
     selectPlaceholder: T;
   };

@@ -34,6 +34,7 @@
 <textarea
   on:input="{onInputOrChange}"
   on:change="{onInputOrChange}"
+  on:paste
   name="{fullName}"
   placeholder="{placeholder}"
   required="{required}"

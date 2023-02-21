@@ -71,6 +71,7 @@
 <input
   on:input="{onInputOrChange}"
   on:change="{onInputOrChange}"
+  on:paste
   name="{fullName}"
   type="{type}"
   value="{getValueForHtmlElement(value)}"

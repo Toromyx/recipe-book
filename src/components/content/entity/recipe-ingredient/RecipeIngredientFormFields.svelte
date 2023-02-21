@@ -8,9 +8,11 @@
   export let quantity = undefined;
   export let unit = undefined;
   export let ingredientId = undefined;
+  export let ingredientName = "";
 </script>
 
 <SvelteInput
+  on:paste
   name="quantity"
   type="number"
   value="{quantity}"
@@ -19,16 +21,19 @@
   min="0"
 />
 <SvelteInput
+  on:paste
   name="unit"
   value="{unit}"
   label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
   required="{true}"
 />
 <Autocomplete
+  on:paste
   name="ingredientId"
   min="{1}"
   max="{1}"
   value="{ingredientId ? [ingredientId] : []}"
+  initialInput="{ingredientName}"
   label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
   callback="{(userInput) =>
     apiClient.listIngredient({

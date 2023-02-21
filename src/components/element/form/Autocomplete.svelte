@@ -12,22 +12,29 @@
   /** @type {(string) => Promise<void>} */
   export let createCallback = undefined;
   export let value = [];
+  export let initialInput = "";
   export let placeholder = label;
   export let min = 0;
   export let max = 1;
   export let maxResults = 10;
   export let debounceWait = 200;
 
-  let userInput = "";
+  let userInput = initialInput;
 
   const formContext = getContext(FORM);
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
   const getResults = debounce(async () => {
+    if (!userInput) {
+      return;
+    }
     results = await callback(userInput);
   }, debounceWait);
-  const getCreateResults = async () => {
-    await createCallback(userInput);
+  const createAndSelect = async () => {
+    const createValue = await createCallback(userInput);
+    if (createValue) {
+      select(createValue);
+    }
     results = await callback(userInput);
   };
 
@@ -35,15 +42,33 @@
   let setChanged = () => {};
   /** @type {unknown[]} */
   let results = [];
+  let input;
 
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
   }
+  getResults();
 
   $: setValue(value);
   $: filteredResults = results.filter((result) => !value.includes(result));
   $: truncatedResults = filteredResults.slice(0, maxResults);
+  $: {
+    if (input) {
+      const validityMessages = [];
+      if (value.length < min) {
+        validityMessages.push(
+          messages.validity.autocomplete.min.format({ min }),
+        );
+      }
+      if (value.length > max) {
+        validityMessages.push(
+          messages.validity.autocomplete.max.format({ max }),
+        );
+      }
+      input.setCustomValidity(validityMessages.join(" "));
+    }
+  }
 
   function onInputOrChange(event) {
     userInput = event.target.value;
@@ -76,9 +101,12 @@
       >{/each}</span
   >
   <input
+    bind:this="{input}"
     on:input="{onInputOrChange}"
     on:change="{onInputOrChange}"
+    on:paste
     name="{fullName}"
+    value="{userInput}"
     type="text"
     placeholder="{placeholder}"
     aria-label="{label}"
@@ -97,7 +125,7 @@
     {#if !results.length && createCallback && userInput}
       <li>
         <SvelteButton
-          on:click="{() => getCreateResults()}"
+          on:click="{() => createAndSelect()}"
           disabled="{value.length >= max}"
           >{messages.labels.actions.create.format()}</SvelteButton
         >

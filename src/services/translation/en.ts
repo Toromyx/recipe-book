@@ -28,6 +28,12 @@ const translationStrings: TranslationStrings = {
       },
     },
   },
+  validity: {
+    autocomplete: {
+      max: "At most {max} {max,plural,one{element needs}other{elements need}} to be selected.",
+      min: "At least {min} {min,plural,one{element needs}other{elements need}} to be selected.",
+    },
+  },
   imperatives: {
     selectPlaceholder: "Select {label}",
   },

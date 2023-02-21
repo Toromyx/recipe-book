@@ -2,23 +2,21 @@
   import { getContext, setContext } from "svelte";
   import { FORM } from "./SvelteForm.svelte";
 
-  export let name;
-  export let label = undefined;
-  export let isList = false;
+  export let id;
 
-  /** @type {{[name: string]: any}|any[]} */
-  const values = isList ? [] : {};
-  /** @type {{[name: string]: boolean}} */
+  /** @type {{[id: number]: any}} */
+  const values = {};
+  /** @type {{[id: number]: boolean}} */
   const changed = {};
   const formContext = getContext(FORM);
 
   let setFormValue = () => {};
   let setFormChanged = () => {};
-  const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
+  const fullName = formContext?.name ? `${formContext.name}_${id}` : `${id}`;
 
   if (formContext) {
-    setFormValue = (value) => formContext.setValue(name, value);
-    setFormChanged = () => formContext.setChanged(name);
+    setFormValue = (value) => formContext.setValue(id, value);
+    setFormChanged = () => formContext.setChanged(id);
   }
 
   setContext(FORM, {
@@ -34,9 +32,4 @@
   });
 </script>
 
-<fieldset>
-  {#if label}
-    <legend>{label}</legend>
-  {/if}
-  <slot />
-</fieldset>
+<slot />
