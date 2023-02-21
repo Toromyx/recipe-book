@@ -60,8 +60,8 @@
           const ingredient = values.ingredients[i];
           recipeIngredientRepository.create({
             order: list.length + 1 + i,
-            quantity: ingredient.quantity,
-            unit: ingredient.unit,
+            quantity: ingredient.quantity || null,
+            unit: ingredient.unit || null,
             ingredientId: ingredient.ingredientId[0],
             recipeStepId,
           });
@@ -96,8 +96,8 @@
     on:submit="{({ detail: { values } }) => {
       recipeIngredientRepository.create({
         order: list.length + 1,
-        quantity: values.quantity,
-        unit: values.unit,
+        quantity: values.quantity || null,
+        unit: values.unit || null,
         ingredientId: values.ingredientId[0],
         recipeStepId,
       });

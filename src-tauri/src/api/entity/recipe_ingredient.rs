@@ -21,8 +21,8 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 pub struct RecipeIngredientCreate {
     pub order: i64,
-    pub quantity: f64,
-    pub unit: String,
+    pub quantity: Option<f64>,
+    pub unit: Option<String>,
     pub recipe_step_id: i64,
     pub ingredient_id: i64,
 }
@@ -44,8 +44,10 @@ pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
 pub struct RecipeIngredientUpdate {
     pub id: i64,
     pub order: Option<i64>,
-    pub quantity: Option<f64>,
-    pub unit: Option<String>,
+    #[serde(default, with = "::serde_with::rust::double_option")]
+    pub quantity: Option<Option<f64>>,
+    #[serde(default, with = "::serde_with::rust::double_option")]
+    pub unit: Option<Option<String>>,
     pub ingredient_id: Option<i64>,
 }
 

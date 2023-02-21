@@ -20,8 +20,8 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
     pub order: i64,
-    pub quantity: f64,
-    pub unit: String,
+    pub quantity: Option<f64>,
+    pub unit: Option<String>,
     pub recipe_step_id: i64,
     pub ingredient_id: i64,
 }

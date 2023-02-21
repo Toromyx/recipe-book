@@ -3,6 +3,7 @@ use sea_orm_migration::prelude::*;
 mod m20230113_000001_init;
 mod m20230218_135537_index;
 mod m20230218_161605_image_type;
+mod m20230221_221123_recipe_ingredient_optionals;
 
 pub struct Migrator;
 
@@ -13,6 +14,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230113_000001_init::Migration),
             Box::new(m20230218_135537_index::Migration),
             Box::new(m20230218_161605_image_type::Migration),
+            Box::new(m20230221_221123_recipe_ingredient_optionals::Migration),
         ]
     }
 }

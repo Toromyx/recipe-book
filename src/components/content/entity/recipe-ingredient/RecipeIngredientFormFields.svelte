@@ -17,7 +17,6 @@
   type="number"
   value="{quantity}"
   label="{messages.labels.entityFields.recipeIngredient.quantity.format()}"
-  required="{true}"
   min="0"
 />
 <SvelteInput
@@ -25,7 +24,6 @@
   name="unit"
   value="{unit}"
   label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
-  required="{true}"
 />
 <Autocomplete
   on:paste

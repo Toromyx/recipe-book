@@ -10,6 +10,7 @@
   /** @type {RecipeIngredientInterface | undefined} */
   let recipeIngredient;
   let unsubscribe = () => {};
+  let qualifiers;
 
   $: {
     unsubscribe();
@@ -17,6 +18,9 @@
       recipeIngredient = entity;
     });
   }
+  $: qualifiers = [recipeIngredient?.quantity, recipeIngredient?.unit].filter(
+    Boolean,
+  );
 
   onDestroy(() => {
     unsubscribe();
@@ -27,10 +31,10 @@
   on:edit="{({ detail: { values, changed } }) => {
     const update = { id };
     if (changed.unit) {
-      update.unit = values.unit;
+      update.unit = values.unit || null;
     }
     if (changed.quantity) {
-      update.quantity = values.quantity;
+      update.quantity = values.quantity || null;
     }
     if (changed.ingredientId) {
       update.ingredientId = values.ingredientId[0];
@@ -39,7 +43,7 @@
   }}"
 >
   <span slot="display"
-    >{recipeIngredient?.quantity}&nbsp;{recipeIngredient?.unit}&nbsp;<IngredientName
+    >{#each qualifiers as qualifier}{qualifier}&nbsp;{/each}<IngredientName
       id="{recipeIngredient?.ingredientId}"
     /></span
   >
