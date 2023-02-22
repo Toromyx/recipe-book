@@ -5,9 +5,8 @@
   import { getDataUrl } from "../../../../services/util/file.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
-  import SvelteInput from "../../../element/form/SvelteInput.svelte";
-  import SvelteTextarea from "../../../element/form/SvelteTextarea.svelte";
   import RecipeStep from "./RecipeStep.svelte";
+  import RecipeStepFormFields from "./RecipeStepFormFields.svelte";
 
   export let recipeId;
 
@@ -59,17 +58,7 @@
     }}"
   >
     <h3>{messages.headings.recipeStep.format({ number: list.length + 1 })}</h3>
-    <SvelteTextarea
-      name="description"
-      label="{messages.labels.entityFields.recipeStep.description.format()}"
-      required="{true}"
-    />
-    <SvelteInput
-      type="file"
-      name="image"
-      label="{messages.labels.entityFields.recipeStep.image.format()}"
-      accept="image/*"
-    />
+    <RecipeStepFormFields />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >
