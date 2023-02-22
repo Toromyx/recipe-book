@@ -62,6 +62,7 @@
     <SvelteTextarea
       name="description"
       label="{messages.labels.entityFields.recipeStep.description.format()}"
+      required="{true}"
     />
     <SvelteInput
       type="file"
