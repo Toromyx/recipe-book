@@ -18,12 +18,6 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
         .await
 }
 
-pub async fn down(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
-    manager
-        .drop_table(Table::drop().table(Ingredient::Table).to_owned())
-        .await
-}
-
 #[derive(Iden)]
 pub enum Ingredient {
     Table,

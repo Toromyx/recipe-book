@@ -75,81 +75,6 @@ impl MigrationTrait for Migration {
             .await?;
         Ok(())
     }
-
-    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(RecipeIngredient::Table)
-                    .rename_column(RecipeIngredient::Quantity, RecipeIngredient::QuantityNew)
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(RecipeIngredient::Table)
-                    .add_column(
-                        ColumnDef::new(RecipeIngredient::Quantity)
-                            .double()
-                            .not_null(),
-                    )
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .exec_stmt(
-                UpdateStatement::new()
-                    .table(RecipeIngredient::Table)
-                    .value(
-                        RecipeIngredient::Quantity,
-                        Expr::col(RecipeIngredient::QuantityNew),
-                    )
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(RecipeIngredient::Table)
-                    .drop_column(RecipeIngredient::QuantityNew)
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(RecipeIngredient::Table)
-                    .rename_column(RecipeIngredient::Unit, RecipeIngredient::UnitNew)
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(RecipeIngredient::Table)
-                    .add_column(ColumnDef::new(RecipeIngredient::Unit).string().not_null())
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .exec_stmt(
-                UpdateStatement::new()
-                    .table(RecipeIngredient::Table)
-                    .value(RecipeIngredient::Unit, Expr::col(RecipeIngredient::UnitNew))
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .alter_table(
-                Table::alter()
-                    .table(RecipeIngredient::Table)
-                    .drop_column(RecipeIngredient::UnitNew)
-                    .to_owned(),
-            )
-            .await?;
-        Ok(())
-    }
 }
 
 #[derive(Iden)]
@@ -157,8 +82,6 @@ pub enum RecipeIngredient {
     Table,
     Quantity,
     QuantityOld,
-    QuantityNew,
     Unit,
     UnitOld,
-    UnitNew,
 }

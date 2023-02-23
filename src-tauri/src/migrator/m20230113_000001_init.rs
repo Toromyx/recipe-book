@@ -22,12 +22,4 @@ impl MigrationTrait for Migration {
         recipe_ingredient::up(manager).await?;
         Ok(())
     }
-
-    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        recipe_ingredient::down(manager).await?;
-        recipe_step::down(manager).await?;
-        recipe::down(manager).await?;
-        ingredient::down(manager).await?;
-        Ok(())
-    }
 }
