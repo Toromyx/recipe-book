@@ -1,4 +1,4 @@
-export enum Command {
+export const enum Command {
   ENTITY_CREATE_INGREDIENT = "entity_create_ingredient",
   ENTITY_READ_INGREDIENT = "entity_read_ingredient",
   ENTITY_UPDATE_INGREDIENT = "entity_update_ingredient",
