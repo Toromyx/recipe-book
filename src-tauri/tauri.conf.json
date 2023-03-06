@@ -11,7 +11,14 @@
     "version": "../package.json"
   },
   "tauri": {
-    "allowlist": {},
+    "allowlist": {
+      "dialog": {
+        "open": true
+      },
+      "protocol": {
+        "all": true
+      }
+    },
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
@@ -46,7 +53,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self' recipe-file: https://recipe-file.localhost"
     },
     "updater": {
       "active": false

@@ -9,6 +9,9 @@ const translationStrings: TranslationStrings = {
       update: "Update",
       delete: "Delete",
       cancel: "Cancel",
+      file: {
+        open: "Open",
+      },
     },
     entityFields: {
       ingredient: {
@@ -17,6 +20,10 @@ const translationStrings: TranslationStrings = {
       recipe: {
         name: "Recipe Name",
       },
+      recipeFile: {
+        name: "Name",
+        path: "File",
+      },
       recipeIngredient: {
         quantity: "Quantity",
         unit: "Unit",
@@ -24,7 +31,6 @@ const translationStrings: TranslationStrings = {
       },
       recipeStep: {
         description: "Description",
-        image: "Image",
       },
     },
   },

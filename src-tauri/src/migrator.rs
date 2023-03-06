@@ -4,6 +4,7 @@ mod m20230113_000001_init;
 mod m20230218_135537_index;
 mod m20230218_161605_image_type;
 mod m20230221_221123_recipe_ingredient_optionals;
+mod m20230223_192245_recipe_file;
 
 pub struct Migrator;
 
@@ -15,6 +16,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230218_135537_index::Migration),
             Box::new(m20230218_161605_image_type::Migration),
             Box::new(m20230221_221123_recipe_ingredient_optionals::Migration),
+            Box::new(m20230223_192245_recipe_file::Migration),
         ]
     }
 }

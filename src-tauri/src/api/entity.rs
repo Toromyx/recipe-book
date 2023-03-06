@@ -1,8 +1,10 @@
 use sea_orm::{sea_query, FromQueryResult};
 use serde::Deserialize;
 
+pub mod error;
 pub mod ingredient;
 pub mod recipe;
+pub mod recipe_file;
 pub mod recipe_ingredient;
 pub mod recipe_step;
 

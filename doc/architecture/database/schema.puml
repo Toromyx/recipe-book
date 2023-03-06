@@ -27,4 +27,13 @@ entity "Ingredient" as ingredient {
 }
 ingredient "ingredient" ||--o{ recipe_ingredient
 
+entity "Recipe File" as recipe_file {
+  --
+  name
+  order
+  mime
+  uri
+}
+recipe_file }o--|| "step" recipe_step
+
 @enduml

@@ -8,6 +8,9 @@ type Translations<T> = {
       update: T;
       delete: T;
       cancel: T;
+      file: {
+        open: T;
+      };
     };
     entityFields: {
       ingredient: {
@@ -16,6 +19,10 @@ type Translations<T> = {
       recipe: {
         name: T;
       };
+      recipeFile: {
+        name: T;
+        path: T;
+      };
       recipeIngredient: {
         quantity: T;
         unit: T;
@@ -23,7 +30,6 @@ type Translations<T> = {
       };
       recipeStep: {
         description: T;
-        image: T;
       };
     };
   };

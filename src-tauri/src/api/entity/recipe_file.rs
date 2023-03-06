@@ -1,3 +1,4 @@
+use mime_guess::mime;
 use sea_orm::{
     sea_query::IntoCondition,
     ActiveModelTrait,
@@ -8,30 +9,43 @@ use sea_orm::{
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{get_order_by, Filter, IdColumn},
+    api::entity::{error::EntityApiError, get_order_by, Filter, IdColumn},
     database,
-    entity::recipe_step::{
+    entity::recipe_file::{
         ActiveModel, Column,
-        Column::{Id, Order, RecipeId},
+        Column::{Id, Order, RecipeStepId},
         Entity, Model,
     },
+    recipe_file_storage,
 };
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeStepCreate {
+pub struct RecipeFileCreate {
+    pub name: String,
     pub order: i64,
-    pub description: String,
-    pub recipe_id: i64,
+    pub path: String,
+    pub recipe_step_id: i64,
 }
 
-pub async fn create(create: RecipeStepCreate) -> Result<i64, DbErr> {
+pub async fn create(create: RecipeFileCreate) -> Result<i64, EntityApiError> {
     let db = database::connect().await;
-    let model = create.into_active_model().insert(db).await?;
+    let mime = mime_guess::from_path(&create.path)
+        .first_or(mime::APPLICATION_OCTET_STREAM)
+        .to_string();
+    let mut active_model = create.into_active_model();
+    active_model.mime = Set(mime);
+    let model = active_model.insert(db).await?;
+    recipe_file_storage::create(&model).await?;
+    let path_segments = recipe_file_storage::path_segments(&model).await?;
+    let path = path_segments.join("/");
+    let mut active_model = model.into_active_model();
+    active_model.path = Set(path);
+    let model = active_model.update(db).await?;
     Ok(model.id)
 }
 
-pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
+pub async fn read(id: i64) -> Result<Option<Model>, EntityApiError> {
     let db = database::connect().await;
     let model = Entity::find_by_id(id).one(db).await?;
     Ok(model)
@@ -39,36 +53,38 @@ pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeStepUpdate {
+pub struct RecipeFileUpdate {
     pub id: i64,
+    pub name: Option<String>,
     pub order: Option<i64>,
-    pub description: Option<String>,
 }
 
-impl IntoActiveModel<ActiveModel> for RecipeStepUpdate {
+impl IntoActiveModel<ActiveModel> for RecipeFileUpdate {
     fn into_active_model(self) -> ActiveModel {
         ActiveModel {
             id: Unchanged(self.id),
+            name: match self.name {
+                Some(name) => Set(name),
+                _ => NotSet,
+            },
             order: match self.order {
                 Some(order) => Set(order),
                 _ => NotSet,
             },
-            description: match self.description {
-                Some(description) => Set(description),
-                _ => NotSet,
-            },
-            recipe_id: NotSet,
+            mime: NotSet,
+            path: NotSet,
+            recipe_step_id: NotSet,
         }
     }
 }
 
-pub async fn update(update: RecipeStepUpdate) -> Result<Model, DbErr> {
+pub async fn update(update: RecipeFileUpdate) -> Result<Model, EntityApiError> {
     let db = database::connect().await;
     let model = update.into_active_model().update(db).await?;
     Ok(model)
 }
 
-pub async fn delete(id: i64) -> Result<(), DbErr> {
+pub async fn delete(id: i64) -> Result<(), EntityApiError> {
     let db = database::connect().await;
     let model_option = Entity::find_by_id(id).one(db).await?;
     let Some(model) = model_option else {
@@ -78,48 +94,51 @@ pub async fn delete(id: i64) -> Result<(), DbErr> {
     Ok(())
 }
 
-pub type RecipeStepFilter = Filter<RecipeStepCondition, RecipeStepOrderBy>;
+pub type RecipeFileFilter = Filter<RecipeFileCondition, RecipeFileOrderBy>;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeStepCondition {
-    pub recipe_id: Option<i64>,
+pub struct RecipeFileCondition {
+    pub recipe_step_id: Option<i64>,
 }
 
-impl IntoCondition for RecipeStepCondition {
+impl IntoCondition for RecipeFileCondition {
     fn into_condition(self) -> Condition {
-        Condition::all().add_option(self.recipe_id.map(|recipe_id| RecipeId.eq(recipe_id)))
+        Condition::all().add_option(
+            self.recipe_step_id
+                .map(|recipe_step_id| RecipeStepId.eq(recipe_step_id)),
+        )
     }
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum RecipeStepOrderBy {
+pub enum RecipeFileOrderBy {
     Order,
 }
 
-impl From<RecipeStepOrderBy> for Column {
-    fn from(value: RecipeStepOrderBy) -> Self {
+impl From<RecipeFileOrderBy> for Column {
+    fn from(value: RecipeFileOrderBy) -> Self {
         match value {
-            RecipeStepOrderBy::Order => Order,
+            RecipeFileOrderBy::Order => Order,
         }
     }
 }
 
-pub async fn list(filter: RecipeStepFilter) -> Result<Vec<i64>, DbErr> {
+pub async fn list(filter: RecipeFileFilter) -> Result<Vec<i64>, DbErr> {
     let db = database::connect().await;
     let mut select = Entity::find().select_only().column(Id);
     if let Some(condition) = filter.condition {
         select = select.filter(condition);
     }
-    for order_by_item in get_order_by::<RecipeStepOrderBy, Column>(filter.order_by) {
+    for order_by_item in get_order_by::<RecipeFileOrderBy, Column>(filter.order_by) {
         select = select.order_by(order_by_item.0, order_by_item.1);
     }
     let models = select.into_model::<IdColumn>().all(db).await?;
     Ok(models.iter().map(|id_column| id_column.id).collect())
 }
 
-pub async fn count(filter: RecipeStepFilter) -> Result<i64, DbErr> {
+pub async fn count(filter: RecipeFileFilter) -> Result<i64, DbErr> {
     let db = database::connect().await;
     let mut select = Entity::find().select_only().column_as(Id.count(), "id");
     if let Some(condition) = filter.condition {

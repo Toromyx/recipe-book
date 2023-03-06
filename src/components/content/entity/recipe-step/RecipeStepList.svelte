@@ -1,7 +1,6 @@
 <script>
   import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
   import { messages } from "../../../../services/translation/en.ts";
-  import { getDataUrl } from "../../../../services/util/file.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
   import RecipeStep from "./RecipeStep.svelte";
@@ -35,11 +34,9 @@
   </ol>
   <SvelteForm
     on:submit="{async ({ detail: { values } }) => {
-      const image = values.image ? await getDataUrl(values.image) : null;
       await recipeStepRepository.create({
         order: $list.length + 1,
         description: values.description,
-        image,
         recipeId,
       });
     }}"

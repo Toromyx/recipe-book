@@ -4,6 +4,11 @@ import type {
   IngredientUpdateInterface,
 } from "../../types/entity/ingredient-interface.ts";
 import type {
+  RecipeFileCreateInterface,
+  RecipeFileInterface,
+  RecipeFileUpdateInterface,
+} from "../../types/entity/recipe-file-interface.ts";
+import type {
   RecipeIngredientCreateInterface,
   RecipeIngredientInterface,
   RecipeIngredientUpdateInterface,
@@ -19,6 +24,7 @@ import type {
   RecipeStepUpdateInterface,
 } from "../../types/entity/recipe-step-interface.ts";
 import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
+import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-filter-interface.ts";
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
@@ -29,6 +35,7 @@ import { Command } from "./command.ts";
 type CommandEntityRead =
   | Command.ENTITY_READ_INGREDIENT
   | Command.ENTITY_READ_RECIPE
+  | Command.ENTITY_READ_RECIPE_FILE
   | Command.ENTITY_READ_RECIPE_INGREDIENT
   | Command.ENTITY_READ_RECIPE_STEP;
 
@@ -44,6 +51,7 @@ const entityReadPromiseCollector: {
 } = {
   [Command.ENTITY_READ_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE]: {},
+  [Command.ENTITY_READ_RECIPE_FILE]: {},
   [Command.ENTITY_READ_RECIPE_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE_STEP]: {},
 };
@@ -102,6 +110,25 @@ export const apiClient = {
   },
   countRecipe(filter: RecipeFilterInterface): Promise<number> {
     return client.invoke(Command.ENTITY_COUNT_RECIPE, { filter });
+  },
+
+  createRecipeFile(create: RecipeFileCreateInterface): Promise<number> {
+    return client.invoke(Command.ENTITY_CREATE_RECIPE_FILE, { create });
+  },
+  readRecipeFile(id: number): Promise<RecipeFileInterface> {
+    return readCollected(Command.ENTITY_READ_RECIPE_FILE, id);
+  },
+  updateRecipeFile(update: RecipeFileUpdateInterface): Promise<void> {
+    return client.invoke(Command.ENTITY_UPDATE_RECIPE_FILE, { update });
+  },
+  deleteRecipeFile(id: number): Promise<void> {
+    return client.invoke(Command.ENTITY_DELETE_RECIPE_FILE, { id });
+  },
+  listRecipeFile(filter: RecipeFileFilterInterface): Promise<number[]> {
+    return client.invoke(Command.ENTITY_LIST_RECIPE_FILE, { filter });
+  },
+  countRecipeFile(filter: RecipeFileFilterInterface): Promise<number> {
+    return client.invoke(Command.ENTITY_COUNT_RECIPE_FILE, { filter });
   },
 
   createRecipeIngredient(

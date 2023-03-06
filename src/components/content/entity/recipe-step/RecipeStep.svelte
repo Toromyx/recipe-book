@@ -1,8 +1,8 @@
 <script>
   import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
   import { messages } from "../../../../services/translation/en.ts";
-  import { getDataUrl } from "../../../../services/util/file.ts";
   import Editable from "../../../layout/Editable.svelte";
+  import RecipeFileList from "../recipe-file/list/RecipeFileList.svelte";
   import RecipeIngredientList from "../recipe-ingredient/RecipeIngredientList.svelte";
   import RecipeStepFormFields from "./RecipeStepFormFields.svelte";
 
@@ -24,17 +24,12 @@
     if (changed.description) {
       update.description = values.description;
     }
-    if (changed.image) {
-      update.image = values.image ? await getDataUrl(values.image) : null;
-    }
     await recipeStepRepository.update(id, () => update);
   }}"
 >
   <svelte:fragment slot="display">
     <p>{$recipeStep?.description}</p>
-    {#if $recipeStep?.image}
-      <img src="{$recipeStep.image}" alt="" />
-    {/if}
   </svelte:fragment>
   <RecipeStepFormFields slot="edit" description="{$recipeStep?.description}" />
 </Editable>
+<RecipeFileList recipeStepId="{id}" />

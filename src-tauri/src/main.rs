@@ -14,6 +14,10 @@ use crate::command::entity::{
         entity_count_recipe, entity_create_recipe, entity_delete_recipe, entity_list_recipe,
         entity_read_recipe, entity_update_recipe,
     },
+    recipe_file::{
+        entity_count_recipe_file, entity_create_recipe_file, entity_delete_recipe_file,
+        entity_list_recipe_file, entity_read_recipe_file, entity_update_recipe_file,
+    },
     recipe_ingredient::{
         entity_count_recipe_ingredient, entity_create_recipe_ingredient,
         entity_delete_recipe_ingredient, entity_list_recipe_ingredient,
@@ -34,6 +38,8 @@ mod fs;
 mod log;
 mod migrator;
 mod path;
+mod protocol;
+mod recipe_file_storage;
 mod window;
 
 static mut APP_HANDLE: Option<AppHandle> = None;
@@ -55,6 +61,10 @@ async fn main() {
             log::init();
             Ok(())
         })
+        .register_uri_scheme_protocol(protocol::recipe_file::URI_SCHEME, |app_handle, request| {
+            let response = protocol::recipe_file::protocol(app_handle, request)?;
+            Ok(response)
+        })
         .invoke_handler(tauri::generate_handler![
             entity_create_ingredient,
             entity_read_ingredient,
@@ -68,6 +78,12 @@ async fn main() {
             entity_delete_recipe,
             entity_list_recipe,
             entity_count_recipe,
+            entity_create_recipe_file,
+            entity_read_recipe_file,
+            entity_update_recipe_file,
+            entity_delete_recipe_file,
+            entity_list_recipe_file,
+            entity_count_recipe_file,
             entity_create_recipe_ingredient,
             entity_read_recipe_ingredient,
             entity_update_recipe_ingredient,

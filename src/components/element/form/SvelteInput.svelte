@@ -6,6 +6,9 @@
   export let label;
   export let name;
   export let value = undefined;
+  /**
+   * @type {'text'|'number'|'range'|'date'|'time'|'datetime-local'}
+   */
   export let type = "text";
   export let placeholder = label;
   export let required = false;
@@ -32,6 +35,7 @@
   }
 
   $: setValue(value);
+  $: htmlValue = value || "";
 
   function onInputOrChange(event) {
     value = ((eventTarget) => {
@@ -45,11 +49,6 @@
           return Temporal.PlainTime.from(eventTarget.value);
         case "datetime-local":
           return Temporal.PlainDateTime.from(eventTarget.value);
-        case "file":
-          if (multiple) {
-            return [...eventTarget.files];
-          }
-          return eventTarget.files.item(0) || undefined;
         default:
           return eventTarget.value;
       }
@@ -59,13 +58,6 @@
       dispatch(event.type, value);
     });
   }
-
-  function getValueForHtmlElement(value) {
-    if (!value || type === "file") {
-      return "";
-    }
-    return value;
-  }
 </script>
 
 <input
@@ -74,7 +66,7 @@
   on:paste
   name="{fullName}"
   type="{type}"
-  value="{getValueForHtmlElement(value)}"
+  value="{htmlValue}"
   placeholder="{placeholder}"
   required="{required}"
   aria-label="{label}"
