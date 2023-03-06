@@ -14,7 +14,7 @@ pub async fn connect() -> &'static DatabaseConnection {
 
 async fn get_path() -> String {
     let database_path_buf = app_data_dir().join("database.db");
-    if let Err(err) = touch(&database_path_buf) {
+    if let Err(err) = touch(&database_path_buf).await {
         log::error!("Could not touch {database_path_buf:?}: {err}");
     }
     match database_path_buf.into_os_string().into_string() {
