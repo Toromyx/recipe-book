@@ -1,6 +1,9 @@
 use sea_orm_migration::prelude::*;
 
-use crate::migrator::m20230113_000001_init::{ingredient::Ingredient, recipe_step::RecipeStep};
+use crate::migrator::{
+    index_name,
+    m20230306_214922_1_0_0::{ingredient::Ingredient, recipe_step::RecipeStep},
+};
 
 pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
@@ -15,12 +18,8 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                         .primary_key(),
                 )
                 .col(ColumnDef::new(RecipeIngredient::Order).integer().not_null())
-                .col(
-                    ColumnDef::new(RecipeIngredient::Quantity)
-                        .double()
-                        .not_null(),
-                )
-                .col(ColumnDef::new(RecipeIngredient::Unit).string().not_null())
+                .col(ColumnDef::new(RecipeIngredient::Quantity).double().null())
+                .col(ColumnDef::new(RecipeIngredient::Unit).string().null())
                 .col(
                     ColumnDef::new(RecipeIngredient::RecipeStepId)
                         .integer()
@@ -51,7 +50,44 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                 )
                 .to_owned(),
         )
-        .await
+        .await?;
+    manager
+        .create_index(
+            Index::create()
+                .name(&index_name(
+                    &RecipeIngredient::Table,
+                    &RecipeIngredient::Order,
+                ))
+                .table(RecipeIngredient::Table)
+                .col(RecipeIngredient::Order)
+                .to_owned(),
+        )
+        .await?;
+    manager
+        .create_index(
+            Index::create()
+                .name(&index_name(
+                    &RecipeIngredient::Table,
+                    &RecipeIngredient::RecipeStepId,
+                ))
+                .table(RecipeIngredient::Table)
+                .col(RecipeIngredient::RecipeStepId)
+                .to_owned(),
+        )
+        .await?;
+    manager
+        .create_index(
+            Index::create()
+                .name(&index_name(
+                    &RecipeIngredient::Table,
+                    &RecipeIngredient::IngredientId,
+                ))
+                .table(RecipeIngredient::Table)
+                .col(RecipeIngredient::IngredientId)
+                .to_owned(),
+        )
+        .await?;
+    Ok(())
 }
 
 #[derive(Iden)]

@@ -1,5 +1,7 @@
 use sea_orm_migration::prelude::*;
 
+use crate::migrator::index_name;
+
 pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
         .create_table(
@@ -15,7 +17,17 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                 .col(ColumnDef::new(Ingredient::Name).string().not_null())
                 .to_owned(),
         )
-        .await
+        .await?;
+    manager
+        .create_index(
+            Index::create()
+                .name(&index_name(&Ingredient::Table, &Ingredient::Name))
+                .table(Ingredient::Table)
+                .col(Ingredient::Name)
+                .to_owned(),
+        )
+        .await?;
+    Ok(())
 }
 
 #[derive(Iden)]

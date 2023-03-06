@@ -1,6 +1,6 @@
 use sea_orm_migration::prelude::*;
 
-use crate::migrator::m20230113_000001_init::recipe::Recipe;
+use crate::migrator::{index_name, m20230306_214922_1_0_0::recipe::Recipe};
 
 pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
@@ -36,7 +36,26 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                 )
                 .to_owned(),
         )
-        .await
+        .await?;
+    manager
+        .create_index(
+            Index::create()
+                .name(&index_name(&RecipeStep::Table, &RecipeStep::Order))
+                .table(RecipeStep::Table)
+                .col(RecipeStep::Order)
+                .to_owned(),
+        )
+        .await?;
+    manager
+        .create_index(
+            Index::create()
+                .name(&index_name(&RecipeStep::Table, &RecipeStep::RecipeId))
+                .table(RecipeStep::Table)
+                .col(RecipeStep::RecipeId)
+                .to_owned(),
+        )
+        .await?;
+    Ok(())
 }
 
 #[derive(Iden)]
