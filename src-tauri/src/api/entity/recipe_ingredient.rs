@@ -2,7 +2,7 @@ use sea_orm::{
     sea_query::IntoCondition,
     ActiveModelTrait,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DbErr, DeriveIntoActiveModel, EntityTrait, IntoActiveModel,
+    ColumnTrait, Condition, DbErr, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, ModelTrait,
     QueryFilter, QueryOrder, QuerySelect,
 };
 use serde::Deserialize;
@@ -82,24 +82,13 @@ pub async fn update(update: RecipeIngredientUpdate) -> Result<Model, DbErr> {
     Ok(model)
 }
 
-impl IntoActiveModel<ActiveModel> for i64 {
-    fn into_active_model(self) -> ActiveModel {
-        ActiveModel {
-            id: Unchanged(self),
-            order: NotSet,
-            quantity: NotSet,
-            unit: NotSet,
-            recipe_step_id: NotSet,
-            ingredient_id: NotSet,
-        }
-    }
-}
-
 pub async fn delete(id: i64) -> Result<(), DbErr> {
     let db = database::connect().await;
-    <i64 as IntoActiveModel<ActiveModel>>::into_active_model(id)
-        .delete(db)
-        .await?;
+    let model_option = Entity::find_by_id(id).one(db).await?;
+    let Some(model) = model_option else {
+        return Ok(());
+    };
+    model.delete(db).await?;
     Ok(())
 }
 
