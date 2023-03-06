@@ -330,9 +330,9 @@ export class EntityRepository<
 
   createStore(identifier: number): Readable<Entity | undefined> {
     return {
-      subscribe: (run) =>
+      subscribe: (subscriber) =>
         this.subscribe(identifier, (entity) => {
-          run(entity);
+          subscriber(entity);
         }),
     };
   }
