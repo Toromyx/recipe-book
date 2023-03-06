@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from "svelte";
   import { recipeRepository } from "../../../../services/repository/recipe-repository.ts";
   import { recipeRoute } from "../../../../services/router.ts";
   import { messages } from "../../../../services/translation/en.ts";
@@ -8,19 +7,14 @@
   import SvelteInput from "../../../element/form/SvelteInput.svelte";
   import RecipeName from "./RecipeName.svelte";
 
-  let list = [];
+  /** @type {Readable<number[]>} */
+  let list;
 
-  let unsubscribe = recipeRepository.subscribeList((l) => {
-    list = l;
-  });
-
-  onDestroy(() => {
-    unsubscribe();
-  });
+  $: list = recipeRepository.createListStore();
 </script>
 
 <ol>
-  {#each list as id}
+  {#each $list as id}
     <li>
       <a href="#{recipeRoute(id)}"><RecipeName id="{id}" /></a><SvelteButton
         on:click="{() => recipeRepository.delete(id)}"

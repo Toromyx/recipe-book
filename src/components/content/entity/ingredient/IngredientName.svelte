@@ -1,25 +1,12 @@
 <script>
-  import { onDestroy } from "svelte";
   import { ingredientRepository } from "../../../../services/repository/ingredient-repository.ts";
 
   export let id;
 
-  /** @type {IngredientInterface | undefined} */
+  /** @type {Readable<IngredientInterface | undefined>} */
   let ingredient;
-  let unsubscribe = () => {};
 
-  $: {
-    unsubscribe();
-    if (id) {
-      unsubscribe = ingredientRepository.subscribe(id, (entity) => {
-        ingredient = entity;
-      });
-    }
-  }
-
-  onDestroy(() => {
-    unsubscribe();
-  });
+  $: ingredient = ingredientRepository.createStore(id);
 </script>
 
-<span>{ingredient?.name}</span>
+<span>{$ingredient?.name}</span>

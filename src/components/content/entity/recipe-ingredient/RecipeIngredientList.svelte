@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from "svelte";
   import {
     parseHtml,
     parseText,
@@ -15,36 +14,24 @@
 
   export let recipeStepId;
 
-  let list = [];
-  let unsubscribe = () => {};
+  /** @type {Readable<number[]>} */
+  let list;
   /** @type {ParsedRecipeIngredient[]} */
   let pastedParsedRecipeIngredients = [];
 
-  $: {
-    unsubscribe();
-    unsubscribe = recipeIngredientRepository.subscribeListFiltered(
+  $: list = recipeIngredientRepository.createListFilteredStore({
+    condition: { recipeStepId },
+    orderBy: [
       {
-        condition: { recipeStepId },
-        orderBy: [
-          {
-            column: "order",
-          },
-        ],
+        column: "order",
       },
-      (l) => {
-        list = l;
-      },
-    );
-  }
-
-  onDestroy(() => {
-    unsubscribe();
+    ],
   });
 </script>
 
 <div>
   <ol>
-    {#each list as id}
+    {#each $list as id}
       <li>
         <RecipeIngredient id="{id}" /><SvelteButton
           on:click="{() => recipeIngredientRepository.delete(id)}"
@@ -59,7 +46,7 @@
         for (let i = 0; i < values.ingredients.length; i++) {
           const ingredient = values.ingredients[i];
           recipeIngredientRepository.create({
-            order: list.length + 1 + i,
+            order: $list.length + 1 + i,
             quantity: ingredient.quantity || null,
             unit: ingredient.unit || null,
             ingredientId: ingredient.ingredientId[0],
@@ -95,7 +82,7 @@
   <SvelteForm
     on:submit="{({ detail: { values } }) => {
       recipeIngredientRepository.create({
-        order: list.length + 1,
+        order: $list.length + 1,
         quantity: values.quantity || null,
         unit: values.unit || null,
         ingredientId: values.ingredientId[0],

@@ -1,3 +1,4 @@
+import type { Readable } from "svelte/store";
 import type { IdentifiableInterface } from "../../types/identifiable-interface.ts";
 import { equalArray } from "../util/compare.ts";
 
@@ -34,6 +35,8 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositorySubscriber<Entity>,
   ): EntityRepositoryUnsubscriber;
 
+  createStore(identifier: number): Readable<Entity | undefined>;
+
   /**
    * subscribes to changes of the complete entity list
    *
@@ -47,6 +50,8 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber;
 
+  createListStore(): Readable<number[]>;
+
   /**
    * subscribes to changes of the complete entity count
    *
@@ -59,6 +64,8 @@ export interface EntityRepositoryInterface<
   subscribeCount(
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber;
+
+  createCountStore(): Readable<number>;
 
   /**
    * subscribes to changes of a filtered entity list
@@ -75,6 +82,8 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber;
 
+  createListFilteredStore(filter: Filter): Readable<number[]>;
+
   /**
    * subscribes to changes of a filtered entity count
    *
@@ -89,6 +98,8 @@ export interface EntityRepositoryInterface<
     filter: Filter,
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber;
+
+  createCountFilteredStore(filter: Filter): Readable<number>;
 
   /**
    * create an entity based on partial data via API
@@ -317,9 +328,19 @@ export class EntityRepository<
     };
   }
 
+  createStore(identifier: number): Readable<Entity | undefined> {
+    return {
+      subscribe: (run) =>
+        this.subscribe(identifier, (entity) => {
+          run(entity);
+        }),
+    };
+  }
+
   subscribeList(
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
+    subscriber(this.listState);
     void this.list().then(() => {
       subscriber(this.listState);
     });
@@ -330,9 +351,19 @@ export class EntityRepository<
     };
   }
 
+  createListStore(): Readable<number[]> {
+    return {
+      subscribe: (subscriber) =>
+        this.subscribeList((list) => {
+          subscriber(list);
+        }),
+    };
+  }
+
   subscribeCount(
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
+    subscriber(this.countState);
     void this.count().then(() => {
       subscriber(this.countState);
     });
@@ -343,10 +374,20 @@ export class EntityRepository<
     };
   }
 
+  createCountStore(): Readable<number> {
+    return {
+      subscribe: (subscriber) =>
+        this.subscribeCount((count) => {
+          subscriber(count);
+        }),
+    };
+  }
+
   subscribeListFiltered(
     filter: Filter,
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
+    subscriber([]);
     const filterKey = stringifyFilter(filter);
     void this.listFiltered(filter).then(() => {
       subscriber(this.filteredListState[filterKey]);
@@ -365,10 +406,20 @@ export class EntityRepository<
     };
   }
 
+  createListFilteredStore(filter: Filter): Readable<number[]> {
+    return {
+      subscribe: (subscriber) =>
+        this.subscribeListFiltered(filter, (list) => {
+          subscriber(list);
+        }),
+    };
+  }
+
   subscribeCountFiltered(
     filter: Filter,
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
+    subscriber(NaN);
     const filterKey = stringifyFilter(filter);
     void this.countFiltered(filter).then(() => {
       subscriber(this.filteredCountState[filterKey]);
@@ -384,6 +435,15 @@ export class EntityRepository<
 
     return (): void => {
       this.filteredCountSubscribers[filterKey]?.set.delete(subscriber);
+    };
+  }
+
+  createCountFilteredStore(filter: Filter): Readable<number> {
+    return {
+      subscribe: (subscriber) =>
+        this.subscribeCountFiltered(filter, (count) => {
+          subscriber(count);
+        }),
     };
   }
 

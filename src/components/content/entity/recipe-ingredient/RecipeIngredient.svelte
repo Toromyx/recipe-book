@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from "svelte";
   import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
   import Editable from "../../../layout/Editable.svelte";
   import IngredientName from "../ingredient/IngredientName.svelte";
@@ -7,24 +6,14 @@
 
   export let id;
 
-  /** @type {RecipeIngredientInterface | undefined} */
+  /** @type {Readable<RecipeIngredientInterface | undefined>} */
   let recipeIngredient;
-  let unsubscribe = () => {};
   let qualifiers;
 
-  $: {
-    unsubscribe();
-    unsubscribe = recipeIngredientRepository.subscribe(id, (entity) => {
-      recipeIngredient = entity;
-    });
-  }
-  $: qualifiers = [recipeIngredient?.quantity, recipeIngredient?.unit].filter(
+  $: recipeIngredient = recipeIngredientRepository.createStore(id);
+  $: qualifiers = [$recipeIngredient?.quantity, $recipeIngredient?.unit].filter(
     Boolean,
   );
-
-  onDestroy(() => {
-    unsubscribe();
-  });
 </script>
 
 <Editable
@@ -44,13 +33,13 @@
 >
   <span slot="display"
     >{#each qualifiers as qualifier}{qualifier}&nbsp;{/each}<IngredientName
-      id="{recipeIngredient?.ingredientId}"
+      id="{$recipeIngredient?.ingredientId}"
     /></span
   >
   <RecipeIngredientForm
     slot="edit"
-    quantity="{recipeIngredient?.quantity}"
-    unit="{recipeIngredient?.unit}"
-    ingredientId="{recipeIngredient?.ingredientId}"
+    quantity="{$recipeIngredient?.quantity}"
+    unit="{$recipeIngredient?.unit}"
+    ingredientId="{$recipeIngredient?.ingredientId}"
   />
 </Editable>

@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from "svelte";
   import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
   import { messages } from "../../../../services/translation/en.ts";
   import { getDataUrl } from "../../../../services/util/file.ts";
@@ -9,24 +8,14 @@
 
   export let id;
 
-  /** @type {RecipeStepInterface | undefined} */
+  /** @type {Readable<RecipeStepInterface | undefined>} */
   let recipeStep;
-  let unsubscribe = () => {};
 
-  $: {
-    unsubscribe();
-    unsubscribe = recipeStepRepository.subscribe(id, (entity) => {
-      recipeStep = entity;
-    });
-  }
-
-  onDestroy(() => {
-    unsubscribe();
-  });
+  $: recipeStep = recipeStepRepository.createStore(id);
 </script>
 
 <h3>
-  {messages.headings.recipeStep.format({ number: recipeStep?.order })}
+  {messages.headings.recipeStep.format({ number: $recipeStep?.order })}
 </h3>
 <RecipeIngredientList recipeStepId="{id}" />
 <Editable
@@ -42,10 +31,10 @@
   }}"
 >
   <svelte:fragment slot="display">
-    <p>{recipeStep?.description}</p>
-    {#if recipeStep?.image}
-      <img src="{recipeStep.image}" alt="" />
+    <p>{$recipeStep?.description}</p>
+    {#if $recipeStep?.image}
+      <img src="{$recipeStep.image}" alt="" />
     {/if}
   </svelte:fragment>
-  <RecipeStepFormFields slot="edit" description="{recipeStep?.description}" />
+  <RecipeStepFormFields slot="edit" description="{$recipeStep?.description}" />
 </Editable>
