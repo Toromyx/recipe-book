@@ -2,6 +2,7 @@
   import { createEventDispatcher, getContext, tick } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
   import { debounce } from "../../../services/util/debounce.ts";
+  import { setCustomValidity } from "../../../services/util/validity.ts";
   import SvelteButton from "../SvelteButton.svelte";
   import { FORM } from "./SvelteForm.svelte";
 
@@ -55,18 +56,19 @@
   $: truncatedResults = filteredResults.slice(0, maxResults);
   $: {
     if (input) {
-      const validityMessages = [];
-      if (value.length < min) {
-        validityMessages.push(
-          messages.validity.autocomplete.min.format({ min }),
-        );
-      }
-      if (value.length > max) {
-        validityMessages.push(
-          messages.validity.autocomplete.max.format({ max }),
-        );
-      }
-      input.setCustomValidity(validityMessages.join(" "));
+      setCustomValidity(
+        input,
+        ...[
+          () =>
+            value.length < min
+              ? messages.validity.autocomplete.min.format({ min })
+              : undefined,
+          () =>
+            value.length > max
+              ? messages.validity.autocomplete.max.format({ max })
+              : undefined,
+        ],
+      );
     }
   }
 
