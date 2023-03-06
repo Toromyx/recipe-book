@@ -28,6 +28,7 @@ import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-f
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
+import { stringifyFilter } from "../repository/entity-repository.ts";
 import { client } from "./client.ts";
 import type { CommandAnswer } from "./command-answer.ts";
 import { Command } from "./command.ts";
@@ -38,6 +39,20 @@ type CommandEntityRead =
   | Command.ENTITY_READ_RECIPE_FILE
   | Command.ENTITY_READ_RECIPE_INGREDIENT
   | Command.ENTITY_READ_RECIPE_STEP;
+
+type CommandEntityList =
+  | Command.ENTITY_LIST_INGREDIENT
+  | Command.ENTITY_LIST_RECIPE
+  | Command.ENTITY_LIST_RECIPE_FILE
+  | Command.ENTITY_LIST_RECIPE_INGREDIENT
+  | Command.ENTITY_LIST_RECIPE_STEP;
+
+type CommandEntityCount =
+  | Command.ENTITY_COUNT_INGREDIENT
+  | Command.ENTITY_COUNT_RECIPE
+  | Command.ENTITY_COUNT_RECIPE_FILE
+  | Command.ENTITY_COUNT_RECIPE_INGREDIENT
+  | Command.ENTITY_COUNT_RECIPE_STEP;
 
 /**
  * when there are duplicate requests to the same entity, the existing promise is returned
@@ -56,6 +71,30 @@ const entityReadPromiseCollector: {
   [Command.ENTITY_READ_RECIPE_STEP]: {},
 };
 
+const entityListPromiseCollector: {
+  [T in CommandEntityList]: {
+    [filterKey: string]: Promise<CommandAnswer<T>>;
+  };
+} = {
+  [Command.ENTITY_LIST_INGREDIENT]: {},
+  [Command.ENTITY_LIST_RECIPE]: {},
+  [Command.ENTITY_LIST_RECIPE_FILE]: {},
+  [Command.ENTITY_LIST_RECIPE_INGREDIENT]: {},
+  [Command.ENTITY_LIST_RECIPE_STEP]: {},
+};
+
+const entityCountPromiseCollector: {
+  [T in CommandEntityCount]: {
+    [filterKey: string]: Promise<CommandAnswer<T>>;
+  };
+} = {
+  [Command.ENTITY_COUNT_INGREDIENT]: {},
+  [Command.ENTITY_COUNT_RECIPE]: {},
+  [Command.ENTITY_COUNT_RECIPE_FILE]: {},
+  [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: {},
+  [Command.ENTITY_COUNT_RECIPE_STEP]: {},
+};
+
 function readCollected<T extends CommandEntityRead>(
   command: T,
   id: number,
@@ -68,9 +107,39 @@ function readCollected<T extends CommandEntityRead>(
         return value;
       });
   }
-  return entityReadPromiseCollector[command][id] as unknown as Promise<
-    CommandAnswer<T>
-  >;
+  return entityReadPromiseCollector[command][id];
+}
+
+function listCollected<Filter extends object>(
+  command: CommandEntityList,
+  filter: Filter,
+): Promise<CommandAnswer<typeof command>> {
+  const filterKey = stringifyFilter(filter);
+  if (entityListPromiseCollector[command][filterKey] === undefined) {
+    entityListPromiseCollector[command][filterKey] = client
+      .invoke(command, { filter })
+      .then((value: CommandAnswer<typeof command>) => {
+        delete entityListPromiseCollector[command][filterKey];
+        return value;
+      });
+  }
+  return entityListPromiseCollector[command][filterKey];
+}
+
+function countCollected<Filter extends object>(
+  command: CommandEntityCount,
+  filter: Filter,
+): Promise<CommandAnswer<typeof command>> {
+  const filterKey = stringifyFilter(filter);
+  if (entityCountPromiseCollector[command][filterKey] === undefined) {
+    entityCountPromiseCollector[command][filterKey] = client
+      .invoke(command, { filter })
+      .then((value: CommandAnswer<typeof command>) => {
+        delete entityCountPromiseCollector[command][filterKey];
+        return value;
+      });
+  }
+  return entityCountPromiseCollector[command][filterKey];
 }
 
 export const apiClient = {
@@ -87,10 +156,10 @@ export const apiClient = {
     return client.invoke(Command.ENTITY_DELETE_INGREDIENT, { id });
   },
   listIngredient(filter: IngredientFilterInterface): Promise<number[]> {
-    return client.invoke(Command.ENTITY_LIST_INGREDIENT, { filter });
+    return listCollected(Command.ENTITY_LIST_INGREDIENT, filter);
   },
   countIngredient(filter: IngredientFilterInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_COUNT_INGREDIENT, { filter });
+    return countCollected(Command.ENTITY_COUNT_INGREDIENT, filter);
   },
 
   createRecipe(create: RecipeCreateInterface): Promise<number> {
@@ -106,10 +175,10 @@ export const apiClient = {
     return client.invoke(Command.ENTITY_DELETE_RECIPE, { id });
   },
   listRecipe(filter: RecipeFilterInterface): Promise<number[]> {
-    return client.invoke(Command.ENTITY_LIST_RECIPE, { filter });
+    return listCollected(Command.ENTITY_LIST_RECIPE, filter);
   },
   countRecipe(filter: RecipeFilterInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_COUNT_RECIPE, { filter });
+    return countCollected(Command.ENTITY_COUNT_RECIPE, filter);
   },
 
   createRecipeFile(create: RecipeFileCreateInterface): Promise<number> {
@@ -125,10 +194,10 @@ export const apiClient = {
     return client.invoke(Command.ENTITY_DELETE_RECIPE_FILE, { id });
   },
   listRecipeFile(filter: RecipeFileFilterInterface): Promise<number[]> {
-    return client.invoke(Command.ENTITY_LIST_RECIPE_FILE, { filter });
+    return listCollected(Command.ENTITY_LIST_RECIPE_FILE, filter);
   },
   countRecipeFile(filter: RecipeFileFilterInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_COUNT_RECIPE_FILE, { filter });
+    return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, filter);
   },
 
   createRecipeIngredient(
@@ -150,12 +219,12 @@ export const apiClient = {
   listRecipeIngredient(
     filter: RecipeIngredientFilterInterface,
   ): Promise<number[]> {
-    return client.invoke(Command.ENTITY_LIST_RECIPE_INGREDIENT, { filter });
+    return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT, filter);
   },
   countRecipeIngredient(
     filter: RecipeIngredientFilterInterface,
   ): Promise<number> {
-    return client.invoke(Command.ENTITY_COUNT_RECIPE_INGREDIENT, { filter });
+    return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, filter);
   },
 
   createRecipeStep(create: RecipeStepCreateInterface): Promise<number> {
@@ -171,9 +240,9 @@ export const apiClient = {
     return client.invoke(Command.ENTITY_DELETE_RECIPE_STEP, { id });
   },
   listRecipeStep(filter: RecipeStepFilterInterface): Promise<number[]> {
-    return client.invoke(Command.ENTITY_LIST_RECIPE_STEP, { filter });
+    return listCollected(Command.ENTITY_LIST_RECIPE_STEP, filter);
   },
   countRecipeStep(filter: RecipeStepFilterInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_COUNT_RECIPE_STEP, { filter });
+    return countCollected(Command.ENTITY_COUNT_RECIPE_STEP, filter);
   },
 };
