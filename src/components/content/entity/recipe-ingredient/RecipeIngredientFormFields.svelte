@@ -9,6 +9,7 @@
   export let unit = undefined;
   export let ingredientId = undefined;
   export let ingredientName = "";
+  export let usedIngredientIds = undefined;
 </script>
 
 <SvelteInput
@@ -32,6 +33,7 @@
   max="{1}"
   value="{ingredientId ? [ingredientId] : []}"
   initialInput="{ingredientName}"
+  excludedValues="{usedIngredientIds}"
   label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
   callback="{(userInput) =>
     apiClient.listIngredient({

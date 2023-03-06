@@ -48,6 +48,12 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                         .col(RecipeIngredient::RecipeStepId)
                         .unique(),
                 )
+                .index(
+                    Index::create()
+                        .col(RecipeIngredient::RecipeStepId)
+                        .col(RecipeIngredient::IngredientId)
+                        .unique(),
+                )
                 .to_owned(),
         )
         .await?;

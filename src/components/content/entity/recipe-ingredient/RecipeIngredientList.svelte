@@ -65,6 +65,7 @@
                   quantity="{parsedRecipeIngredient.quantity}"
                   unit="{parsedRecipeIngredient.unit}"
                   ingredientName="{parsedRecipeIngredient.name}"
+                  usedIngredientIds="{$list}"
                 />
               </FieldListItem>
             </li>
@@ -101,6 +102,7 @@
         const text = e.clipboardData.getData('text/text');
         pastedParsedRecipeIngredients = parseText(text);
       }}"
+      usedIngredientIds="{$list}"
     />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton

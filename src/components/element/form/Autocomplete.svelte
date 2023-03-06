@@ -14,6 +14,7 @@
   export let createCallback = undefined;
   export let value = [];
   export let initialInput = "";
+  export let excludedValues = [];
   export let placeholder = label;
   export let min = 0;
   export let max = 1;
@@ -120,7 +121,8 @@
       <li>
         <SvelteButton
           on:click="{() => select(item)}"
-          disabled="{value.length >= max}"><slot item="{item}" /></SvelteButton
+          disabled="{value.length >= max || excludedValues.includes(item)}"
+          ><slot item="{item}" /></SvelteButton
         >
       </li>
     {/each}
