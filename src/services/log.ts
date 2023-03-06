@@ -4,6 +4,7 @@ export const enum LogLevel {
   WARN = 2,
   INFO = 3,
   DEBUG = 4,
+  TRACE = 5,
 }
 
 export function log(level: LogLevel, ...data: unknown[]): void {
@@ -23,6 +24,9 @@ export function log(level: LogLevel, ...data: unknown[]): void {
     case LogLevel.DEBUG:
       console.debug(...data);
       break;
+    case LogLevel.TRACE:
+      console.trace(...data);
+      break;
   }
 }
 
@@ -40,4 +44,8 @@ export function info(...data: unknown[]): void {
 
 export function debug(...data: unknown[]): void {
   log(LogLevel.DEBUG, ...data);
+}
+
+export function trace(...data: unknown[]): void {
+  log(LogLevel.TRACE, ...data);
 }
