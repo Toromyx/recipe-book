@@ -1,13 +1,11 @@
 @startuml
 
 entity "Recipe" as recipe {
-  A recipe.
   --
   name
 }
 
 entity "Recipe Step" as recipe_step {
-  A step in a recipe.
   --
   order
   description
@@ -16,7 +14,6 @@ entity "Recipe Step" as recipe_step {
 recipe_step }o--|| "recipe" recipe
 
 entity "Recipe Ingredient" as recipe_ingredient {
-  An recipe ingredient.
   --
   order
   quantity
@@ -25,7 +22,6 @@ entity "Recipe Ingredient" as recipe_ingredient {
 recipe_ingredient }o--|| "step" recipe_step
 
 entity "Ingredient" as ingredient {
-  An ingredient.
   --
   name
 }
