@@ -30,15 +30,33 @@ export const ingredientRepository: EntityRepositoryInterface<
         reactFunction(event.payload);
       },
     );
+    void client.listen(
+      EventChannel.ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT,
+      (event) => {
+        reactFunction(event.payload);
+      },
+    );
   },
   (reactFunction) => {
     void client.listen(EventChannel.ENTITY_ACTION_CREATED_INGREDIENT, () => {
       reactFunction();
     });
+    void client.listen(
+      EventChannel.ENTITY_ACTION_CREATED_RECIPE_INGREDIENT,
+      () => {
+        reactFunction();
+      },
+    );
   },
   (reactFunction) => {
     void client.listen(
       EventChannel.ENTITY_ACTION_DELETED_INGREDIENT,
+      (event) => {
+        reactFunction(event.payload);
+      },
+    );
+    void client.listen(
+      EventChannel.ENTITY_ACTION_DELETED_RECIPE_INGREDIENT,
       (event) => {
         reactFunction(event.payload);
       },

@@ -3,6 +3,7 @@
     parseHtml,
     parseText,
   } from "../../../../../services/parser/recipe-ingredient-parser.ts";
+  import { ingredientRepository } from "../../../../../services/repository/ingredient-repository.ts";
   import { recipeIngredientRepository } from "../../../../../services/repository/recipe-ingredient-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
@@ -17,6 +18,8 @@
 
   /** @type {Readable<Loadable<number[]>>} */
   let list;
+  /** @type {Readable<Loadable<number[]>>} */
+  let usedIngredientsList;
   /** @type {ParsedRecipeIngredient[]} */
   let pastedParsedRecipeIngredients = [];
 
@@ -27,6 +30,9 @@
         column: "order",
       },
     ],
+  });
+  $: usedIngredientsList = ingredientRepository.createListFilteredStore({
+    condition: { recipeStepId },
   });
 </script>
 
@@ -103,7 +109,7 @@
         const text = e.clipboardData.getData('text/text');
         pastedParsedRecipeIngredients = parseText(text);
       }}"
-      usedIngredientIds="{$list}"
+      usedIngredientIds="{$usedIngredientsList || []}"
     />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton

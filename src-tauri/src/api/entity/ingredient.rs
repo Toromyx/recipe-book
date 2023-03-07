@@ -3,17 +3,20 @@ use sea_orm::{
     ActiveModelTrait,
     ActiveValue::{NotSet, Set, Unchanged},
     ColumnTrait, Condition, DbErr, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, ModelTrait,
-    QueryFilter, QueryOrder, QuerySelect,
+    QueryFilter, QueryOrder, QuerySelect, QueryTrait,
 };
 use serde::Deserialize;
 
 use crate::{
     api::entity::{get_order_by, Filter, IdColumn},
     database,
-    entity::ingredient::{
-        ActiveModel, Column,
-        Column::{Id, Name},
-        Entity, Model,
+    entity::{
+        ingredient::{
+            ActiveModel, Column,
+            Column::{Id, Name},
+            Entity, Model,
+        },
+        recipe_ingredient,
     },
 };
 
@@ -76,11 +79,22 @@ pub type IngredientFilter = Filter<IngredientCondition, IngredientOrderBy>;
 #[serde(rename_all = "camelCase")]
 pub struct IngredientCondition {
     pub name: Option<String>,
+    pub recipe_step_id: Option<i64>,
 }
 
 impl IntoCondition for IngredientCondition {
     fn into_condition(self) -> Condition {
-        Condition::all().add_option(self.name.map(|name| Name.like(&format!("%{name}%"))))
+        Condition::all()
+            .add_option(self.name.map(|name| Name.like(&format!("%{name}%"))))
+            .add_option(self.recipe_step_id.map(|recipe_step_id| {
+                Id.in_subquery(
+                    recipe_ingredient::Entity::find()
+                        .select_only()
+                        .column(recipe_ingredient::Column::IngredientId)
+                        .filter(recipe_ingredient::Column::RecipeStepId.eq(recipe_step_id))
+                        .into_query(),
+                )
+            }))
     }
 }
 
