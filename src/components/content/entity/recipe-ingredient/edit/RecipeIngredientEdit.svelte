@@ -1,9 +1,9 @@
 <script>
-  import { apiClient } from "../../../../services/command/entity.ts";
-  import { messages } from "../../../../services/translation/en.ts";
-  import Autocomplete from "../../../element/form/Autocomplete.svelte";
-  import SvelteInput from "../../../element/form/SvelteInput.svelte";
-  import IngredientName from "../ingredient/IngredientName.svelte";
+  import { apiClient } from "../../../../../services/command/entity.ts";
+  import { messages } from "../../../../../services/translation/en.ts";
+  import Autocomplete from "../../../../element/form/Autocomplete.svelte";
+  import SvelteInput from "../../../../element/form/SvelteInput.svelte";
+  import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
 
   export let quantity = undefined;
   export let unit = undefined;
@@ -43,6 +43,6 @@
   createCallback="{(userInput) =>
     apiClient.createIngredient({ name: userInput })}"
   ><svelte:fragment let:item>
-    <IngredientName id="{item}" />
+    <IngredientViewName id="{item}" />
   </svelte:fragment></Autocomplete
 >

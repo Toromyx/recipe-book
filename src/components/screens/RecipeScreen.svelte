@@ -1,6 +1,6 @@
 <script>
   import { onDestroy } from "svelte";
-  import RecipeFull from "../content/entity/recipe/RecipeFull.svelte";
+  import RecipeView from "../content/entity/recipe/view/RecipeView.svelte";
 
   export let params;
 
@@ -14,5 +14,5 @@
 </script>
 
 <div>
-  <RecipeFull id="{Number(params.id)}" />
+  <RecipeView id="{Number(params.id)}" />
 </div>

@@ -1,11 +1,11 @@
 <script>
-  import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
-  import { messages } from "../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../services/util/is-loading.ts";
-  import SvelteButton from "../../../element/SvelteButton.svelte";
-  import SvelteForm from "../../../element/form/SvelteForm.svelte";
-  import RecipeStep from "./RecipeStep.svelte";
-  import RecipeStepFormFields from "./RecipeStepFormFields.svelte";
+  import { recipeStepRepository } from "../../../../../services/repository/recipe-step-repository.ts";
+  import { messages } from "../../../../../services/translation/en.ts";
+  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import SvelteButton from "../../../../element/SvelteButton.svelte";
+  import SvelteForm from "../../../../element/form/SvelteForm.svelte";
+  import RecipeStepEdit from "../edit/RecipeStepEdit.svelte";
+  import RecipeStepView from "../view/RecipeStepView.svelte";
 
   export let recipeId;
 
@@ -26,7 +26,7 @@
   <ol>
     {#each $list as id}
       <li>
-        <RecipeStep id="{id}" /><SvelteButton
+        <RecipeStepView id="{id}" /><SvelteButton
           on:click="{() => recipeStepRepository.delete(id)}"
           >{messages.labels.actions.delete.format()}</SvelteButton
         >
@@ -43,7 +43,7 @@
     }}"
   >
     <h3>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h3>
-    <RecipeStepFormFields />
+    <RecipeStepEdit />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >

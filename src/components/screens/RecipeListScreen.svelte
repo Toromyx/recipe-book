@@ -1,5 +1,5 @@
 <script>
-  import RecipeList from "../content/entity/recipe/RecipeList.svelte";
+  import RecipeList from "../content/entity/recipe/list/RecipeList.svelte";
 </script>
 
 <div>

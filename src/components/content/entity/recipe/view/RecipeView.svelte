@@ -1,8 +1,8 @@
 <script>
-  import { recipeRepository } from "../../../../services/repository/recipe-repository.ts";
-  import { messages } from "../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../services/util/is-loading.ts";
-  import RecipeStepList from "../recipe-step/RecipeStepList.svelte";
+  import { recipeRepository } from "../../../../../services/repository/recipe-repository.ts";
+  import { messages } from "../../../../../services/translation/en.ts";
+  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import RecipeStepList from "../../recipe-step/list/RecipeStepList.svelte";
 
   export let id;
 

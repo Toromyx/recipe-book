@@ -2,16 +2,16 @@
   import {
     parseHtml,
     parseText,
-  } from "../../../../services/parser/recipe-ingredient-parser.ts";
-  import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
-  import { messages } from "../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../services/util/is-loading.ts";
-  import SvelteButton from "../../../element/SvelteButton.svelte";
-  import FieldListItem from "../../../element/form/FieldListItem.svelte";
-  import SvelteFieldset from "../../../element/form/SvelteFieldset.svelte";
-  import SvelteForm from "../../../element/form/SvelteForm.svelte";
-  import RecipeIngredient from "./RecipeIngredient.svelte";
-  import RecipeIngredientFormFields from "./RecipeIngredientFormFields.svelte";
+  } from "../../../../../services/parser/recipe-ingredient-parser.ts";
+  import { recipeIngredientRepository } from "../../../../../services/repository/recipe-ingredient-repository.ts";
+  import { messages } from "../../../../../services/translation/en.ts";
+  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import SvelteButton from "../../../../element/SvelteButton.svelte";
+  import FieldListItem from "../../../../element/form/FieldListItem.svelte";
+  import SvelteFieldset from "../../../../element/form/SvelteFieldset.svelte";
+  import SvelteForm from "../../../../element/form/SvelteForm.svelte";
+  import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
+  import RecipeIngredientView from "../view/RecipeIngredientView.svelte";
 
   export let recipeStepId;
 
@@ -34,7 +34,7 @@
   <ol>
     {#each $list as id}
       <li>
-        <RecipeIngredient id="{id}" /><SvelteButton
+        <RecipeIngredientView id="{id}" /><SvelteButton
           on:click="{() => recipeIngredientRepository.delete(id)}"
           >{messages.labels.actions.delete.format()}</SvelteButton
         >
@@ -62,7 +62,7 @@
           {#each pastedParsedRecipeIngredients as parsedRecipeIngredient, i}
             <li>
               <FieldListItem id="{i}">
-                <RecipeIngredientFormFields
+                <RecipeIngredientEdit
                   quantity="{parsedRecipeIngredient.quantity}"
                   unit="{parsedRecipeIngredient.unit}"
                   ingredientName="{parsedRecipeIngredient.name}"
@@ -92,7 +92,7 @@
       });
     }}"
   >
-    <RecipeIngredientFormFields
+    <RecipeIngredientEdit
       on:paste="{(e) => {
         e.preventDefault();
         const html = e.clipboardData.getData('text/html');

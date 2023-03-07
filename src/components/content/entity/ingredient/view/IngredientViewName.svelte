@@ -1,6 +1,6 @@
 <script>
-  import { ingredientRepository } from "../../../../services/repository/ingredient-repository.ts";
-  import { isLoading } from "../../../../services/util/is-loading.ts";
+  import { ingredientRepository } from "../../../../../services/repository/ingredient-repository.ts";
+  import { isLoading } from "../../../../../services/util/is-loading.ts";
 
   export let id;
 

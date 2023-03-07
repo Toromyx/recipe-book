@@ -1,6 +1,6 @@
 <script>
-  import { messages } from "../../../../services/translation/en.ts";
-  import SvelteTextarea from "../../../element/form/SvelteTextarea.svelte";
+  import { messages } from "../../../../../services/translation/en.ts";
+  import SvelteTextarea from "../../../../element/form/SvelteTextarea.svelte";
 
   export let description = undefined;
 </script>

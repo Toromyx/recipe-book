@@ -1,11 +1,11 @@
 <script>
-  import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
-  import { messages } from "../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../services/util/is-loading.ts";
-  import Editable from "../../../layout/Editable.svelte";
-  import RecipeFileList from "../recipe-file/list/RecipeFileList.svelte";
-  import RecipeIngredientList from "../recipe-ingredient/RecipeIngredientList.svelte";
-  import RecipeStepFormFields from "./RecipeStepFormFields.svelte";
+  import { recipeStepRepository } from "../../../../../services/repository/recipe-step-repository.ts";
+  import { messages } from "../../../../../services/translation/en.ts";
+  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import Editable from "../../../../layout/Editable.svelte";
+  import RecipeFileList from "../../recipe-file/list/RecipeFileList.svelte";
+  import RecipeIngredientList from "../../recipe-ingredient/list/RecipeIngredientList.svelte";
+  import RecipeStepEdit from "../edit/RecipeStepEdit.svelte";
 
   export let id;
 
@@ -32,7 +32,7 @@
     <svelte:fragment slot="display">
       <p>{$recipeStep.description}</p>
     </svelte:fragment>
-    <RecipeStepFormFields slot="edit" description="{$recipeStep.description}" />
+    <RecipeStepEdit slot="edit" description="{$recipeStep.description}" />
   </Editable>
   <RecipeFileList recipeStepId="{id}" />
 {/if}

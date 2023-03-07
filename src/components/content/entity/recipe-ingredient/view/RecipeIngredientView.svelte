@@ -1,9 +1,9 @@
 <script>
-  import { recipeIngredientRepository } from "../../../../services/repository/recipe-ingredient-repository.ts";
-  import { isLoading } from "../../../../services/util/is-loading.ts";
-  import Editable from "../../../layout/Editable.svelte";
-  import IngredientName from "../ingredient/IngredientName.svelte";
-  import RecipeIngredientForm from "./RecipeIngredientFormFields.svelte";
+  import { recipeIngredientRepository } from "../../../../../services/repository/recipe-ingredient-repository.ts";
+  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import Editable from "../../../../layout/Editable.svelte";
+  import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
+  import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
 
   export let id;
 
@@ -34,11 +34,11 @@
     }}"
   >
     <span slot="display"
-      >{#each qualifiers as qualifier}{qualifier}&nbsp;{/each}<IngredientName
+      >{#each qualifiers as qualifier}{qualifier}&nbsp;{/each}<IngredientViewName
         id="{$recipeIngredient.ingredientId}"
       /></span
     >
-    <RecipeIngredientForm
+    <RecipeIngredientEdit
       slot="edit"
       quantity="{$recipeIngredient.quantity}"
       unit="{$recipeIngredient.unit}"
