@@ -1,6 +1,7 @@
 <script>
   import { recipeStepRepository } from "../../../../services/repository/recipe-step-repository.ts";
   import { messages } from "../../../../services/translation/en.ts";
+  import { isLoading } from "../../../../services/util/is-loading.ts";
   import SvelteButton from "../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../element/form/SvelteForm.svelte";
   import RecipeStep from "./RecipeStep.svelte";
@@ -8,7 +9,7 @@
 
   export let recipeId;
 
-  /** @type {Readable<number[]>} */
+  /** @type {Readable<Loadable<number[]>>} */
   let list;
 
   $: list = recipeStepRepository.createListFilteredStore({
@@ -21,28 +22,30 @@
   });
 </script>
 
-<ol>
-  {#each $list as id}
-    <li>
-      <RecipeStep id="{id}" /><SvelteButton
-        on:click="{() => recipeStepRepository.delete(id)}"
-        >{messages.labels.actions.delete.format()}</SvelteButton
-      >
-    </li>
-  {/each}
-</ol>
-<SvelteForm
-  on:submit="{async ({ detail: { values } }) => {
-    await recipeStepRepository.create({
-      order: $list.length + 1,
-      description: values.description,
-      recipeId,
-    });
-  }}"
->
-  <h3>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h3>
-  <RecipeStepFormFields />
-  <SvelteButton type="submit"
-    >{messages.labels.actions.create.format()}</SvelteButton
+{#if !isLoading($list)}
+  <ol>
+    {#each $list as id}
+      <li>
+        <RecipeStep id="{id}" /><SvelteButton
+          on:click="{() => recipeStepRepository.delete(id)}"
+          >{messages.labels.actions.delete.format()}</SvelteButton
+        >
+      </li>
+    {/each}
+  </ol>
+  <SvelteForm
+    on:submit="{async ({ detail: { values } }) => {
+      await recipeStepRepository.create({
+        order: $list.length + 1,
+        description: values.description,
+        recipeId,
+      });
+    }}"
   >
-</SvelteForm>
+    <h3>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h3>
+    <RecipeStepFormFields />
+    <SvelteButton type="submit"
+      >{messages.labels.actions.create.format()}</SvelteButton
+    >
+  </SvelteForm>
+{/if}

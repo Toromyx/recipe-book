@@ -1,12 +1,15 @@
 <script>
   import { ingredientRepository } from "../../../../services/repository/ingredient-repository.ts";
+  import { isLoading } from "../../../../services/util/is-loading.ts";
 
   export let id;
 
-  /** @type {Readable<IngredientInterface | undefined>} */
+  /** @type {Readable<Loadable<IngredientInterface>>} */
   let ingredient;
 
   $: ingredient = ingredientRepository.createStore(id);
 </script>
 
-<span>{$ingredient?.name}</span>
+{#if !isLoading($ingredient)}
+  <span>{$ingredient.name}</span>
+{/if}

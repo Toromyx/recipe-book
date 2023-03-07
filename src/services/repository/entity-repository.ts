@@ -1,8 +1,9 @@
 import type { Readable } from "svelte/store";
 import type { IdentifiableInterface } from "../../types/identifiable-interface.ts";
+import type { Loadable } from "../../types/loadable.ts";
 import { equalArray } from "../util/compare.ts";
 
-type EntityRepositorySubscriber<Entity> = (entity: Entity | undefined) => void;
+type EntityRepositorySubscriber<Entity> = (entity: Entity) => void;
 
 export type EntityRepositoryListSubscriber = (list: number[]) => void;
 
@@ -35,7 +36,7 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositorySubscriber<Entity>,
   ): EntityRepositoryUnsubscriber;
 
-  createStore(identifier: number): Readable<Entity | undefined>;
+  createStore(identifier: number): Readable<Loadable<Entity>>;
 
   /**
    * subscribes to changes of the complete entity list
@@ -50,7 +51,7 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber;
 
-  createListStore(): Readable<number[]>;
+  createListStore(): Readable<Loadable<number[]>>;
 
   /**
    * subscribes to changes of the complete entity count
@@ -65,7 +66,7 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber;
 
-  createCountStore(): Readable<number>;
+  createCountStore(): Readable<Loadable<number>>;
 
   /**
    * subscribes to changes of a filtered entity list
@@ -82,7 +83,7 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber;
 
-  createListFilteredStore(filter: Filter): Readable<number[]>;
+  createListFilteredStore(filter: Filter): Readable<Loadable<number[]>>;
 
   /**
    * subscribes to changes of a filtered entity count
@@ -99,7 +100,7 @@ export interface EntityRepositoryInterface<
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber;
 
-  createCountFilteredStore(filter: Filter): Readable<number>;
+  createCountFilteredStore(filter: Filter): Readable<Loadable<number>>;
 
   /**
    * create an entity based on partial data via API
@@ -342,7 +343,7 @@ export class EntityRepository<
     };
   }
 
-  createStore(identifier: number): Readable<Entity | undefined> {
+  createStore(identifier: number): Readable<Loadable<Entity>> {
     return {
       subscribe: (subscriber) =>
         this.subscribe(identifier, (entity) => {
@@ -354,7 +355,6 @@ export class EntityRepository<
   subscribeList(
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
-    subscriber(this.listState);
     void this.list().then(() => {
       subscriber(this.listState);
     });
@@ -365,7 +365,7 @@ export class EntityRepository<
     };
   }
 
-  createListStore(): Readable<number[]> {
+  createListStore(): Readable<Loadable<number[]>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeList((list) => {
@@ -377,7 +377,6 @@ export class EntityRepository<
   subscribeCount(
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
-    subscriber(this.countState);
     void this.count().then(() => {
       subscriber(this.countState);
     });
@@ -388,7 +387,7 @@ export class EntityRepository<
     };
   }
 
-  createCountStore(): Readable<number> {
+  createCountStore(): Readable<Loadable<number>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeCount((count) => {
@@ -401,7 +400,6 @@ export class EntityRepository<
     filter: Filter,
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
-    subscriber([]);
     const filterKey = stringifyFilter(filter);
     void this.listFiltered(filter).then(() => {
       subscriber(this.filteredListState[filterKey]);
@@ -420,7 +418,7 @@ export class EntityRepository<
     };
   }
 
-  createListFilteredStore(filter: Filter): Readable<number[]> {
+  createListFilteredStore(filter: Filter): Readable<Loadable<number[]>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeListFiltered(filter, (list) => {
@@ -433,7 +431,6 @@ export class EntityRepository<
     filter: Filter,
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
-    subscriber(NaN);
     const filterKey = stringifyFilter(filter);
     void this.countFiltered(filter).then(() => {
       subscriber(this.filteredCountState[filterKey]);
@@ -452,7 +449,7 @@ export class EntityRepository<
     };
   }
 
-  createCountFilteredStore(filter: Filter): Readable<number> {
+  createCountFilteredStore(filter: Filter): Readable<Loadable<number>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeCountFiltered(filter, (count) => {
