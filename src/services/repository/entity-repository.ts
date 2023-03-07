@@ -238,24 +238,37 @@ export class EntityRepository<
     this.defaultFilter = defaultFilter;
 
     const react = async (identifier: number): Promise<void> => {
+      if (!this.state[identifier]) {
+        return;
+      }
       this.state[identifier] = await this.apiRead(identifier);
       this.run(identifier);
     };
 
     const reactDelete = (identifier: number): void => {
+      if (!this.state[identifier]) {
+        return;
+      }
       delete this.state[identifier];
       this.run(identifier);
       delete this.subscribers[identifier];
     };
 
     const reactList = async (): Promise<void> => {
+      if (!this.listSubscribers.size) {
+        return;
+      }
       const list = await this.apiList(this.defaultFilter);
       if (!equalArray(this.listState, list)) {
         this.listState = list;
         this.runList();
       }
     };
+
     const reactCount = async (): Promise<void> => {
+      if (!this.countSubscribers.size) {
+        return;
+      }
       const count = await this.apiCount(this.defaultFilter);
       if (this.countState !== count) {
         this.countState = count;
@@ -275,6 +288,7 @@ export class EntityRepository<
         }
       }
     };
+
     const reactFilteredCount = async (): Promise<void> => {
       for (const filteredCountSubscriber of Object.values(
         this.filteredCountSubscribers,
