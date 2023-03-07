@@ -31,19 +31,19 @@
       >
     </li>
   {/each}
-  <SvelteForm
-    on:submit="{async ({ detail: { values } }) => {
-      await recipeFileRepository.create({
-        name: values.name,
-        order: $list.length + 1,
-        path: values.path,
-        recipeStepId,
-      });
-    }}"
-  >
-    <RecipeFileEdit />
-    <SvelteButton type="submit"
-      >{messages.labels.actions.create.format()}</SvelteButton
-    >
-  </SvelteForm>
 </ol>
+<SvelteForm
+  on:submit="{async ({ detail: { values } }) => {
+    await recipeFileRepository.create({
+      name: values.name,
+      order: $list.length + 1,
+      path: values.path,
+      recipeStepId,
+    });
+  }}"
+>
+  <RecipeFileEdit />
+  <SvelteButton type="submit"
+    >{messages.labels.actions.create.format()}</SvelteButton
+  >
+</SvelteForm>

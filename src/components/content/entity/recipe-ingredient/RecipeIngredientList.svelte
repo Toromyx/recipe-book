@@ -29,83 +29,81 @@
   });
 </script>
 
-<div>
-  <ol>
-    {#each $list as id}
-      <li>
-        <RecipeIngredient id="{id}" /><SvelteButton
-          on:click="{() => recipeIngredientRepository.delete(id)}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
-        >
-      </li>
-    {/each}
-  </ol>
-  {#if pastedParsedRecipeIngredients.length}
-    <SvelteForm
-      on:submit="{({ detail: { values } }) => {
-        for (let i = 0; i < values.ingredients.length; i++) {
-          const ingredient = values.ingredients[i];
-          recipeIngredientRepository.create({
-            order: $list.length + 1 + i,
-            quantity: ingredient.quantity || null,
-            unit: ingredient.unit || null,
-            ingredientId: ingredient.ingredientId[0],
-            recipeStepId,
-          });
-        }
-        pastedParsedRecipeIngredients = [];
-      }}"
-    >
-      <SvelteFieldset name="ingredients" isList="{true}">
-        <ol>
-          {#each pastedParsedRecipeIngredients as parsedRecipeIngredient, i}
-            <li>
-              <FieldListItem id="{i}">
-                <RecipeIngredientFormFields
-                  quantity="{parsedRecipeIngredient.quantity}"
-                  unit="{parsedRecipeIngredient.unit}"
-                  ingredientName="{parsedRecipeIngredient.name}"
-                  usedIngredientIds="{$list}"
-                />
-              </FieldListItem>
-            </li>
-          {/each}
-        </ol>
-      </SvelteFieldset>
-      <SvelteButton type="submit"
-        >{messages.labels.actions.create.format()}</SvelteButton
+<ol>
+  {#each $list as id}
+    <li>
+      <RecipeIngredient id="{id}" /><SvelteButton
+        on:click="{() => recipeIngredientRepository.delete(id)}"
+        >{messages.labels.actions.delete.format()}</SvelteButton
       >
-      <SvelteButton on:click="{() => (pastedParsedRecipeIngredients = [])}"
-        >{messages.labels.actions.cancel.format()}</SvelteButton
-      >
-    </SvelteForm>
-  {/if}
+    </li>
+  {/each}
+</ol>
+{#if pastedParsedRecipeIngredients.length}
   <SvelteForm
     on:submit="{({ detail: { values } }) => {
-      recipeIngredientRepository.create({
-        order: $list.length + 1,
-        quantity: values.quantity || null,
-        unit: values.unit || null,
-        ingredientId: values.ingredientId[0],
-        recipeStepId,
-      });
+      for (let i = 0; i < values.ingredients.length; i++) {
+        const ingredient = values.ingredients[i];
+        recipeIngredientRepository.create({
+          order: $list.length + 1 + i,
+          quantity: ingredient.quantity || null,
+          unit: ingredient.unit || null,
+          ingredientId: ingredient.ingredientId[0],
+          recipeStepId,
+        });
+      }
+      pastedParsedRecipeIngredients = [];
     }}"
   >
-    <RecipeIngredientFormFields
-      on:paste="{(e) => {
-        e.preventDefault();
-        const html = e.clipboardData.getData('text/html');
-        if (html) {
-          pastedParsedRecipeIngredients = parseHtml(html);
-          return;
-        }
-        const text = e.clipboardData.getData('text/text');
-        pastedParsedRecipeIngredients = parseText(text);
-      }}"
-      usedIngredientIds="{$list}"
-    />
+    <SvelteFieldset name="ingredients" isList="{true}">
+      <ol>
+        {#each pastedParsedRecipeIngredients as parsedRecipeIngredient, i}
+          <li>
+            <FieldListItem id="{i}">
+              <RecipeIngredientFormFields
+                quantity="{parsedRecipeIngredient.quantity}"
+                unit="{parsedRecipeIngredient.unit}"
+                ingredientName="{parsedRecipeIngredient.name}"
+                usedIngredientIds="{$list}"
+              />
+            </FieldListItem>
+          </li>
+        {/each}
+      </ol>
+    </SvelteFieldset>
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >
+    <SvelteButton on:click="{() => (pastedParsedRecipeIngredients = [])}"
+      >{messages.labels.actions.cancel.format()}</SvelteButton
+    >
   </SvelteForm>
-</div>
+{/if}
+<SvelteForm
+  on:submit="{({ detail: { values } }) => {
+    recipeIngredientRepository.create({
+      order: $list.length + 1,
+      quantity: values.quantity || null,
+      unit: values.unit || null,
+      ingredientId: values.ingredientId[0],
+      recipeStepId,
+    });
+  }}"
+>
+  <RecipeIngredientFormFields
+    on:paste="{(e) => {
+      e.preventDefault();
+      const html = e.clipboardData.getData('text/html');
+      if (html) {
+        pastedParsedRecipeIngredients = parseHtml(html);
+        return;
+      }
+      const text = e.clipboardData.getData('text/text');
+      pastedParsedRecipeIngredients = parseText(text);
+    }}"
+    usedIngredientIds="{$list}"
+  />
+  <SvelteButton type="submit"
+    >{messages.labels.actions.create.format()}</SvelteButton
+  >
+</SvelteForm>

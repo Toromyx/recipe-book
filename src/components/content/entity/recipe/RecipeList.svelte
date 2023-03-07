@@ -22,18 +22,18 @@
       >
     </li>
   {/each}
-  <SvelteForm
-    on:submit="{({ detail: { values } }) => {
-      recipeRepository.create({ name: values.name });
-    }}"
-  >
-    <SvelteInput
-      name="name"
-      required="{true}"
-      label="{messages.labels.entityFields.recipe.name.format()}"
-    />
-    <SvelteButton type="submit"
-      >{messages.labels.actions.create.format()}</SvelteButton
-    >
-  </SvelteForm>
 </ol>
+<SvelteForm
+  on:submit="{({ detail: { values } }) => {
+    recipeRepository.create({ name: values.name });
+  }}"
+>
+  <SvelteInput
+    name="name"
+    required="{true}"
+    label="{messages.labels.entityFields.recipe.name.format()}"
+  />
+  <SvelteButton type="submit"
+    >{messages.labels.actions.create.format()}</SvelteButton
+  >
+</SvelteForm>

@@ -21,30 +21,28 @@
   });
 </script>
 
-<div>
-  <ol>
-    {#each $list as id}
-      <li>
-        <RecipeStep id="{id}" /><SvelteButton
-          on:click="{() => recipeStepRepository.delete(id)}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
-        >
-      </li>
-    {/each}
-  </ol>
-  <SvelteForm
-    on:submit="{async ({ detail: { values } }) => {
-      await recipeStepRepository.create({
-        order: $list.length + 1,
-        description: values.description,
-        recipeId,
-      });
-    }}"
+<ol>
+  {#each $list as id}
+    <li>
+      <RecipeStep id="{id}" /><SvelteButton
+        on:click="{() => recipeStepRepository.delete(id)}"
+        >{messages.labels.actions.delete.format()}</SvelteButton
+      >
+    </li>
+  {/each}
+</ol>
+<SvelteForm
+  on:submit="{async ({ detail: { values } }) => {
+    await recipeStepRepository.create({
+      order: $list.length + 1,
+      description: values.description,
+      recipeId,
+    });
+  }}"
+>
+  <h3>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h3>
+  <RecipeStepFormFields />
+  <SvelteButton type="submit"
+    >{messages.labels.actions.create.format()}</SvelteButton
   >
-    <h3>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h3>
-    <RecipeStepFormFields />
-    <SvelteButton type="submit"
-      >{messages.labels.actions.create.format()}</SvelteButton
-    >
-  </SvelteForm>
-</div>
+</SvelteForm>
