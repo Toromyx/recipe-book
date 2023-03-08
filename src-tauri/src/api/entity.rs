@@ -6,7 +6,7 @@ use sea_orm::{
 };
 use serde::Deserialize;
 
-use crate::{api::entity::error::EntityApiError, database};
+use crate::{api::entity::error::EntityApiError, database, window::get_window};
 
 pub mod error;
 pub mod ingredient;
@@ -114,7 +114,8 @@ pub trait EntityCrudTrait {
         let active_model = Self::pre_create(create).await?;
         let model = active_model.insert(db).await?;
         let model = Self::post_create(model).await?;
-        Ok(Self::primary_key_value(model))
+        get_window().emit(Self::entity_action_created_channel(), ())?;
+        Ok(Self::primary_key_value(&model))
     }
 
     async fn post_create(model: Self::Model) -> Result<Self::Model, EntityApiError> {
@@ -132,6 +133,10 @@ pub trait EntityCrudTrait {
     async fn update(update: Self::EntityUpdate) -> Result<Self::Model, EntityApiError> {
         let db = database::connect().await;
         let model = update.into_active_model().update(db).await?;
+        get_window().emit(
+            Self::entity_action_updated_channel(),
+            Self::primary_key_value(&model),
+        )?;
         Ok(model)
     }
 
@@ -144,6 +149,7 @@ pub trait EntityCrudTrait {
             return Ok(());
         };
         model.delete(db).await?;
+        get_window().emit(Self::entity_action_deleted_channel(), id)?;
         Ok(())
     }
 
@@ -182,7 +188,13 @@ pub trait EntityCrudTrait {
         Ok(count)
     }
 
-    fn primary_key_value(model: Self::Model) -> <Self::PrimaryKey as PrimaryKeyTrait>::ValueType;
+    fn primary_key_value(model: &Self::Model) -> <Self::PrimaryKey as PrimaryKeyTrait>::ValueType;
 
     fn primary_key_colum() -> Self::Column;
+
+    fn entity_action_created_channel() -> &'static str;
+
+    fn entity_action_updated_channel() -> &'static str;
+
+    fn entity_action_deleted_channel() -> &'static str;
 }

@@ -12,6 +12,10 @@ use crate::{
     api::entity::{error::EntityApiError, EntityCrudTrait, Filter},
     database,
     entity::recipe_file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
+    event::channel::{
+        ENTITY_ACTION_CREATED_RECIPE_FILE, ENTITY_ACTION_DELETED_RECIPE_FILE,
+        ENTITY_ACTION_UPDATED_RECIPE_FILE,
+    },
     recipe_file_storage,
 };
 
@@ -117,11 +121,23 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(model)
     }
 
-    fn primary_key_value(model: Model) -> i64 {
+    fn primary_key_value(model: &Model) -> i64 {
         model.id
     }
 
     fn primary_key_colum() -> Column {
         Column::Id
+    }
+
+    fn entity_action_created_channel() -> &'static str {
+        ENTITY_ACTION_CREATED_RECIPE_FILE
+    }
+
+    fn entity_action_updated_channel() -> &'static str {
+        ENTITY_ACTION_UPDATED_RECIPE_FILE
+    }
+
+    fn entity_action_deleted_channel() -> &'static str {
+        ENTITY_ACTION_DELETED_RECIPE_FILE
     }
 }

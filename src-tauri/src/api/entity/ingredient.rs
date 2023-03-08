@@ -1,8 +1,8 @@
 use sea_orm::{
     sea_query::IntoCondition,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, QueryTrait,
+    ColumnTrait, Condition, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, QueryFilter,
+    QuerySelect, QueryTrait,
 };
 use serde::Deserialize;
 
@@ -11,6 +11,10 @@ use crate::{
     entity::{
         ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
         recipe_ingredient,
+    },
+    event::channel::{
+        ENTITY_ACTION_CREATED_INGREDIENT, ENTITY_ACTION_DELETED_INGREDIENT,
+        ENTITY_ACTION_UPDATED_INGREDIENT,
     },
 };
 
@@ -95,11 +99,23 @@ impl EntityCrudTrait for IngredientCrud {
     type EntityCondition = IngredientCondition;
     type EntityOrderBy = IngredientOrderBy;
 
-    fn primary_key_value(model: Self::Model) -> <Self::PrimaryKey as PrimaryKeyTrait>::ValueType {
+    fn primary_key_value(model: &Model) -> i64 {
         model.id
     }
 
-    fn primary_key_colum() -> Self::Column {
+    fn primary_key_colum() -> Column {
         Column::Id
+    }
+
+    fn entity_action_created_channel() -> &'static str {
+        ENTITY_ACTION_CREATED_INGREDIENT
+    }
+
+    fn entity_action_updated_channel() -> &'static str {
+        ENTITY_ACTION_UPDATED_INGREDIENT
+    }
+
+    fn entity_action_deleted_channel() -> &'static str {
+        ENTITY_ACTION_DELETED_INGREDIENT
     }
 }

@@ -8,6 +8,10 @@ use serde::Deserialize;
 use crate::{
     api::entity::{EntityCrudTrait, Filter},
     entity::recipe_step::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
+    event::channel::{
+        ENTITY_ACTION_CREATED_RECIPE_STEP, ENTITY_ACTION_DELETED_RECIPE_STEP,
+        ENTITY_ACTION_UPDATED_RECIPE_STEP,
+    },
 };
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
@@ -88,11 +92,23 @@ impl EntityCrudTrait for RecipeStepCrud {
     type EntityCondition = RecipeStepCondition;
     type EntityOrderBy = RecipeStepOrderBy;
 
-    fn primary_key_value(model: Self::Model) -> i64 {
+    fn primary_key_value(model: &Model) -> i64 {
         model.id
     }
 
-    fn primary_key_colum() -> Self::Column {
+    fn primary_key_colum() -> Column {
         Column::Id
+    }
+
+    fn entity_action_created_channel() -> &'static str {
+        ENTITY_ACTION_CREATED_RECIPE_STEP
+    }
+
+    fn entity_action_updated_channel() -> &'static str {
+        ENTITY_ACTION_UPDATED_RECIPE_STEP
+    }
+
+    fn entity_action_deleted_channel() -> &'static str {
+        ENTITY_ACTION_DELETED_RECIPE_STEP
     }
 }
