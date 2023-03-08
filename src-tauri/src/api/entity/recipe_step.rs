@@ -1,20 +1,13 @@
 use sea_orm::{
     sea_query::IntoCondition,
-    ActiveModelTrait,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DbErr, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, ModelTrait,
-    QueryFilter, QueryOrder, QuerySelect,
+    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel,
 };
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{get_order_by, Filter, IdColumn},
-    database,
-    entity::recipe_step::{
-        ActiveModel, Column,
-        Column::{Id, Order, RecipeId},
-        Entity, Model,
-    },
+    api::entity::{EntityCrudTrait, Filter},
+    entity::recipe_step::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
 };
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
@@ -23,18 +16,6 @@ pub struct RecipeStepCreate {
     pub order: i64,
     pub description: String,
     pub recipe_id: i64,
-}
-
-pub async fn create(create: RecipeStepCreate) -> Result<i64, DbErr> {
-    let db = database::connect().await;
-    let model = create.into_active_model().insert(db).await?;
-    Ok(model.id)
-}
-
-pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
-    let db = database::connect().await;
-    let model = Entity::find_by_id(id).one(db).await?;
-    Ok(model)
 }
 
 #[derive(Debug, Deserialize)]
@@ -62,22 +43,6 @@ impl IntoActiveModel<ActiveModel> for RecipeStepUpdate {
     }
 }
 
-pub async fn update(update: RecipeStepUpdate) -> Result<Model, DbErr> {
-    let db = database::connect().await;
-    let model = update.into_active_model().update(db).await?;
-    Ok(model)
-}
-
-pub async fn delete(id: i64) -> Result<(), DbErr> {
-    let db = database::connect().await;
-    let model_option = Entity::find_by_id(id).one(db).await?;
-    let Some(model) = model_option else {
-        return Ok(());
-    };
-    model.delete(db).await?;
-    Ok(())
-}
-
 pub type RecipeStepFilter = Filter<RecipeStepCondition, RecipeStepOrderBy>;
 
 #[derive(Debug, Deserialize)]
@@ -88,7 +53,10 @@ pub struct RecipeStepCondition {
 
 impl IntoCondition for RecipeStepCondition {
     fn into_condition(self) -> Condition {
-        Condition::all().add_option(self.recipe_id.map(|recipe_id| RecipeId.eq(recipe_id)))
+        Condition::all().add_option(
+            self.recipe_id
+                .map(|recipe_id| Column::RecipeId.eq(recipe_id)),
+        )
     }
 }
 
@@ -101,34 +69,30 @@ pub enum RecipeStepOrderBy {
 impl From<RecipeStepOrderBy> for Column {
     fn from(value: RecipeStepOrderBy) -> Self {
         match value {
-            RecipeStepOrderBy::Order => Order,
+            RecipeStepOrderBy::Order => Column::Order,
         }
     }
 }
 
-pub async fn list(filter: RecipeStepFilter) -> Result<Vec<i64>, DbErr> {
-    let db = database::connect().await;
-    let mut select = Entity::find().select_only().column(Id);
-    if let Some(condition) = filter.condition {
-        select = select.filter(condition);
-    }
-    for order_by_item in get_order_by::<RecipeStepOrderBy, Column>(filter.order_by) {
-        select = select.order_by(order_by_item.0, order_by_item.1);
-    }
-    let models = select.into_model::<IdColumn>().all(db).await?;
-    Ok(models.iter().map(|id_column| id_column.id).collect())
-}
+pub struct RecipeStepCrud {}
 
-pub async fn count(filter: RecipeStepFilter) -> Result<i64, DbErr> {
-    let db = database::connect().await;
-    let mut select = Entity::find().select_only().column_as(Id.count(), "id");
-    if let Some(condition) = filter.condition {
-        select = select.filter(condition);
+impl EntityCrudTrait for RecipeStepCrud {
+    type Entity = Entity;
+    type Model = Model;
+    type ActiveModel = ActiveModel;
+    type Column = Column;
+    type Relation = Relation;
+    type PrimaryKey = PrimaryKey;
+    type EntityCreate = RecipeStepCreate;
+    type EntityUpdate = RecipeStepUpdate;
+    type EntityCondition = RecipeStepCondition;
+    type EntityOrderBy = RecipeStepOrderBy;
+
+    fn primary_key_value(model: Self::Model) -> i64 {
+        model.id
     }
-    let count_option = select.into_model::<IdColumn>().one(db).await?;
-    let count = match count_option {
-        Some(id_column) => id_column.id,
-        _ => 0,
-    };
-    Ok(count)
+
+    fn primary_key_colum() -> Self::Column {
+        Column::Id
+    }
 }

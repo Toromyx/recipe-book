@@ -1,7 +1,10 @@
 use crate::{
-    api,
-    api::entity::recipe_ingredient::{
-        RecipeIngredientCreate, RecipeIngredientFilter, RecipeIngredientUpdate,
+    api::entity::{
+        recipe_ingredient::{
+            RecipeIngredientCreate, RecipeIngredientCrud, RecipeIngredientFilter,
+            RecipeIngredientUpdate,
+        },
+        EntityCrudTrait,
     },
     command::error::{CommandError, CommandError::NotFound},
     entity::recipe_ingredient::Model,
@@ -11,13 +14,13 @@ use crate::{
 pub async fn entity_create_recipe_ingredient(
     create: RecipeIngredientCreate,
 ) -> Result<i64, CommandError> {
-    let id = api::entity::recipe_ingredient::create(create).await?;
+    let id = RecipeIngredientCrud::create(create).await?;
     Ok(id)
 }
 
 #[tauri::command]
 pub async fn entity_read_recipe_ingredient(id: i64) -> Result<Model, CommandError> {
-    let model_option = api::entity::recipe_ingredient::read(id).await?;
+    let model_option = RecipeIngredientCrud::read(id).await?;
     let model = model_option.ok_or(NotFound)?;
     Ok(model)
 }
@@ -26,13 +29,13 @@ pub async fn entity_read_recipe_ingredient(id: i64) -> Result<Model, CommandErro
 pub async fn entity_update_recipe_ingredient(
     update: RecipeIngredientUpdate,
 ) -> Result<(), CommandError> {
-    api::entity::recipe_ingredient::update(update).await?;
+    RecipeIngredientCrud::update(update).await?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn entity_delete_recipe_ingredient(id: i64) -> Result<(), CommandError> {
-    api::entity::recipe_ingredient::delete(id).await?;
+    RecipeIngredientCrud::delete(id).await?;
     Ok(())
 }
 
@@ -40,7 +43,7 @@ pub async fn entity_delete_recipe_ingredient(id: i64) -> Result<(), CommandError
 pub async fn entity_list_recipe_ingredient(
     filter: RecipeIngredientFilter,
 ) -> Result<Vec<i64>, CommandError> {
-    let list = api::entity::recipe_ingredient::list(filter).await?;
+    let list = RecipeIngredientCrud::list(filter).await?;
     Ok(list)
 }
 
@@ -48,6 +51,6 @@ pub async fn entity_list_recipe_ingredient(
 pub async fn entity_count_recipe_ingredient(
     filter: RecipeIngredientFilter,
 ) -> Result<i64, CommandError> {
-    let count = api::entity::recipe_ingredient::count(filter).await?;
+    let count = RecipeIngredientCrud::count(filter).await?;
     Ok(count)
 }

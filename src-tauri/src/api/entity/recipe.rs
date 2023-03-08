@@ -1,38 +1,19 @@
 use sea_orm::{
     sea_query::IntoCondition,
-    ActiveModelTrait,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DbErr, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, ModelTrait,
-    QueryFilter, QueryOrder, QuerySelect,
+    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel,
 };
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{get_order_by, Filter, IdColumn},
-    database,
-    entity::recipe::{
-        ActiveModel, Column,
-        Column::{Id, Name},
-        Entity, Model,
-    },
+    api::entity::{EntityCrudTrait, Filter},
+    entity::recipe::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
 };
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
 pub struct RecipeCreate {
     pub name: String,
-}
-
-pub async fn create(create: RecipeCreate) -> Result<i64, DbErr> {
-    let db = database::connect().await;
-    let model = create.into_active_model().insert(db).await?;
-    Ok(model.id)
-}
-
-pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
-    let db = database::connect().await;
-    let model = Entity::find_by_id(id).one(db).await?;
-    Ok(model)
 }
 
 #[derive(Debug, Deserialize)]
@@ -54,22 +35,6 @@ impl IntoActiveModel<ActiveModel> for RecipeUpdate {
     }
 }
 
-pub async fn update(update: RecipeUpdate) -> Result<Model, DbErr> {
-    let db = database::connect().await;
-    let model = update.into_active_model().update(db).await?;
-    Ok(model)
-}
-
-pub async fn delete(id: i64) -> Result<(), DbErr> {
-    let db = database::connect().await;
-    let model_option = Entity::find_by_id(id).one(db).await?;
-    let Some(model) = model_option else {
-        return Ok(());
-    };
-    model.delete(db).await?;
-    Ok(())
-}
-
 pub type RecipeFilter = Filter<RecipeCondition, RecipeOrderBy>;
 
 #[derive(Debug, Deserialize)]
@@ -80,7 +45,10 @@ pub struct RecipeCondition {
 
 impl IntoCondition for RecipeCondition {
     fn into_condition(self) -> Condition {
-        Condition::all().add_option(self.name.map(|name| Name.like(&format!("%{name}%"))))
+        Condition::all().add_option(
+            self.name
+                .map(|name| Column::Name.like(&format!("%{name}%"))),
+        )
     }
 }
 
@@ -93,34 +61,30 @@ pub enum RecipeOrderBy {
 impl From<RecipeOrderBy> for Column {
     fn from(value: RecipeOrderBy) -> Self {
         match value {
-            RecipeOrderBy::Name => Name,
+            RecipeOrderBy::Name => Column::Name,
         }
     }
 }
 
-pub async fn list(filter: RecipeFilter) -> Result<Vec<i64>, DbErr> {
-    let db = database::connect().await;
-    let mut select = Entity::find().select_only().column(Id);
-    if let Some(condition) = filter.condition {
-        select = select.filter(condition);
-    }
-    for order_by_item in get_order_by::<RecipeOrderBy, Column>(filter.order_by) {
-        select = select.order_by(order_by_item.0, order_by_item.1);
-    }
-    let models = select.into_model::<IdColumn>().all(db).await?;
-    Ok(models.iter().map(|id_column| id_column.id).collect())
-}
+pub struct RecipeCrud {}
 
-pub async fn count(filter: RecipeFilter) -> Result<i64, DbErr> {
-    let db = database::connect().await;
-    let mut select = Entity::find().select_only().column_as(Id.count(), "id");
-    if let Some(condition) = filter.condition {
-        select = select.filter(condition);
+impl EntityCrudTrait for RecipeCrud {
+    type Entity = Entity;
+    type Model = Model;
+    type ActiveModel = ActiveModel;
+    type Column = Column;
+    type Relation = Relation;
+    type PrimaryKey = PrimaryKey;
+    type EntityCreate = RecipeCreate;
+    type EntityUpdate = RecipeUpdate;
+    type EntityCondition = RecipeCondition;
+    type EntityOrderBy = RecipeOrderBy;
+
+    fn primary_key_value(model: Self::Model) -> i64 {
+        model.id
     }
-    let count_option = select.into_model::<IdColumn>().one(db).await?;
-    let count = match count_option {
-        Some(id_column) => id_column.id,
-        _ => 0,
-    };
-    Ok(count)
+
+    fn primary_key_colum() -> Self::Column {
+        Column::Id
+    }
 }

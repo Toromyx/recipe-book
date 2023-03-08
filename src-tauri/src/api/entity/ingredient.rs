@@ -1,21 +1,15 @@
 use sea_orm::{
     sea_query::IntoCondition,
-    ActiveModelTrait,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DbErr, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, ModelTrait,
-    QueryFilter, QueryOrder, QuerySelect, QueryTrait,
+    ColumnTrait, Condition, DeriveIntoActiveModel, EntityTrait, IntoActiveModel, PrimaryKeyTrait,
+    QueryFilter, QuerySelect, QueryTrait,
 };
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{get_order_by, Filter, IdColumn},
-    database,
+    api::entity::{EntityCrudTrait, Filter},
     entity::{
-        ingredient::{
-            ActiveModel, Column,
-            Column::{Id, Name},
-            Entity, Model,
-        },
+        ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
         recipe_ingredient,
     },
 };
@@ -24,18 +18,6 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 pub struct IngredientCreate {
     pub name: String,
-}
-
-pub async fn create(create: IngredientCreate) -> Result<i64, DbErr> {
-    let db = database::connect().await;
-    let model = create.into_active_model().insert(db).await?;
-    Ok(model.id)
-}
-
-pub async fn read(id: i64) -> Result<Option<Model>, DbErr> {
-    let db = database::connect().await;
-    let model = Entity::find_by_id(id).one(db).await?;
-    Ok(model)
 }
 
 #[derive(Debug, Deserialize)]
@@ -57,22 +39,6 @@ impl IntoActiveModel<ActiveModel> for IngredientUpdate {
     }
 }
 
-pub async fn update(update: IngredientUpdate) -> Result<Model, DbErr> {
-    let db = database::connect().await;
-    let model = update.into_active_model().update(db).await?;
-    Ok(model)
-}
-
-pub async fn delete(id: i64) -> Result<(), DbErr> {
-    let db = database::connect().await;
-    let model_option = Entity::find_by_id(id).one(db).await?;
-    let Some(model) = model_option else {
-        return Ok(());
-    };
-    model.delete(db).await?;
-    Ok(())
-}
-
 pub type IngredientFilter = Filter<IngredientCondition, IngredientOrderBy>;
 
 #[derive(Debug, Deserialize)]
@@ -85,9 +51,12 @@ pub struct IngredientCondition {
 impl IntoCondition for IngredientCondition {
     fn into_condition(self) -> Condition {
         Condition::all()
-            .add_option(self.name.map(|name| Name.like(&format!("%{name}%"))))
+            .add_option(
+                self.name
+                    .map(|name| Column::Name.like(&format!("%{name}%"))),
+            )
             .add_option(self.recipe_step_id.map(|recipe_step_id| {
-                Id.in_subquery(
+                Column::Id.in_subquery(
                     recipe_ingredient::Entity::find()
                         .select_only()
                         .column(recipe_ingredient::Column::IngredientId)
@@ -107,34 +76,30 @@ pub enum IngredientOrderBy {
 impl From<IngredientOrderBy> for Column {
     fn from(value: IngredientOrderBy) -> Self {
         match value {
-            IngredientOrderBy::Name => Name,
+            IngredientOrderBy::Name => Column::Name,
         }
     }
 }
 
-pub async fn list(filter: IngredientFilter) -> Result<Vec<i64>, DbErr> {
-    let db = database::connect().await;
-    let mut select = Entity::find().select_only().column(Id);
-    if let Some(condition) = filter.condition {
-        select = select.filter(condition);
-    }
-    for order_by_item in get_order_by::<IngredientOrderBy, Column>(filter.order_by) {
-        select = select.order_by(order_by_item.0, order_by_item.1);
-    }
-    let models = select.into_model::<IdColumn>().all(db).await?;
-    Ok(models.iter().map(|id_column| id_column.id).collect())
-}
+pub struct IngredientCrud {}
 
-pub async fn count(filter: IngredientFilter) -> Result<i64, DbErr> {
-    let db = database::connect().await;
-    let mut select = Entity::find().select_only().column_as(Id.count(), "id");
-    if let Some(condition) = filter.condition {
-        select = select.filter(condition);
+impl EntityCrudTrait for IngredientCrud {
+    type Entity = Entity;
+    type Model = Model;
+    type ActiveModel = ActiveModel;
+    type Column = Column;
+    type Relation = Relation;
+    type PrimaryKey = PrimaryKey;
+    type EntityCreate = IngredientCreate;
+    type EntityUpdate = IngredientUpdate;
+    type EntityCondition = IngredientCondition;
+    type EntityOrderBy = IngredientOrderBy;
+
+    fn primary_key_value(model: Self::Model) -> <Self::PrimaryKey as PrimaryKeyTrait>::ValueType {
+        model.id
     }
-    let count_option = select.into_model::<IdColumn>().one(db).await?;
-    let count = match count_option {
-        Some(id_column) => id_column.id,
-        _ => 0,
-    };
-    Ok(count)
+
+    fn primary_key_colum() -> Self::Column {
+        Column::Id
+    }
 }
