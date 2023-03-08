@@ -217,6 +217,7 @@ export class EntityRepository<
    * @param registerUpdate - register callbacks for reacting to entity updates
    * @param registerCreate - register callbacks for reacting to entity creations
    * @param registerDelete - register callbacks for reacting to entity deletions
+   * @param registerFilterRelatedActions - register callbacks for reacting to related entity actions which might influence filtered lists and counts
    */
   constructor(
     apiCreate: (entityCreate: EntityCreate) => Promise<number>,
@@ -229,6 +230,7 @@ export class EntityRepository<
     registerUpdate: (reactFunction: (identifier: number) => void) => void,
     registerCreate: (reactFunction: () => void) => void,
     registerDelete: (reactFunction: (identifier: number) => void) => void,
+    registerFilterRelatedActions?: (reactFunction: () => void) => void,
   ) {
     this.apiCreate = apiCreate;
     this.apiRead = apiRead;
@@ -323,6 +325,13 @@ export class EntityRepository<
       void reactFilteredList();
       void reactFilteredCount();
     });
+
+    if (registerFilterRelatedActions) {
+      registerFilterRelatedActions(() => {
+        void reactFilteredList();
+        void reactFilteredCount();
+      });
+    }
   }
 
   subscribe(
