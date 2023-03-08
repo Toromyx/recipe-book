@@ -7,6 +7,7 @@
   import { recipeIngredientRepository } from "../../../../../services/repository/recipe-ingredient-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import FieldListItem from "../../../../element/form/FieldListItem.svelte";
   import SvelteFieldset from "../../../../element/form/SvelteFieldset.svelte";
@@ -41,8 +42,10 @@
     {#each $list as id}
       <li>
         <RecipeIngredientView id="{id}" /><SvelteButton
-          on:click="{() => recipeIngredientRepository.delete(id)}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
+          on:click="{async () => {
+            await recipeIngredientRepository.delete(id);
+            updateOrder(recipeIngredientRepository, $list, id);
+          }}">{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>
     {/each}

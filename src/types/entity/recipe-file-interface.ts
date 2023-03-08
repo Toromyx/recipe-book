@@ -1,21 +1,26 @@
 import type { IdentifiableInterface } from "../identifiable-interface.ts";
+import type {
+  SortableInterface,
+  SortableUpdateInterface,
+} from "../sortable-interface.ts";
 
-export interface RecipeFileInterface extends IdentifiableInterface {
+export interface RecipeFileInterface
+  extends IdentifiableInterface,
+    SortableInterface {
   name: string;
-  order: number;
   mime: string;
   path: string;
   recipeStepId: number;
 }
 
-export interface RecipeFileCreateInterface {
+export interface RecipeFileCreateInterface extends SortableInterface {
   name: string;
-  order: number;
   path: string;
   recipeStepId: number;
 }
 
-export interface RecipeFileUpdateInterface extends IdentifiableInterface {
+export interface RecipeFileUpdateInterface
+  extends IdentifiableInterface,
+    SortableUpdateInterface {
   name?: string;
-  order?: number;
 }

@@ -2,6 +2,7 @@
   import { recipeFileRepository } from "../../../../../services/repository/recipe-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import RecipeFileEdit from "../edit/RecipeFileEdit.svelte";
@@ -29,8 +30,10 @@
     {#each $list as id}
       <li>
         <RecipeFileView id="{id}" /><SvelteButton
-          on:click="{() => recipeFileRepository.delete(id)}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
+          on:click="{async () => {
+            await recipeFileRepository.delete(id);
+            updateOrder(recipeFileRepository, $list, id);
+          }}">{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>
     {/each}

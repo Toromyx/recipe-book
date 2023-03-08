@@ -2,6 +2,7 @@
   import { recipeStepRepository } from "../../../../../services/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import RecipeStepEdit from "../edit/RecipeStepEdit.svelte";
@@ -27,8 +28,10 @@
     {#each $list as id}
       <li>
         <RecipeStepView id="{id}" /><SvelteButton
-          on:click="{() => recipeStepRepository.delete(id)}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
+          on:click="{async () => {
+            await recipeStepRepository.delete(id);
+            updateOrder(recipeStepRepository, $list, id);
+          }}">{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>
     {/each}
