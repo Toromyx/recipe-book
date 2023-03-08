@@ -103,12 +103,22 @@ pub trait EntityCrudTrait {
 
     type EntityOrderBy: Send;
 
+    async fn pre_create(create: Self::EntityCreate) -> Result<Self::ActiveModel, EntityApiError> {
+        Ok(create.into_active_model())
+    }
+
     async fn create(
         create: Self::EntityCreate,
     ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType, EntityApiError> {
         let db = database::connect().await;
-        let model = create.into_active_model().insert(db).await?;
+        let active_model = Self::pre_create(create).await?;
+        let model = active_model.insert(db).await?;
+        let model = Self::post_create(model).await?;
         Ok(Self::primary_key_value(model))
+    }
+
+    async fn post_create(model: Self::Model) -> Result<Self::Model, EntityApiError> {
+        Ok(model)
     }
 
     async fn read(
