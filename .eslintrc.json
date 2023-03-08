@@ -20,6 +20,7 @@
     "eqeqeq": "warn",
     "guard-for-in": "warn",
     "no-console": "warn",
+    "prefer-arrow-callback": "warn",
 
     "import/order": [
       "warn",
