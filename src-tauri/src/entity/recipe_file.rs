@@ -1,7 +1,5 @@
-use sea_orm::{entity::prelude::*, prelude::async_trait::async_trait};
+use sea_orm::entity::prelude::*;
 use serde::Serialize;
-
-use crate::recipe_file_storage;
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -34,13 +32,4 @@ impl Related<super::recipe_step::Entity> for Entity {
     }
 }
 
-#[async_trait]
-impl ActiveModelBehavior for ActiveModel {
-    async fn before_delete<C>(self, _db: &C) -> Result<Self, DbErr> {
-        let model = Model::try_from(self.clone())?;
-        recipe_file_storage::delete(&model).await.map_err(|err| {
-            DbErr::Custom(format!("Could not delete recipe file on disk: {}", err))
-        })?;
-        Ok(self)
-    }
-}
+impl ActiveModelBehavior for ActiveModel {}

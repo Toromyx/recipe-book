@@ -121,6 +121,11 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(model)
     }
 
+    async fn pre_delete(model: Model) -> Result<Model, EntityApiError> {
+        recipe_file_storage::delete(&model).await?;
+        Ok(model)
+    }
+
     fn primary_key_value(model: &Model) -> i64 {
         model.id
     }

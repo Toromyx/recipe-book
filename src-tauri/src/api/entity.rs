@@ -140,6 +140,10 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
+    async fn pre_delete(model: Self::Model) -> Result<Self::Model, EntityApiError> {
+        Ok(model)
+    }
+
     async fn delete(
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
     ) -> Result<(), EntityApiError> {
@@ -148,6 +152,7 @@ pub trait EntityCrudTrait {
         let Some(model) = model_option else {
             return Ok(());
         };
+        let model = Self::pre_delete(model).await?;
         model.delete(db).await?;
         get_window().emit(Self::entity_action_deleted_channel(), id)?;
         Ok(())
