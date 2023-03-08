@@ -22,6 +22,7 @@
     "fix:format:backend": "cd src-tauri && cargo +nightly fmt",
     "fix:format:frontend": "prettier -w **/*.*",
     "fix:format": "concurrently -c yellow,blue \"npm:fix:format:*\"",
+    "check": "npm run lint && npm run format",
     "fix": "npm run fix:lint && npm run fix:format",
     "tauri": "tauri"
   },
