@@ -12,7 +12,7 @@
 </script>
 
 {#if !isLoading($list)}
-  <ol>
+  <ul>
     {#each $list as id}
       <li>
         <a href="#{recipeRoute(id)}"><RecipeViewName id="{id}" /></a
@@ -21,7 +21,7 @@
         >
       </li>
     {/each}
-  </ol>
+  </ul>
   <SvelteForm
     on:submit="{({ detail: { values } }) => {
       recipeRepository.create({ name: values.name });
