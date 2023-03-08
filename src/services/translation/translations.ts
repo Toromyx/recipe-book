@@ -43,8 +43,10 @@ type Translations<T> = {
     selectPlaceholder: T;
   };
   headings: {
-    ingredients: T;
     recipeStep: T;
+    ingredients: T;
+    description: T;
+    files: T;
   };
 };
 

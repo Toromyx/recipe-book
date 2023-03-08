@@ -24,18 +24,14 @@
 </script>
 
 {#if !isLoading($list)}
-  <ol>
-    {#each $list as id}
-      <li>
-        <RecipeStepView id="{id}" /><SvelteButton
-          on:click="{async () => {
-            await recipeStepRepository.delete(id);
-            updateOrder(recipeStepRepository, $list, id);
-          }}">{messages.labels.actions.delete.format()}</SvelteButton
-        >
-      </li>
-    {/each}
-  </ol>
+  {#each $list as id}
+    <RecipeStepView id="{id}" /><SvelteButton
+      on:click="{async () => {
+        await recipeStepRepository.delete(id);
+        updateOrder(recipeStepRepository, $list, id);
+      }}">{messages.labels.actions.delete.format()}</SvelteButton
+    >
+  {/each}
   <SvelteForm
     on:submit="{async ({ detail: { values } }) => {
       await recipeStepRepository.create({
@@ -45,7 +41,7 @@
       });
     }}"
   >
-    <h3>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h3>
+    <h2>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h2>
     <RecipeStepEdit />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton

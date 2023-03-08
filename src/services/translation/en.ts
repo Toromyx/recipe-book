@@ -44,8 +44,10 @@ const translationStrings: TranslationStrings = {
     selectPlaceholder: "Select {label}",
   },
   headings: {
-    ingredients: "Ingredients",
     recipeStep: "Step {number}",
+    ingredients: "Ingredients",
+    description: "Description",
+    files: "Files",
   },
 };
 

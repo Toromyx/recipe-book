@@ -16,10 +16,12 @@
 </script>
 
 {#if !isLoading($recipeStep)}
-  <h3>
+  <h2>
     {messages.headings.recipeStep.format({ number: $recipeStep.order })}
-  </h3>
+  </h2>
+  <h3>{messages.headings.ingredients.format()}</h3>
   <RecipeIngredientList recipeStepId="{id}" />
+  <h3>{messages.headings.description.format()}</h3>
   <Editable
     on:edit="{async ({ detail: { values, changed } }) => {
       const update = { id };
@@ -34,5 +36,6 @@
     </svelte:fragment>
     <RecipeStepEdit slot="edit" description="{$recipeStep.description}" />
   </Editable>
+  <h3>{messages.headings.files.format()}</h3>
   <RecipeFileList recipeStepId="{id}" />
 {/if}
