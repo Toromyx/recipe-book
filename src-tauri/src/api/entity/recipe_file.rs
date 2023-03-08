@@ -4,13 +4,12 @@ use sea_orm::{
     sea_query::IntoCondition,
     ActiveModelTrait,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel,
+    ColumnTrait, Condition, DatabaseTransaction, DeriveIntoActiveModel, IntoActiveModel,
 };
 use serde::Deserialize;
 
 use crate::{
     api::entity::{error::EntityApiError, EntityCrudTrait, Filter},
-    database,
     entity::recipe_file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE_FILE, ENTITY_ACTION_DELETED_RECIPE_FILE,
@@ -101,7 +100,10 @@ impl EntityCrudTrait for RecipeFileCrud {
     type EntityCondition = RecipeFileCondition;
     type EntityOrderBy = RecipeFileOrderBy;
 
-    async fn pre_create(create: RecipeFileCreate) -> Result<ActiveModel, EntityApiError> {
+    async fn pre_create(
+        create: RecipeFileCreate,
+        _txn: &DatabaseTransaction,
+    ) -> Result<ActiveModel, EntityApiError> {
         let mime = mime_guess::from_path(&create.path)
             .first_or(mime::APPLICATION_OCTET_STREAM)
             .to_string();
@@ -110,18 +112,17 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(active_model)
     }
 
-    async fn post_create(model: Model) -> Result<Model, EntityApiError> {
-        let db = database::connect().await;
+    async fn post_create(model: Model, txn: &DatabaseTransaction) -> Result<Model, EntityApiError> {
         recipe_file_storage::create(&model).await?;
         let path_segments = recipe_file_storage::path_segments(&model).await?;
         let path = path_segments.join("/");
         let mut active_model = model.into_active_model();
         active_model.path = Set(path);
-        let model = active_model.update(db).await?;
+        let model = active_model.update(txn).await?;
         Ok(model)
     }
 
-    async fn pre_delete(model: Model) -> Result<Model, EntityApiError> {
+    async fn pre_delete(model: Model, _txn: &DatabaseTransaction) -> Result<Model, EntityApiError> {
         recipe_file_storage::delete(&model).await?;
         Ok(model)
     }

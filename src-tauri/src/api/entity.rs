@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
-    EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait, PrimaryKeyToColumn, PrimaryKeyTrait,
-    QueryFilter, QueryOrder, QuerySelect, RelationTrait,
+    DatabaseTransaction, EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait,
+    PrimaryKeyToColumn, PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect, RelationTrait,
+    TransactionTrait,
 };
 use serde::Deserialize;
 
@@ -103,7 +104,10 @@ pub trait EntityCrudTrait {
 
     type EntityOrderBy: Send;
 
-    async fn pre_create(create: Self::EntityCreate) -> Result<Self::ActiveModel, EntityApiError> {
+    async fn pre_create(
+        create: Self::EntityCreate,
+        _txn: &DatabaseTransaction,
+    ) -> Result<Self::ActiveModel, EntityApiError> {
         Ok(create.into_active_model())
     }
 
@@ -111,14 +115,19 @@ pub trait EntityCrudTrait {
         create: Self::EntityCreate,
     ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType, EntityApiError> {
         let db = database::connect().await;
-        let active_model = Self::pre_create(create).await?;
-        let model = active_model.insert(db).await?;
-        let model = Self::post_create(model).await?;
+        let txn = db.begin().await?;
+        let active_model = Self::pre_create(create, &txn).await?;
+        let model = active_model.insert(&txn).await?;
+        let model = Self::post_create(model, &txn).await?;
+        txn.commit().await?;
         get_window().emit(Self::entity_action_created_channel(), ())?;
         Ok(Self::primary_key_value(&model))
     }
 
-    async fn post_create(model: Self::Model) -> Result<Self::Model, EntityApiError> {
+    async fn post_create(
+        model: Self::Model,
+        _txn: &DatabaseTransaction,
+    ) -> Result<Self::Model, EntityApiError> {
         Ok(model)
     }
 
@@ -132,7 +141,9 @@ pub trait EntityCrudTrait {
 
     async fn update(update: Self::EntityUpdate) -> Result<Self::Model, EntityApiError> {
         let db = database::connect().await;
-        let model = update.into_active_model().update(db).await?;
+        let txn = db.begin().await?;
+        let model = update.into_active_model().update(&txn).await?;
+        txn.commit().await?;
         get_window().emit(
             Self::entity_action_updated_channel(),
             Self::primary_key_value(&model),
@@ -140,7 +151,10 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
-    async fn pre_delete(model: Self::Model) -> Result<Self::Model, EntityApiError> {
+    async fn pre_delete(
+        model: Self::Model,
+        _txn: &DatabaseTransaction,
+    ) -> Result<Self::Model, EntityApiError> {
         Ok(model)
     }
 
@@ -148,12 +162,14 @@ pub trait EntityCrudTrait {
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
     ) -> Result<(), EntityApiError> {
         let db = database::connect().await;
-        let model_option = Self::Entity::find_by_id(id).one(db).await?;
+        let txn = db.begin().await?;
+        let model_option = Self::Entity::find_by_id(id).one(&txn).await?;
         let Some(model) = model_option else {
             return Ok(());
         };
-        let model = Self::pre_delete(model).await?;
+        let model = Self::pre_delete(model, &txn).await?;
         model.delete(db).await?;
+        txn.commit().await?;
         get_window().emit(Self::entity_action_deleted_channel(), id)?;
         Ok(())
     }
