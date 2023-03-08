@@ -18,6 +18,7 @@
   },
   "rules": {
     "eqeqeq": "warn",
+    "guard-for-in": "warn",
     "no-console": "warn",
 
     "import/order": [
