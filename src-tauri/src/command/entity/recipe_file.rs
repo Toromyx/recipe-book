@@ -1,10 +1,10 @@
 use crate::{
-    api::entity::{
+    command::error::{CommandError, CommandError::NotFound},
+    entity::recipe_file::Model,
+    entity_crud::{
         recipe_file::{RecipeFileCreate, RecipeFileCrud, RecipeFileFilter, RecipeFileUpdate},
         EntityCrudTrait,
     },
-    command::error::{CommandError, CommandError::NotFound},
-    entity::recipe_file::Model,
 };
 
 #[tauri::command]

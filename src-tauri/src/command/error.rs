@@ -2,7 +2,7 @@ use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 use thiserror::Error;
 
-use crate::api::entity::error::EntityApiError;
+use crate::entity_crud::error::EntityCrudError;
 
 #[serde_as]
 #[derive(Debug, Error, Serialize)]
@@ -14,10 +14,10 @@ pub enum CommandError {
         sea_orm::error::DbErr,
     ),
     #[error(transparent)]
-    EntityApi(
+    EntityCrud(
         #[serde_as(as = "DisplayFromStr")]
         #[from]
-        EntityApiError,
+        EntityCrudError,
     ),
     #[error("Entity was not found.")]
     NotFound,

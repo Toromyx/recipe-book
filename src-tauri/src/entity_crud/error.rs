@@ -3,7 +3,7 @@ use thiserror::Error;
 use crate::recipe_file_storage::error::RecipeFileStorageError;
 
 #[derive(Debug, Error)]
-pub enum EntityApiError {
+pub enum EntityCrudError {
     #[error(transparent)]
     Db(#[from] sea_orm::DbErr),
     #[error(transparent)]

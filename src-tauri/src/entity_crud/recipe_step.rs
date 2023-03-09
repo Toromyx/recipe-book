@@ -6,8 +6,8 @@ use sea_orm::{
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{EntityCrudTrait, Filter},
     entity::recipe_step::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
+    entity_crud::{EntityCrudTrait, Filter},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE_STEP, ENTITY_ACTION_DELETED_RECIPE_STEP,
         ENTITY_ACTION_UPDATED_RECIPE_STEP,

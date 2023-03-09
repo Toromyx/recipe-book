@@ -29,10 +29,10 @@ use crate::command::entity::{
     },
 };
 
-mod api;
 mod command;
 mod database;
 mod entity;
+mod entity_crud;
 mod event;
 mod fs;
 mod log;

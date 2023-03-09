@@ -9,8 +9,8 @@ use sea_orm::{
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{error::EntityApiError, EntityCrudTrait, Filter},
     entity::recipe_file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
+    entity_crud::{error::EntityCrudError, EntityCrudTrait, Filter},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE_FILE, ENTITY_ACTION_DELETED_RECIPE_FILE,
         ENTITY_ACTION_UPDATED_RECIPE_FILE,
@@ -103,7 +103,7 @@ impl EntityCrudTrait for RecipeFileCrud {
     async fn pre_create(
         create: RecipeFileCreate,
         _txn: &DatabaseTransaction,
-    ) -> Result<ActiveModel, EntityApiError> {
+    ) -> Result<ActiveModel, EntityCrudError> {
         let mime = mime_guess::from_path(&create.path)
             .first_or(mime::APPLICATION_OCTET_STREAM)
             .to_string();
@@ -112,7 +112,10 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(active_model)
     }
 
-    async fn post_create(model: Model, txn: &DatabaseTransaction) -> Result<Model, EntityApiError> {
+    async fn post_create(
+        model: Model,
+        txn: &DatabaseTransaction,
+    ) -> Result<Model, EntityCrudError> {
         recipe_file_storage::create(&model).await?;
         let path_segments = recipe_file_storage::path_segments(&model).await?;
         let path = path_segments.join("/");
@@ -122,7 +125,10 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(model)
     }
 
-    async fn pre_delete(model: Model, _txn: &DatabaseTransaction) -> Result<Model, EntityApiError> {
+    async fn pre_delete(
+        model: Model,
+        _txn: &DatabaseTransaction,
+    ) -> Result<Model, EntityCrudError> {
         recipe_file_storage::delete(&model).await?;
         Ok(model)
     }

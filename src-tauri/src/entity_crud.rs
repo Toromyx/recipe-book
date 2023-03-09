@@ -7,7 +7,7 @@ use sea_orm::{
 };
 use serde::Deserialize;
 
-use crate::{api::entity::error::EntityApiError, database, window::get_window};
+use crate::{database, entity_crud::error::EntityCrudError, window::get_window};
 
 pub mod error;
 pub mod ingredient;
@@ -107,13 +107,13 @@ pub trait EntityCrudTrait {
     async fn pre_create(
         create: Self::EntityCreate,
         _txn: &DatabaseTransaction,
-    ) -> Result<Self::ActiveModel, EntityApiError> {
+    ) -> Result<Self::ActiveModel, EntityCrudError> {
         Ok(create.into_active_model())
     }
 
     async fn create(
         create: Self::EntityCreate,
-    ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType, EntityApiError> {
+    ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType, EntityCrudError> {
         let db = database::connect().await;
         let txn = db.begin().await?;
         let active_model = Self::pre_create(create, &txn).await?;
@@ -127,19 +127,19 @@ pub trait EntityCrudTrait {
     async fn post_create(
         model: Self::Model,
         _txn: &DatabaseTransaction,
-    ) -> Result<Self::Model, EntityApiError> {
+    ) -> Result<Self::Model, EntityCrudError> {
         Ok(model)
     }
 
     async fn read(
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
-    ) -> Result<Option<Self::Model>, EntityApiError> {
+    ) -> Result<Option<Self::Model>, EntityCrudError> {
         let db = database::connect().await;
         let model = Self::Entity::find_by_id(id).one(db).await?;
         Ok(model)
     }
 
-    async fn update(update: Self::EntityUpdate) -> Result<Self::Model, EntityApiError> {
+    async fn update(update: Self::EntityUpdate) -> Result<Self::Model, EntityCrudError> {
         let db = database::connect().await;
         let txn = db.begin().await?;
         let model = update.into_active_model().update(&txn).await?;
@@ -154,13 +154,13 @@ pub trait EntityCrudTrait {
     async fn pre_delete(
         model: Self::Model,
         _txn: &DatabaseTransaction,
-    ) -> Result<Self::Model, EntityApiError> {
+    ) -> Result<Self::Model, EntityCrudError> {
         Ok(model)
     }
 
     async fn delete(
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
-    ) -> Result<(), EntityApiError> {
+    ) -> Result<(), EntityCrudError> {
         let db = database::connect().await;
         let txn = db.begin().await?;
         let model_option = Self::Entity::find_by_id(id).one(&txn).await?;
@@ -176,7 +176,7 @@ pub trait EntityCrudTrait {
 
     async fn list(
         filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
-    ) -> Result<Vec<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType>, EntityApiError> {
+    ) -> Result<Vec<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType>, EntityCrudError> {
         let db = database::connect().await;
         let mut select = Self::Entity::find()
             .select_only()
@@ -193,7 +193,7 @@ pub trait EntityCrudTrait {
 
     async fn count(
         filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
-    ) -> Result<i64, EntityApiError> {
+    ) -> Result<i64, EntityCrudError> {
         let db = database::connect().await;
         let mut select = Self::Entity::find()
             .select_only()

@@ -7,11 +7,11 @@ use sea_orm::{
 use serde::Deserialize;
 
 use crate::{
-    api::entity::{EntityCrudTrait, Filter},
     entity::{
         ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
         recipe_ingredient,
     },
+    entity_crud::{EntityCrudTrait, Filter},
     event::channel::{
         ENTITY_ACTION_CREATED_INGREDIENT, ENTITY_ACTION_DELETED_INGREDIENT,
         ENTITY_ACTION_UPDATED_INGREDIENT,
