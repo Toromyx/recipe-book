@@ -168,7 +168,7 @@ pub trait EntityCrudTrait {
             return Ok(());
         };
         let model = Self::pre_delete(model, &txn).await?;
-        model.delete(db).await?;
+        model.delete(&txn).await?;
         txn.commit().await?;
         get_window().emit(Self::entity_action_deleted_channel(), id)?;
         Ok(())
