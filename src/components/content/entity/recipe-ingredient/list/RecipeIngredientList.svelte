@@ -91,14 +91,15 @@
     </SvelteForm>
   {/if}
   <SvelteForm
-    on:submit="{({ detail: { values } }) => {
-      recipeIngredientRepository.create({
+    on:submit="{async ({ detail: { values, context } }) => {
+      await recipeIngredientRepository.create({
         order: $list.length + 1,
         quantity: values.quantity || null,
         unit: values.unit || null,
         ingredientId: values.ingredientId[0],
         recipeStepId,
       });
+      context.reset();
     }}"
   >
     <RecipeIngredientEdit

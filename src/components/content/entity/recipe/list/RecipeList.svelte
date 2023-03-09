@@ -23,8 +23,9 @@
     {/each}
   </ul>
   <SvelteForm
-    on:submit="{({ detail: { values } }) => {
-      recipeRepository.create({ name: values.name });
+    on:submit="{async ({ detail: { values, context } }) => {
+      await recipeRepository.create({ name: values.name });
+      context.reset();
     }}"
   >
     <SvelteInput

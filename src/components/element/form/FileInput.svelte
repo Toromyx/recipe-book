@@ -1,6 +1,6 @@
 <script>
   import { open } from "@tauri-apps/api/dialog";
-  import { createEventDispatcher, getContext, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
   import { fileDrop } from "../../../services/actions/file-drop.ts";
   import { messages } from "../../../services/translation/en.ts";
   import SvelteButton from "../SvelteButton.svelte";
@@ -23,6 +23,9 @@
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
+    formContext.registerReset(name, () => {
+      value = "";
+    });
   }
 
   $: setValue(value);
@@ -42,6 +45,10 @@
       dispatch(eventType, value);
     });
   }
+
+  onDestroy(() => {
+    formContext?.onDestroy(name);
+  });
 </script>
 
 <span

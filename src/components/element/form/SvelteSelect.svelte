@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, getContext, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
   import { FORM } from "./SvelteForm.svelte";
 
@@ -23,6 +23,9 @@
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
+    formContext.registerReset(name, () => {
+      value = undefined;
+    });
   }
 
   $: setValue(value);
@@ -34,6 +37,10 @@
       dispatch(event.type, value);
     });
   }
+
+  onDestroy(() => {
+    formContext?.onDestroy(name);
+  });
 </script>
 
 <select

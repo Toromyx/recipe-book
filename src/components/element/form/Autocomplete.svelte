@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, getContext, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
   import { debounce } from "../../../services/util/debounce.ts";
   import { setCustomValidity } from "../../../services/util/validity.ts";
@@ -49,6 +49,10 @@
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
+    formContext.registerReset(name, () => {
+      value = [];
+      userInput = "";
+    });
   }
   getResults();
 
@@ -93,6 +97,10 @@
       dispatch("select", value);
     });
   }
+
+  onDestroy(() => {
+    formContext.onDestroy(name);
+  });
 </script>
 
 <div class="autocomplete">

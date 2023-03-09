@@ -33,12 +33,13 @@
     >
   {/each}
   <SvelteForm
-    on:submit="{async ({ detail: { values } }) => {
+    on:submit="{async ({ detail: { values, context } }) => {
       await recipeStepRepository.create({
         order: $list.length + 1,
         description: values.description,
         recipeId,
       });
+      context.reset();
     }}"
   >
     <h2>{messages.headings.recipeStep.format({ number: $list.length + 1 })}</h2>

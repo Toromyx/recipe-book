@@ -1,6 +1,6 @@
 <script>
   import { Temporal } from "@js-temporal/polyfill";
-  import { createEventDispatcher, getContext, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
   import { FORM } from "./SvelteForm.svelte";
 
   export let label;
@@ -32,6 +32,9 @@
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
+    formContext.registerReset(name, () => {
+      value = undefined;
+    });
   }
 
   $: setValue(value);
@@ -58,6 +61,10 @@
       dispatch(event.type, value);
     });
   }
+
+  onDestroy(() => {
+    formContext?.onDestroy(name);
+  });
 </script>
 
 <input

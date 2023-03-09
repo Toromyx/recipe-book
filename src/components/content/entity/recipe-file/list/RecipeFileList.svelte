@@ -39,13 +39,14 @@
     {/each}
   </ol>
   <SvelteForm
-    on:submit="{async ({ detail: { values } }) => {
+    on:submit="{async ({ detail: { values, context } }) => {
       await recipeFileRepository.create({
         name: values.name,
         order: $list.length + 1,
         path: values.path,
         recipeStepId,
       });
+      context.reset();
     }}"
   >
     <RecipeFileEdit />

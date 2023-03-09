@@ -1,5 +1,5 @@
 <script>
-  import { getContext, setContext } from "svelte";
+  import { getContext, onDestroy, setContext } from "svelte";
   import { FORM } from "./SvelteForm.svelte";
 
   export let name;
@@ -10,18 +10,22 @@
   const values = isList ? [] : {};
   /** @type {{[name: string]: boolean}} */
   const changed = {};
+  /** @type {{[name: string]: () => void}} */
+  const resets = {};
   const formContext = getContext(FORM);
 
   let setFormValue = () => {};
   let setFormChanged = () => {};
+  let formOnDestroy = () => {};
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
   if (formContext) {
     setFormValue = (value) => formContext.setValue(name, value);
     setFormChanged = () => formContext.setChanged(name);
+    formOnDestroy = () => formContext.onDestroy(name);
   }
 
-  setContext(FORM, {
+  const context = setContext(FORM, {
     name: fullName,
     setValue: (elementName, value) => {
       values[elementName] = value;
@@ -31,6 +35,29 @@
       changed[elementName] = true;
       setFormChanged();
     },
+    registerReset: (elementName, reset) => {
+      resets[elementName] = () => reset();
+    },
+    reset: () => {
+      for (const reset of Object.values(resets)) {
+        reset();
+      }
+    },
+    onDestroy: (elementName) => {
+      delete values[elementName];
+      delete changed[elementName];
+      delete resets[elementName];
+    },
+  });
+
+  if (formContext) {
+    formContext.registerReset(name, () => {
+      context.reset();
+    });
+  }
+
+  onDestroy(() => {
+    formOnDestroy();
   });
 </script>
 
