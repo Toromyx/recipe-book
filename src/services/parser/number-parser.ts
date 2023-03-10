@@ -13,11 +13,9 @@ export class NumberParser {
     const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
     this.#groupSeparator =
       parts.find((part) => part.type === "group")?.value ?? ",";
-    // @ts-expect-error @see ../polyfill/regex-escaping.ts
     this.#groupSeparatorRegExpEscaped = RegExp.escape(this.#groupSeparator);
     this.#decimalSeparator =
       parts.find((part) => part.type === "decimal")?.value ?? ".";
-    // @ts-expect-error @see ../polyfill/regex-escaping.ts
     this.#decimalSeparatorRegExpEscaped = RegExp.escape(this.#decimalSeparator);
   }
 
