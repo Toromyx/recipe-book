@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "Recipe App",
+    "productName": "Recipe Book",
     "version": "../package.json"
   },
   "tauri": {
@@ -34,7 +34,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.github.toromyx.recipe-app",
+      "identifier": "com.github.toromyx.recipe-book",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -63,7 +63,7 @@
         "fullscreen": false,
         "height": 800,
         "resizable": true,
-        "title": "Recipe App",
+        "title": "Recipe Book",
         "width": 1200
       }
     ]

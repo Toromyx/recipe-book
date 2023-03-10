@@ -1,11 +1,11 @@
 [package]
-name = "recipe-app"
+name = "recipe-book"
 version = "0.0.2"
-description = "Recipe App"
+description = "Recipe Book"
 authors = [
     "Thomas Gauges <thomas.gauges@gmail.com>",
 ]
-repository = "https://github.com/Toromyx/recipe-app"
+repository = "https://github.com/Toromyx/recipe-book"
 edition = "2021"
 rust-version = "1.66"
 

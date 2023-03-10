@@ -33,6 +33,6 @@ Types of changes:
 
 - Implement basic GUI and creation and reading of recipes
 
-[unreleased]: https://github.com/Toromyx/recipe-app/compare/v0.0.2...HEAD
-[0.0.2]: https://github.com/Toromyx/recipe-app/releases/tag/v0.0.2
-[0.0.1]: https://github.com/Toromyx/recipe-app/releases/tag/v0.0.1
+[unreleased]: https://github.com/Toromyx/recipe-book/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/Toromyx/recipe-book/releases/tag/v0.0.2
+[0.0.1]: https://github.com/Toromyx/recipe-book/releases/tag/v0.0.1
