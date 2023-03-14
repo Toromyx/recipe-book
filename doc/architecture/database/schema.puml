@@ -1,39 +1,44 @@
 @startuml
 
 entity "Recipe" as recipe {
+  id
   --
   name
 }
 
 entity "Recipe Step" as recipe_step {
+  id
   --
   order
   description
   image
 }
-recipe_step }o--|| "recipe" recipe
+recipe_step }o--|| "recipe_id" recipe
 
 entity "Recipe Ingredient" as recipe_ingredient {
+  id
   --
   order
   quantity
   unit
 }
-recipe_ingredient }o--|| "step" recipe_step
+recipe_ingredient }o--|| "step_id" recipe_step
 
 entity "Ingredient" as ingredient {
+  id
   --
   name
 }
-ingredient "ingredient" ||--o{ recipe_ingredient
+ingredient "ingredient_id" ||--o{ recipe_ingredient
 
 entity "Recipe File" as recipe_file {
+  id
   --
   name
   order
   mime
   uri
 }
-recipe_file }o--|| "step" recipe_step
+recipe_file }o--|| "step_id" recipe_step
 
 @enduml
