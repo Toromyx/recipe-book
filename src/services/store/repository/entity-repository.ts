@@ -1,7 +1,7 @@
 import type { Readable } from "svelte/store";
-import type { IdentifiableInterface } from "../../types/identifiable-interface.ts";
-import type { Loadable } from "../../types/loadable.ts";
-import { equalArray } from "../util/compare.ts";
+import type { IdentifiableInterface } from "../../../types/identifiable-interface.ts";
+import type { Loadable } from "../../../types/loadable.ts";
+import { equalArray } from "../../util/compare.ts";
 
 type EntityRepositorySubscriber<Entity> = (entity: Entity) => void;
 

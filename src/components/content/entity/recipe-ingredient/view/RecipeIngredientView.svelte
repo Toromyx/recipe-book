@@ -1,5 +1,5 @@
 <script>
-  import { recipeIngredientRepository } from "../../../../../services/repository/recipe-ingredient-repository.ts";
+  import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
   import Editable from "../../../../layout/Editable.svelte";
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";

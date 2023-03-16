@@ -28,7 +28,7 @@ import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-f
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
-import { stringifyFilter } from "../repository/entity-repository.ts";
+import { stringifyFilter } from "../store/repository/entity-repository.ts";
 import { client } from "./client.ts";
 import type { CommandAnswer } from "./command-answer.ts";
 import { Command } from "./command.ts";

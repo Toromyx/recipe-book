@@ -2,11 +2,11 @@ import type {
   RecipeCreateInterface,
   RecipeInterface,
   RecipeUpdateInterface,
-} from "../../types/entity/recipe-interface.ts";
-import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
-import { apiClient } from "../command/entity.ts";
-import { client } from "../event/client.ts";
-import { EventChannel } from "../event/event-channel.ts";
+} from "../../../types/entity/recipe-interface.ts";
+import type { RecipeFilterInterface } from "../../../types/filter/recipe-filter-interface.ts";
+import { apiClient } from "../../command/entity.ts";
+import { client } from "../../event/client.ts";
+import { EventChannel } from "../../event/event-channel.ts";
 import type { EntityRepositoryInterface } from "./entity-repository.ts";
 import { EntityRepository } from "./entity-repository.ts";
 

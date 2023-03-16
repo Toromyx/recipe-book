@@ -1,5 +1,5 @@
 <script>
-  import { recipeRepository } from "../../../../../services/repository/recipe-repository.ts";
+  import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
   import RecipeStepList from "../../recipe-step/list/RecipeStepList.svelte";
 

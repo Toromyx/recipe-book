@@ -1,7 +1,7 @@
 import type { IdentifiableInterface } from "../../types/identifiable-interface.ts";
 import type { Loadable } from "../../types/loadable.ts";
 import type { SortableUpdateInterface } from "../../types/sortable-interface.ts";
-import type { EntityRepositoryInterface } from "../repository/entity-repository.ts";
+import type { EntityRepositoryInterface } from "../store/repository/entity-repository.ts";
 import { isLoading } from "./is-loading.ts";
 
 export function updateOrder(

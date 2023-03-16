@@ -3,8 +3,8 @@
     parseHtml,
     parseText,
   } from "../../../../../services/parser/recipe-ingredient-parser.ts";
-  import { ingredientRepository } from "../../../../../services/repository/ingredient-repository.ts";
-  import { recipeIngredientRepository } from "../../../../../services/repository/recipe-ingredient-repository.ts";
+  import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
+  import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";

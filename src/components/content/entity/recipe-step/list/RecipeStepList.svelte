@@ -1,5 +1,5 @@
 <script>
-  import { recipeStepRepository } from "../../../../../services/repository/recipe-step-repository.ts";
+  import { recipeStepRepository } from "../../../../../services/store/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";

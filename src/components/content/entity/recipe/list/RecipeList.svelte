@@ -1,6 +1,6 @@
 <script>
-  import { recipeRepository } from "../../../../../services/repository/recipe-repository.ts";
   import { recipeRoute } from "../../../../../services/router.ts";
+  import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";

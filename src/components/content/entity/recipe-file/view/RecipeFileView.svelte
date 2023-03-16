@@ -1,7 +1,7 @@
 <script>
   import { convertFileSrc } from "@tauri-apps/api/tauri";
   import { RECIPE_FILE_URI_SCHEME } from "../../../../../services/protocol.ts";
-  import { recipeFileRepository } from "../../../../../services/repository/recipe-file-repository.ts";
+  import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
 
   export let id;
