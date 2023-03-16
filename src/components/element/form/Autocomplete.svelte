@@ -134,7 +134,7 @@
         >
       </li>
     {/each}
-    {#if !results.length && createCallback && userInput}
+    {#if createCallback && userInput}
       <li>
         <SvelteButton
           on:click="{() => createAndSelect()}"
