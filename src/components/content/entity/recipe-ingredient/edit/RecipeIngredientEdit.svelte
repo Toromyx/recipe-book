@@ -25,6 +25,7 @@
   name="unit"
   value="{unit}"
   label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
+  list="unit-list"
 />
 <Autocomplete
   on:paste

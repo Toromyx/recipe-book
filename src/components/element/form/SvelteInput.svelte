@@ -22,6 +22,8 @@
 
   export let multiple = undefined;
 
+  export let list = undefined;
+
   const formContext = getContext(FORM);
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
@@ -82,4 +84,5 @@
   step="{step}"
   accept="{accept}"
   multiple="{multiple}"
+  list="{list}"
 />
