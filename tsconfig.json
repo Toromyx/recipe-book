@@ -6,7 +6,7 @@
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "strict": true,
-    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "types": ["svelte", "vite/client"]
   },
