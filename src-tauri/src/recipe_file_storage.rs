@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use sea_orm::{DbErr, EntityTrait, ModelTrait};
+use sea_orm::{DbErr, EntityTrait};
 use tokio::fs;
 
 use crate::{
