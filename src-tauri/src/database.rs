@@ -1,4 +1,6 @@
-use sea_orm::{Database, DatabaseConnection};
+use std::time::Duration;
+
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
 use tokio::{self, sync::OnceCell};
 
@@ -30,7 +32,10 @@ async fn get_path() -> String {
 async fn get_connection() -> DatabaseConnection {
     let path = get_path().await;
     let database_url = String::from("sqlite://") + &path;
-    match Database::connect(database_url).await {
+    let mut opt = ConnectOptions::new(database_url);
+    opt.max_connections(100)
+        .acquire_timeout(Duration::from_millis(100));
+    match Database::connect(opt).await {
         Ok(ok) => ok,
         Err(err) => {
             let msg = format!("Could not connect to database: {err}",);
