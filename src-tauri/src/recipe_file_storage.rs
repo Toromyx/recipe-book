@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use sea_orm::{DbErr, ModelTrait};
+use sea_orm::{DbErr, EntityTrait, ModelTrait};
 use tokio::fs;
 
 use crate::{
@@ -34,8 +34,7 @@ pub fn dir() -> PathBuf {
 
 pub async fn path_segments(recipe_file: &Model) -> Result<Vec<String>, DbErr> {
     let db = database::connect().await;
-    let recipe_step = recipe_file
-        .find_related(recipe_step::Entity)
+    let recipe_step = recipe_step::Entity::find_by_id(recipe_file.recipe_step_id)
         .one(db)
         .await?
         .unwrap();
