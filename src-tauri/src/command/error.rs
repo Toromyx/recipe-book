@@ -14,6 +14,12 @@ pub enum CommandError {
         sea_orm::error::DbErr,
     ),
     #[error(transparent)]
+    Ocr(
+        #[serde_as(as = "DisplayFromStr")]
+        #[from]
+        tesseract::TesseractError,
+    ),
+    #[error(transparent)]
     EntityCrud(
         #[serde_as(as = "DisplayFromStr")]
         #[from]

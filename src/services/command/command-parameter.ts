@@ -77,6 +77,8 @@ type CommandParameterMap = {
   [Command.ENTITY_LIST_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
   [Command.ENTITY_COUNT_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
 
+  [Command.OCR]: { recipeFileId: number };
+
   [Command.UNIT_LIST_GET]: undefined;
 };
 export type CommandParameter<T extends Command> = CommandParameterMap[T];

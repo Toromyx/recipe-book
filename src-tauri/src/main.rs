@@ -29,6 +29,7 @@ use crate::command::{
             entity_list_recipe_step, entity_read_recipe_step, entity_update_recipe_step,
         },
     },
+    ocr::ocr,
     unit_list::unit_list_get,
 };
 
@@ -99,6 +100,7 @@ async fn main() {
             entity_delete_recipe_step,
             entity_list_recipe_step,
             entity_count_recipe_step,
+            ocr,
             unit_list_get,
         ])
         .run(tauri::generate_context!())

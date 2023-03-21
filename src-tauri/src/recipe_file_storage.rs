@@ -49,7 +49,7 @@ pub async fn path_segments(recipe_file: &Model) -> Result<Vec<String>, DbErr> {
     ])
 }
 
-async fn file(recipe_file: &Model) -> Result<PathBuf, DbErr> {
+pub async fn file(recipe_file: &Model) -> Result<PathBuf, DbErr> {
     let mut file = dir();
     for path_segment in path_segments(recipe_file).await? {
         file.push(path_segment);

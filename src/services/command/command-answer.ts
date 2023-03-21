@@ -41,6 +41,8 @@ type CommandAnswerMap = {
   [Command.ENTITY_LIST_RECIPE_STEP]: number[];
   [Command.ENTITY_COUNT_RECIPE_STEP]: number;
 
+  [Command.OCR]: string;
+
   [Command.UNIT_LIST_GET]: string[];
 };
 export type CommandAnswer<T extends Command> = CommandAnswerMap[T];
