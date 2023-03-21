@@ -1,13 +1,10 @@
 use log::LevelFilter;
 use log4rs::{
-    append::{
-        console::ConsoleAppender,
-        rolling_file::{
-            policy::compound::{
-                roll::fixed_window::FixedWindowRoller, trigger::size::SizeTrigger, CompoundPolicy,
-            },
-            RollingFileAppender,
+    append::rolling_file::{
+        policy::compound::{
+            roll::fixed_window::FixedWindowRoller, trigger::size::SizeTrigger, CompoundPolicy,
         },
+        RollingFileAppender,
     },
     config::{Appender, Root},
     encode::pattern::PatternEncoder,
@@ -22,7 +19,10 @@ pub fn init() {
     let mut root_builder = Root::builder();
 
     // console
-    if cfg!(debug_assertions) {
+    #[cfg(debug_assertions)]
+    {
+        use log4rs::append::console::ConsoleAppender;
+
         config_builder = config_builder.appender(
             Appender::builder().build(
                 "console",
@@ -68,7 +68,11 @@ pub fn init() {
     );
     root_builder = root_builder.appender("file");
 
-    let root = root_builder.build(LevelFilter::Warn);
+    #[cfg(debug_assertions)]
+    let level_filter = LevelFilter::Debug;
+    #[cfg(not(debug_assertions))]
+    let level_filter = LevelFilter::Warn;
+    let root = root_builder.build(level_filter);
 
     log4rs::init_config(config_builder.build(root).unwrap()).unwrap();
 }
