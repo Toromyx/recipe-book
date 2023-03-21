@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use log;
 use mime_guess::mime;
 use sea_orm::{
     sea_query::IntoCondition,
@@ -129,7 +130,9 @@ impl EntityCrudTrait for RecipeFileCrud {
         model: Model,
         _txn: &DatabaseTransaction,
     ) -> Result<Model, EntityCrudError> {
-        recipe_file_storage::delete(&model).await?;
+        if let Err(err) = recipe_file_storage::delete(&model).await {
+            log::warn!("Could not delete recipe file from storage: {}", err);
+        }
         Ok(model)
     }
 
