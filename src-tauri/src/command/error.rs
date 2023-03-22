@@ -14,10 +14,22 @@ pub enum CommandError {
         sea_orm::error::DbErr,
     ),
     #[error(transparent)]
-    Ocr(
+    OcrInitialize(
         #[serde_as(as = "DisplayFromStr")]
         #[from]
-        tesseract::TesseractError,
+        tesseract::InitializeError,
+    ),
+    #[error(transparent)]
+    OcrSetImage(
+        #[serde_as(as = "DisplayFromStr")]
+        #[from]
+        tesseract::SetImageError,
+    ),
+    #[error(transparent)]
+    OcrGetHocrText(
+        #[serde_as(as = "DisplayFromStr")]
+        #[from]
+        tesseract::plumbing::TessBaseApiGetHocrTextError,
     ),
     #[error(transparent)]
     EntityCrud(

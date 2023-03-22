@@ -8,6 +8,7 @@
   export let type = "button";
   export let disabled = false;
   export let value = "";
+  export let id = undefined;
   export let confirmation = false;
   export let confirmationQuestion = undefined;
   export let confirmationCancel = undefined;
@@ -28,6 +29,7 @@
 
 <button
   on:click="{onClick}"
+  id="{id}"
   type="{type}"
   disabled="{disabled}"
   value="{value}"

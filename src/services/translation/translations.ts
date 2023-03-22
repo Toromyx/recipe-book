@@ -12,6 +12,7 @@ type Translations<T> = {
       file: {
         open: T;
       };
+      ocr: T;
     };
     entityFields: {
       ingredient: {
@@ -32,6 +33,9 @@ type Translations<T> = {
       recipeStep: {
         description: T;
       };
+    };
+    descriptions: {
+      ocrOutput: T;
     };
   };
   validity: {

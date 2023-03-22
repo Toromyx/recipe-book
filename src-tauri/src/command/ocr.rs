@@ -1,3 +1,5 @@
+use tesseract::Tesseract;
+
 use crate::{
     command::error::CommandError, entity_crud, entity_crud::EntityCrudTrait, get_app_handle,
     recipe_file_storage,
@@ -17,6 +19,8 @@ pub async fn ocr(recipe_file_id: i64) -> Result<String, CommandError> {
         .to_string_lossy()
         .to_string();
     std::env::set_var("TESSDATA_PREFIX", &tessdata);
-    let ocr_result = tesseract::ocr(&file.to_string_lossy(), "Latin")?;
-    Ok(ocr_result)
+    let mut tesseract = Tesseract::new(None, Some("Latin"))?;
+    tesseract = tesseract.set_image(&file.to_string_lossy())?;
+    let hocr_string = tesseract.get_hocr_text(1)?;
+    Ok(hocr_string)
 }

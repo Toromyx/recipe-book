@@ -13,6 +13,7 @@ const translationStrings: TranslationStrings = {
       file: {
         open: "Open",
       },
+      ocr: "OCR",
     },
     entityFields: {
       ingredient: {
@@ -33,6 +34,9 @@ const translationStrings: TranslationStrings = {
       recipeStep: {
         description: "Description",
       },
+    },
+    descriptions: {
+      ocrOutput: "OCR output",
     },
   },
   validity: {
