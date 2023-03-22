@@ -33,7 +33,9 @@
           on:click="{async () => {
             await recipeFileRepository.delete(id);
             updateOrder(recipeFileRepository, $list, id);
-          }}">{messages.labels.actions.delete.format()}</SvelteButton
+          }}"
+          confirmation="{true}"
+          >{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>
     {/each}

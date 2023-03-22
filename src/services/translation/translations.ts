@@ -8,6 +8,7 @@ type Translations<T> = {
       update: T;
       delete: T;
       cancel: T;
+      confirm: T;
       file: {
         open: T;
       };
@@ -38,6 +39,9 @@ type Translations<T> = {
       max: T;
       min: T;
     };
+  };
+  questions: {
+    confirmation: T;
   };
   imperatives: {
     selectPlaceholder: T;

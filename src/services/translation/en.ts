@@ -9,6 +9,7 @@ const translationStrings: TranslationStrings = {
       update: "Update",
       delete: "Delete",
       cancel: "Cancel",
+      confirm: "Confirm",
       file: {
         open: "Open",
       },
@@ -39,6 +40,9 @@ const translationStrings: TranslationStrings = {
       max: "At most {max} {max,plural,one{element needs}other{elements need}} to be selected.",
       min: "At least {min} {min,plural,one{element needs}other{elements need}} to be selected.",
     },
+  },
+  questions: {
+    confirmation: "Are you sure?",
   },
   imperatives: {
     selectPlaceholder: "Select {label}",

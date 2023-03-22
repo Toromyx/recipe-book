@@ -16,7 +16,9 @@
     {#each $list as id}
       <li>
         <a href="#{recipeRoute(id)}"><RecipeViewName id="{id}" /></a
-        ><SvelteButton on:click="{() => recipeRepository.delete(id)}"
+        ><SvelteButton
+          on:click="{() => recipeRepository.delete(id)}"
+          confirmation="{true}"
           >{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>

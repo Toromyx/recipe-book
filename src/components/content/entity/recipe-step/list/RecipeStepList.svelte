@@ -29,7 +29,9 @@
       on:click="{async () => {
         await recipeStepRepository.delete(id);
         updateOrder(recipeStepRepository, $list, id);
-      }}">{messages.labels.actions.delete.format()}</SvelteButton
+      }}"
+      confirmation="{true}"
+      >{messages.labels.actions.delete.format()}</SvelteButton
     >
   {/each}
   <SvelteForm
