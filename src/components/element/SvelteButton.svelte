@@ -7,7 +7,7 @@
    */
   export let type = "button";
   export let disabled = false;
-  export let value = false;
+  export let value = "";
   export let confirmation = false;
   export let confirmationQuestion = undefined;
   export let confirmationCancel = undefined;
