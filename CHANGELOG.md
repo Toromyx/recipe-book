@@ -19,7 +19,11 @@ Types of changes:
 ### Added
 
 - Implement recipe editing
-- Implement recipe files (image/video/audio)
+- Implement recipe files (image/video/audio) with optical character recognition
+
+### Changed
+
+- Improve user experience of adding multiple recipe ingredients
 
 ## [0.0.2] - 2023-02-15
 
