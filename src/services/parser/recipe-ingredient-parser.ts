@@ -224,20 +224,57 @@ type ExtractedQuantity = {
 } & Extracted;
 
 function extractQuantity(string: string): ExtractedQuantity | null {
-  let matches = [...userLocaleNumberParser.match(string)];
+  const userLocaleNumberRegExp = new RegExp(
+    userLocaleNumberParser.getRegExpString(),
+    "gd",
+  );
+  let matches = [...string.matchAll(userLocaleNumberRegExp)];
   let numberParser = userLocaleNumberParser;
   if (!matches.length) {
-    matches = [...enNumberParser.match(string)];
+    const enNumberRegExp = new RegExp(enNumberParser.getRegExpString(), "gd");
+    matches = [...string.matchAll(enNumberRegExp)];
     numberParser = enNumberParser;
   }
   if (!matches.length) {
     return null;
   }
-  const match = matches[0];
+  let fractionMatches: RegExpMatchArray[] = [];
+  let rangeMatches: RegExpMatchArray[] = [];
+  if (matches.length > 1) {
+    const fractionRegExp = new RegExp(
+      `(?<numerator>${numberParser.getRegExpString()})/(?<denominator>${numberParser.getRegExpString()})`,
+      "gd",
+    );
+    fractionMatches = [...string.matchAll(fractionRegExp)];
+    const rangeRegExp = new RegExp(
+      `(?<start>${numberParser.getRegExpString()})-(?<end>${numberParser.getRegExpString()})`,
+      "gd",
+    );
+    rangeMatches = [...string.matchAll(rangeRegExp)];
+  }
+  let match = matches[0];
+  let quantity = numberParser.parse(match[0]);
+  if (fractionMatches.length) {
+    match = fractionMatches[0];
+    quantity =
+      // @ts-expect-error groups is defined
+      numberParser.parse(match.groups.numerator) /
+      // @ts-expect-error groups is defined
+      numberParser.parse(match.groups.denominator);
+  }
+  if (rangeMatches.length) {
+    match = rangeMatches[0];
+    quantity =
+      // @ts-expect-error groups is defined
+      (numberParser.parse(match.groups.end) +
+        // @ts-expect-error groups is defined
+        numberParser.parse(match.groups.start)) /
+      2;
+  }
   return {
     // @ts-expect-error indices is defined
     prefix: string.slice(0, match.indices[0][0]),
-    quantity: numberParser.parse(match[0]),
+    quantity,
     // @ts-expect-error indices is defined
     suffix: string.slice(match.indices[0][1]),
   };
