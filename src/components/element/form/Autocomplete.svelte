@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
   import { debounce } from "../../../services/util/debounce.ts";
   import { setCustomValidity } from "../../../services/util/validity.ts";
@@ -85,17 +85,13 @@
   function select(item) {
     value = [...value, item];
     setChanged();
-    void tick().then(() => {
-      dispatch("select", value);
-    });
+    dispatch("select", value);
   }
 
   function deselect(item) {
     value = value.filter((valueItem) => valueItem !== item);
     setChanged();
-    void tick().then(() => {
-      dispatch("select", value);
-    });
+    dispatch("select", value);
   }
 
   onDestroy(() => {

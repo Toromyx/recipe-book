@@ -1,6 +1,6 @@
 <script>
   import { open } from "@tauri-apps/api/dialog";
-  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy } from "svelte";
   import { fileDrop } from "../../../services/actions/file-drop.ts";
   import { messages } from "../../../services/translation/en.ts";
   import SvelteButton from "../SvelteButton.svelte";
@@ -41,9 +41,7 @@
   function onUserInput(userValue, eventType = "input") {
     value = userValue;
     setChanged();
-    void tick().then(() => {
-      dispatch(eventType, value);
-    });
+    dispatch(eventType, value);
   }
 
   onDestroy(() => {

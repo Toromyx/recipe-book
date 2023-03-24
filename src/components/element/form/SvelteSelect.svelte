@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, getContext, onDestroy, tick } from "svelte";
+  import { createEventDispatcher, getContext, onDestroy } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
   import { FORM } from "./SvelteForm.svelte";
 
@@ -33,9 +33,7 @@
   function onInputOrChange(event) {
     value = options[event.target.value].value;
     setChanged();
-    void tick().then(() => {
-      dispatch(event.type, value);
-    });
+    dispatch(event.type, value);
   }
 
   onDestroy(() => {
