@@ -7,7 +7,10 @@
   import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
   import { unitList } from "../../../../../services/store/unit-list.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import {
+    whenLoadingDefault,
+    isLoading,
+  } from "../../../../../services/util/is-loading.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import FieldListItem from "../../../../element/form/FieldListItem.svelte";
@@ -143,11 +146,17 @@
         e.preventDefault();
         const html = e.clipboardData.getData('text/html');
         if (html) {
-          pastedParsedRecipeIngredients = parseHtml(html);
+          pastedParsedRecipeIngredients = parseHtml(
+            html,
+            whenLoadingDefault($unitList, []),
+          );
           return;
         }
         const text = e.clipboardData.getData('text/text');
-        pastedParsedRecipeIngredients = parseText(text);
+        pastedParsedRecipeIngredients = parseText(
+          text,
+          whenLoadingDefault($unitList, []),
+        );
       }}"
       usedIngredientIds="{$usedIngredientsList || []}"
     />

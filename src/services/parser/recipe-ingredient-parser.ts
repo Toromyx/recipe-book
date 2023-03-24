@@ -2,6 +2,7 @@
  * This module implements simple parsing logic for parsing recipe ingredients from common inputs.
  * In most cases this will be from the user's clipboard.
  */
+import { standardDeviation } from "../util/statistics.ts";
 import { enNumberParser } from "./number-parser/en-number-parser.ts";
 import { userLocaleNumberParser } from "./number-parser/user-locale-number-parser.ts";
 
@@ -11,7 +12,21 @@ export type ParsedRecipeIngredient = {
   name: string;
 };
 
-export function parseHtml(html: string): ParsedRecipeIngredient[] {
+type AndIndex = {
+  index: number;
+};
+
+type Extracted = {
+  prefix: string;
+  suffix: string;
+};
+
+const ingredientSeparators = ["\n", ",", ";"];
+
+export function parseHtml(
+  html: string,
+  unitList: string[],
+): ParsedRecipeIngredient[] {
   const parser = new DOMParser();
   const document = parser.parseFromString(html, "text/html");
   const recipeIngredients: ParsedRecipeIngredient[] = [];
@@ -21,6 +36,7 @@ export function parseHtml(html: string): ParsedRecipeIngredient[] {
       return [...table.rows]
         .map((row): ParsedRecipeIngredient | null => {
           return fromParts(
+            unitList,
             ...[...row.cells]
               .map((cell) => cell.innerText.trim())
               .filter(Boolean),
@@ -34,30 +50,56 @@ export function parseHtml(html: string): ParsedRecipeIngredient[] {
     ...[...lists].flatMap((list): ParsedRecipeIngredient[] => {
       return [...list.querySelectorAll("li")]
         .map((listItem): ParsedRecipeIngredient | null => {
-          return fromParts(...listItem.innerText.split(/\s+/).filter(Boolean));
+          return fromParts(
+            unitList,
+            ...listItem.innerText.split(/\s+/).filter(Boolean),
+          );
         })
         .filter(Boolean) as ParsedRecipeIngredient[];
     }),
   );
   if (!recipeIngredients.length) {
-    recipeIngredients.push(...parseText(document.documentElement.innerText));
+    recipeIngredients.push(
+      ...parseText(document.documentElement.innerText, unitList),
+    );
   }
   return recipeIngredients;
 }
 
-export function parseText(text: string): ParsedRecipeIngredient[] {
+export function parseText(
+  text: string,
+  unitList: string[],
+): ParsedRecipeIngredient[] {
   const recipeIngredients: ParsedRecipeIngredient[] = [];
+  const separators = ingredientSeparators.filter((separator) =>
+    text.includes(separator),
+  );
+  const splitTextsBySeparator = separators.map((separator) =>
+    text.split(separator),
+  );
+  const standardDeviationOfIngredientLength = splitTextsBySeparator.map(
+    (splitText) => standardDeviation(...splitText.map((part) => part.length)),
+  );
+  const separator =
+    separators[
+      standardDeviationOfIngredientLength.indexOf(
+        Math.min(...standardDeviationOfIngredientLength),
+      )
+    ];
   recipeIngredients.push(
     ...(text
-      .split("\n")
+      .split(separator)
       .filter((e) => e.trim())
-      .map((line) => fromParts(...line.split(/\s+/).filter(Boolean)))
+      .map((line) => fromParts(unitList, ...line.split(/\s+/).filter(Boolean)))
       .filter(Boolean) as ParsedRecipeIngredient[]),
   );
   return recipeIngredients;
 }
 
-function fromParts(...parts: string[]): ParsedRecipeIngredient | null {
+function fromParts(
+  unitList: string[],
+  ...parts: string[]
+): ParsedRecipeIngredient | null {
   if (parts.length <= 0) {
     return null;
   }
@@ -66,85 +108,79 @@ function fromParts(...parts: string[]): ParsedRecipeIngredient | null {
       name: parts[0],
     };
   }
+  const extractedQuantityAndIndex = extractQuantityAndIndex(...parts);
+  const extractedUnitAndIndex = extractUnitAndIndex(unitList, ...parts);
   if (parts.length === 2) {
-    const extractedQuantityAndIndex = extractQuantityAndIndex(...parts);
-    if (!extractedQuantityAndIndex) {
+    if (extractedQuantityAndIndex) {
       return {
-        name: parts.join(" "),
+        quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
+        unit:
+          extractUnitFromExtractedQuantity(
+            extractedQuantityAndIndex.extractedQuantity,
+          ) || undefined,
+        name: parts[(extractedQuantityAndIndex.index + 1) % 2],
       };
     }
-    return {
-      quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-      unit:
-        extractUnit(extractedQuantityAndIndex.extractedQuantity) || undefined,
-      name: parts[extractedQuantityAndIndex.index + (1 % 2)],
-    };
-  }
-  const extractedQuantityAndIndex = extractQuantityAndIndex(...parts);
-  if (!extractedQuantityAndIndex) {
+    if (extractedUnitAndIndex) {
+      return {
+        unit: extractedUnitAndIndex.extractedUnit.unit,
+        name: parts[(extractedUnitAndIndex.index + 1) % 2],
+      };
+    }
     return {
       name: parts.join(" "),
     };
   }
-  const unit = extractUnit(extractedQuantityAndIndex.extractedQuantity);
-  if (extractedQuantityAndIndex.index === 0) {
-    if (unit) {
-      return {
-        quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-        unit,
-        name: parts.slice(1).join(" "),
-      };
+  if (extractedQuantityAndIndex) {
+    let unit = extractUnitFromExtractedQuantity(
+      extractedQuantityAndIndex.extractedQuantity,
+    );
+    if (!unit && extractedUnitAndIndex) {
+      unit = extractedUnitAndIndex.extractedUnit.unit;
     }
-    return {
-      quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-      unit: parts[1],
-      name: parts.slice(2).join(" "),
-    };
-  }
-  if (extractedQuantityAndIndex.index === parts.length - 1) {
-    if (unit) {
-      return {
-        quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-        unit,
-        name: parts.slice(0, -1).join(" "),
-      };
-    }
-    return {
-      quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-      unit: parts[parts.length - 2],
-      name: parts.slice(0, -2).join(" "),
-    };
-  }
-  if (unit) {
-    return {
-      quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-      unit,
-      name: parts
+    let name;
+    if (extractedUnitAndIndex) {
+      name = parts
+        .filter(
+          (_, i) =>
+            i !== extractedQuantityAndIndex.index &&
+            i !== extractedUnitAndIndex.index,
+        )
+        .join(" ");
+    } else {
+      name = parts
         .filter((_, i) => i !== extractedQuantityAndIndex.index)
-        .join(" "),
-    };
-  }
-  const partsBefore = parts.slice(0, extractedQuantityAndIndex.index);
-  const partsAfter = parts.slice(extractedQuantityAndIndex.index + 1);
-  const unitPartsBefore = partsBefore < partsAfter;
-  if (unitPartsBefore) {
+        .join(" ");
+    }
+    if (unit) {
+      return {
+        quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
+        unit,
+        name,
+      };
+    }
     return {
       quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-      unit: partsBefore.join(" "),
-      name: partsAfter.join(" "),
+      name,
+    };
+  }
+  if (extractedUnitAndIndex) {
+    const name = parts
+      .filter((_, i) => i !== extractedUnitAndIndex.index)
+      .join(" ");
+    return {
+      unit: extractedUnitAndIndex.extractedUnit.unit,
+      name,
     };
   }
   return {
-    quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-    unit: partsAfter.join(" "),
-    name: partsBefore.join(" "),
+    name: parts.join(" "),
   };
 }
 
 type ExtractedQuantityAndIndex = {
-  index: number;
   extractedQuantity: ExtractedQuantity;
-};
+} & AndIndex;
 
 function extractQuantityAndIndex(
   ...parts: string[]
@@ -162,11 +198,30 @@ function extractQuantityAndIndex(
   return null;
 }
 
+type ExtractedUnitAndIndex = {
+  extractedUnit: ExtractedUnit;
+} & AndIndex;
+
+function extractUnitAndIndex(
+  unitList: string[],
+  ...parts: string[]
+): ExtractedUnitAndIndex | null {
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    const extractedUnit = extractUnit(part, unitList);
+    if (extractedUnit) {
+      return {
+        index: i,
+        extractedUnit,
+      };
+    }
+  }
+  return null;
+}
+
 type ExtractedQuantity = {
-  prefix: string;
   quantity: number;
-  suffix: string;
-};
+} & Extracted;
 
 function extractQuantity(string: string): ExtractedQuantity | null {
   let matches = [...userLocaleNumberParser.match(string)];
@@ -188,7 +243,30 @@ function extractQuantity(string: string): ExtractedQuantity | null {
   };
 }
 
-function extractUnit(extractedQuantity: ExtractedQuantity): string | null {
+type ExtractedUnit = {
+  unit: string;
+} & Extracted;
+
+function extractUnit(string: string, unitList: string[]): ExtractedUnit | null {
+  for (const unit of unitList) {
+    const parts = string.split(
+      new RegExp(`(^|\\s+)${RegExp.escape(unit)}($|\\s+)`),
+    );
+    if (parts.length > 1) {
+      return {
+        prefix: parts[0].trim(),
+        unit,
+        suffix: parts.slice(1).join(unit).trim(),
+      };
+    }
+  }
+
+  return null;
+}
+
+function extractUnitFromExtractedQuantity(
+  extractedQuantity: ExtractedQuantity,
+): string | null {
   if (extractedQuantity.suffix.trim()) {
     return extractedQuantity.suffix.trim();
   }
