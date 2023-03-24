@@ -4,6 +4,7 @@
 
 <script>
   import { createEventDispatcher, setContext } from "svelte";
+  import { deleteEntry } from "../../../services/util/delete-entry.ts";
 
   /** @type {{[name: string]: any}} */
   const values = {};
@@ -29,9 +30,9 @@
       }
     },
     onDestroy: (elementName) => {
-      delete values[elementName];
-      delete changed[elementName];
-      delete resets[elementName];
+      deleteEntry(values, elementName);
+      deleteEntry(changed, elementName);
+      deleteEntry(resets, elementName);
     },
   });
 

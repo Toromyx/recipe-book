@@ -1,5 +1,6 @@
 <script>
   import { getContext, onDestroy, setContext } from "svelte";
+  import { deleteEntry } from "../../../services/util/delete-entry.ts";
   import { FORM } from "./SvelteForm.svelte";
 
   export let id;
@@ -42,9 +43,9 @@
       }
     },
     onDestroy: (elementName) => {
-      delete values[elementName];
-      delete changed[elementName];
-      delete resets[elementName];
+      deleteEntry(values, elementName);
+      deleteEntry(changed, elementName);
+      deleteEntry(resets, elementName);
     },
   });
 
