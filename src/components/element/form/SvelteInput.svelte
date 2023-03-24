@@ -16,7 +16,7 @@
 
   export let max = undefined;
 
-  export let step = undefined;
+  export let step = "any";
 
   export let accept = undefined;
 
