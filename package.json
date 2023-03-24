@@ -4,10 +4,10 @@
   "version": "0.0.2",
   "type": "module",
   "scripts": {
-    "dev:typescript": "tsc --noEmit -p tsconfig.json -w --pretty --preserveWatchOutput",
+    "dev:typescript": "tsc -p tsconfig.json -w --pretty --preserveWatchOutput",
     "dev:bundle": "vite -c vite.config.js",
     "dev": "concurrently -c cyan,magenta \"npm:dev:*\"",
-    "build:typescript": "tsc --noEmit -p tsconfig.json",
+    "build:typescript": "tsc -p tsconfig.json",
     "build:bundle": "vite build -c vite.config.js",
     "build": "npm run build:typescript && npm run build:bundle",
     "lint:backend": "cd src-tauri && cargo clippy --no-deps -- --deny warnings",

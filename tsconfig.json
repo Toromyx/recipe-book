@@ -3,6 +3,7 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "nodenext",
+    "noEmit": true,
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "strict": true,
