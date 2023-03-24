@@ -5,6 +5,7 @@
   } from "../../../../../services/parser/recipe-ingredient-parser.ts";
   import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
   import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
+  import { unitList } from "../../../../../services/store/unit-list.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoading } from "../../../../../services/util/is-loading.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
@@ -21,7 +22,7 @@
   let list;
   /** @type {Readable<Loadable<number[]>>} */
   let usedIngredientsList;
-  /** @type {ParsedRecipeIngredient[]} */
+  /** @type {(ParsedRecipeIngredient & {id?: number})[]} */
   let pastedParsedRecipeIngredients = [];
 
   $: list = recipeIngredientRepository.createListFilteredStore({
@@ -35,6 +36,9 @@
   $: usedIngredientsList = ingredientRepository.createListFilteredStore({
     condition: { recipeStepId },
   });
+  $: pastedIngredientIds = pastedParsedRecipeIngredients
+    .map((ingredient) => ingredient.id)
+    .filter(Boolean);
 </script>
 
 {#if !isLoading($list)}
@@ -74,15 +78,45 @@
             <li>
               <FieldListItem id="{i}">
                 <RecipeIngredientEdit
+                  on:edit="{({
+                    detail: { quantity, unit, ingredientName, ingredientId },
+                  }) => {
+                    parsedRecipeIngredient.quantity = quantity || undefined;
+                    parsedRecipeIngredient.unit = unit || undefined;
+                    parsedRecipeIngredient.name = ingredientName;
+                    parsedRecipeIngredient.id = ingredientId;
+                    pastedParsedRecipeIngredients =
+                      pastedParsedRecipeIngredients;
+                  }}"
                   quantity="{parsedRecipeIngredient.quantity}"
                   unit="{parsedRecipeIngredient.unit}"
                   ingredientName="{parsedRecipeIngredient.name}"
-                  usedIngredientIds="{$list}"
+                  ingredientId="{parsedRecipeIngredient.id}"
+                  usedIngredientIds="{[
+                    ...$usedIngredientsList,
+                    ...pastedIngredientIds,
+                  ]}"
                 />
               </FieldListItem>
+              <SvelteButton
+                on:click="{() => {
+                  pastedParsedRecipeIngredients.splice(i, 1);
+                  pastedParsedRecipeIngredients = pastedParsedRecipeIngredients;
+                }}"
+                confirmation="{true}"
+                >{messages.labels.actions.remove.format()}</SvelteButton
+              >
             </li>
           {/each}
         </ol>
+        <SvelteButton
+          on:click="{() => {
+            pastedParsedRecipeIngredients = [
+              ...pastedParsedRecipeIngredients,
+              { name: '' },
+            ];
+          }}">{messages.labels.actions.add.format()}</SvelteButton
+        >
       </SvelteFieldset>
       <SvelteButton type="submit"
         >{messages.labels.actions.create.format()}</SvelteButton

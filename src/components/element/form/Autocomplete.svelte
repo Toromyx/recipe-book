@@ -13,15 +13,13 @@
   /** @type {(string) => Promise<void>} */
   export let createCallback = undefined;
   export let value = [];
-  export let initialInput = "";
+  export let userInput = "";
   export let excludedValues = [];
   export let placeholder = label;
   export let min = 0;
   export let max = 1;
   export let maxResults = 10;
   export let debounceWait = 200;
-
-  let userInput = initialInput;
 
   const formContext = getContext(FORM);
   const dispatch = createEventDispatcher();
@@ -80,6 +78,7 @@
   function onInputOrChange(event) {
     userInput = event.target.value;
     getResults();
+    dispatch(event.type, userInput);
   }
 
   function select(item) {

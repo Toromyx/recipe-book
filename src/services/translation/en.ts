@@ -10,6 +10,8 @@ const translationStrings: TranslationStrings = {
       delete: "Delete",
       cancel: "Cancel",
       confirm: "Confirm",
+      add: "Add",
+      remove: "remove",
       file: {
         open: "Open",
       },

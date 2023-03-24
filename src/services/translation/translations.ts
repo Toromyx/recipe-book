@@ -9,6 +9,8 @@ type Translations<T> = {
       delete: T;
       cancel: T;
       confirm: T;
+      add: T;
+      remove: T;
       file: {
         open: T;
       };
