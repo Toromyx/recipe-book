@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import { portal } from "../../services/actions/portal.ts";
   import { messages } from "../../services/translation/en.ts";
   import SvelteButton from "../element/SvelteButton.svelte";
 
@@ -28,10 +29,12 @@
   }
 </script>
 
-<dialog bind:this="{dialog}" on:close="{onClose}">
-  <p>{question}</p>
-  <form method="dialog">
-    <SvelteButton type="submit" value="cancel">{cancel}</SvelteButton>
-    <SvelteButton type="submit" value="confirm">{confirm}</SvelteButton>
-  </form>
-</dialog>
+<div use:portal="{document.body}">
+  <dialog bind:this="{dialog}" on:close="{onClose}">
+    <p>{question}</p>
+    <form method="dialog">
+      <SvelteButton type="submit" value="cancel">{cancel}</SvelteButton>
+      <SvelteButton type="submit" value="confirm">{confirm}</SvelteButton>
+    </form>
+  </dialog>
+</div>
