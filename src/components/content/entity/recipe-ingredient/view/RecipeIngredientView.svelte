@@ -9,12 +9,12 @@
 
   /** @type {Readable<Loadable<RecipeIngredientInterface>>} */
   let recipeIngredient;
-  let qualifiers;
 
   $: recipeIngredient = recipeIngredientRepository.createStore(id);
-  $: qualifiers = [$recipeIngredient?.quantity, $recipeIngredient?.unit].filter(
-    Boolean,
-  );
+  $: quantifiers = [
+    $recipeIngredient?.quantity,
+    $recipeIngredient?.unit,
+  ].filter(Boolean);
 </script>
 
 {#if !isLoading($recipeIngredient)}
@@ -27,6 +27,9 @@
       if (changed.quantity) {
         update.quantity = values.quantity || null;
       }
+      if (changed.quality) {
+        update.quality = values.quality || null;
+      }
       if (changed.ingredientId) {
         update.ingredientId = values.ingredientId[0];
       }
@@ -34,15 +37,16 @@
     }}"
   >
     <span slot="display"
-      >{#each qualifiers as qualifier}{qualifier}&nbsp;{/each}<IngredientViewName
+      >{#each quantifiers as qualifier}{qualifier}&nbsp;{/each}<IngredientViewName
         id="{$recipeIngredient.ingredientId}"
-      /></span
+      />{#if $recipeIngredient.quality}{` (${$recipeIngredient.quality})`}{/if}</span
     >
     <RecipeIngredientEdit
       slot="edit"
       quantity="{$recipeIngredient.quantity}"
       unit="{$recipeIngredient.unit}"
       ingredientId="{$recipeIngredient.ingredientId}"
+      quality="{$recipeIngredient.quality}"
     />
   </Editable>
 {/if}

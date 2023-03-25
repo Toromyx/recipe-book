@@ -9,6 +9,7 @@ export interface RecipeIngredientInterface
     SortableInterface {
   quantity: number | null;
   unit: string | null;
+  quality: string | null;
   recipeStepId: number;
   ingredientId: number;
 }
@@ -16,6 +17,7 @@ export interface RecipeIngredientInterface
 export interface RecipeIngredientCreateInterface extends SortableInterface {
   quantity: number | null;
   unit: string | null;
+  quality: string | null;
   recipeStepId: number;
   ingredientId: number;
 }
@@ -26,5 +28,6 @@ export interface RecipeIngredientUpdateInterface
   order?: number;
   quantity?: number | null;
   unit?: string | null;
+  quality?: string | null;
   ingredientId?: number;
 }

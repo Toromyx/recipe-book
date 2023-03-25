@@ -32,6 +32,7 @@ const translationStrings: TranslationStrings = {
         quantity: "Quantity",
         unit: "Unit",
         ingredient: "Ingredient",
+        quality: "Quality",
       },
       recipeStep: {
         description: "Description",

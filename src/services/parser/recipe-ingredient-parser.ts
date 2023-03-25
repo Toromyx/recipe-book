@@ -10,6 +10,7 @@ export type ParsedRecipeIngredient = {
   quantity?: number;
   unit?: string;
   name: string;
+  quality?: string;
 };
 
 type AndIndex = {

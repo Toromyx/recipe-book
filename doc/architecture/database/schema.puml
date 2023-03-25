@@ -21,6 +21,7 @@ entity "Recipe Ingredient" as recipe_ingredient {
   order: INTEGER
   quantity: REAL
   unit: TEXT
+  quality: TEXT
 }
 recipe_ingredient }o--|| "step_id" recipe_step
 

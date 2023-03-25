@@ -68,6 +68,7 @@
             order: $list.length + 1 + i,
             quantity: ingredient.quantity || null,
             unit: ingredient.unit || null,
+            quality: ingredient.quality || null,
             ingredientId: ingredient.ingredientId[0],
             recipeStepId,
           });
@@ -135,6 +136,7 @@
         order: $list.length + 1,
         quantity: values.quantity || null,
         unit: values.unit || null,
+        quality: values.quality || null,
         ingredientId: values.ingredientId[0],
         recipeStepId,
       });

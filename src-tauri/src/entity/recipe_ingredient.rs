@@ -10,6 +10,7 @@ pub struct Model {
     pub order: i64,
     pub quantity: Option<f64>,
     pub unit: Option<String>,
+    pub quality: Option<String>,
     pub recipe_step_id: i64,
     pub ingredient_id: i64,
 }

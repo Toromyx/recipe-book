@@ -20,6 +20,7 @@ pub struct RecipeIngredientCreate {
     pub order: i64,
     pub quantity: Option<f64>,
     pub unit: Option<String>,
+    pub quality: Option<String>,
     pub recipe_step_id: i64,
     pub ingredient_id: i64,
 }
@@ -33,6 +34,8 @@ pub struct RecipeIngredientUpdate {
     pub quantity: Option<Option<f64>>,
     #[serde(default, with = "::serde_with::rust::double_option")]
     pub unit: Option<Option<String>>,
+    #[serde(default, with = "::serde_with::rust::double_option")]
+    pub quality: Option<Option<String>>,
     pub ingredient_id: Option<i64>,
 }
 
@@ -50,6 +53,10 @@ impl IntoActiveModel<ActiveModel> for RecipeIngredientUpdate {
             },
             unit: match self.unit {
                 Some(unit) => Set(unit),
+                _ => NotSet,
+            },
+            quality: match self.quality {
+                Some(quality) => Set(quality),
                 _ => NotSet,
             },
             recipe_step_id: NotSet,

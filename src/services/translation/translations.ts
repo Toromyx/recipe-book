@@ -31,6 +31,7 @@ type Translations<T> = {
         quantity: T;
         unit: T;
         ingredient: T;
+        quality: T;
       };
       recipeStep: {
         description: T;

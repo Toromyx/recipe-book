@@ -20,6 +20,7 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                 .col(ColumnDef::new(RecipeIngredient::Order).integer().not_null())
                 .col(ColumnDef::new(RecipeIngredient::Quantity).double().null())
                 .col(ColumnDef::new(RecipeIngredient::Unit).string().null())
+                .col(ColumnDef::new(RecipeIngredient::Quality).string().null())
                 .col(
                     ColumnDef::new(RecipeIngredient::RecipeStepId)
                         .integer()
@@ -103,6 +104,7 @@ pub enum RecipeIngredient {
     Order,
     Quantity,
     Unit,
+    Quality,
     RecipeStepId,
     IngredientId,
 }

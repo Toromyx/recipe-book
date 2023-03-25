@@ -10,6 +10,7 @@
   export let unit = undefined;
   export let ingredientId = undefined;
   export let ingredientName = "";
+  export let quality = undefined;
   export let usedIngredientIds = undefined;
 
   const values = {
@@ -17,6 +18,7 @@
     unit,
     ingredientName,
     ingredientId,
+    quality,
   };
   const dispatch = createEventDispatcher();
 
@@ -34,6 +36,10 @@
   }
   function onIngredientId({ detail }) {
     values.ingredientId = detail[0];
+    onUserInput();
+  }
+  function onQuality({ detail }) {
+    values.quality = detail;
     onUserInput();
   }
 
@@ -84,3 +90,11 @@
     <IngredientViewName id="{item}" />
   </svelte:fragment></Autocomplete
 >
+<SvelteInput
+  on:input="{onQuality}"
+  on:change="{onQuality}"
+  on:paste
+  name="quality"
+  value="{quality}"
+  label="{messages.labels.entityFields.recipeIngredient.quality.format()}"
+/>
