@@ -1,5 +1,3 @@
-import "../polyfill/regex-escaping.ts";
-
 export class NumberParser {
   #groupSeparator: string;
 
