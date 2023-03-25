@@ -2,7 +2,7 @@
  * This module implements simple parsing logic for parsing recipe ingredients from common inputs.
  * In most cases this will be from the user's clipboard.
  */
-import { standardDeviation } from "../util/statistics.ts";
+import { mean, standardDeviation } from "../util/statistics.ts";
 import { enNumberParser } from "./number-parser/en-number-parser.ts";
 import { userLocaleNumberParser } from "./number-parser/user-locale-number-parser.ts";
 
@@ -75,22 +75,43 @@ export function parseText(
   const separators = ingredientSeparators.filter((separator) =>
     text.includes(separator),
   );
-  const splitTextsBySeparator = separators.map((separator) =>
-    text.split(separator),
+  const separatorRegExps = separators.map(
+    (separator) => new RegExp(`${separator}(?![^({\\[<]*[)}\\]>])`),
   );
-  const standardDeviationOfIngredientLength = splitTextsBySeparator.map(
-    (splitText) => standardDeviation(...splitText.map((part) => part.length)),
+  const splitTextsBySeparator = separatorRegExps.map((separatorRegExp) =>
+    text
+      .split(separatorRegExp)
+      .map((part) => part.trim())
+      .filter(Boolean),
   );
-  const separator =
-    separators[
-      standardDeviationOfIngredientLength.indexOf(
-        Math.min(...standardDeviationOfIngredientLength),
-      )
-    ];
+  const getSquareness = (splitText: string[]): number => {
+    const lengths = splitText.map((part) => part.length);
+    const lengthsMean = mean(...lengths);
+    const lengthAndLengthsMean = [splitText.length, lengthsMean];
+    return (
+      Math.min(...lengthAndLengthsMean) / Math.max(...lengthAndLengthsMean)
+    );
+  };
+  const getLengthsStandardDeviation = (splitText: string[]): number => {
+    const lengths = splitText.map((part) => part.length);
+    return standardDeviation(...lengths);
+  };
+  splitTextsBySeparator.sort((splitTextA, splitTextB) => {
+    const squarenessA = getSquareness(splitTextA);
+    const squarenessB = getSquareness(splitTextB);
+    // higher is better
+    const squarenessComparison = squarenessB - squarenessA;
+    if (squarenessComparison) {
+      return squarenessComparison;
+    }
+    const lengthsStandardDeviationA = getLengthsStandardDeviation(splitTextA);
+    const lengthsStandardDeviationB = getLengthsStandardDeviation(splitTextB);
+    // lower is better
+    return lengthsStandardDeviationA - lengthsStandardDeviationB;
+  });
+  const splitText = splitTextsBySeparator[0];
   recipeIngredients.push(
-    ...(text
-      .split(separator)
-      .filter((e) => e.trim())
+    ...(splitText
       .map((line) => fromParts(unitList, ...line.split(/\s+/).filter(Boolean)))
       .filter(Boolean) as ParsedRecipeIngredient[]),
   );
