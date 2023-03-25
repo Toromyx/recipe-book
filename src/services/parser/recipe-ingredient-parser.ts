@@ -24,6 +24,11 @@ type Extracted = {
 
 const ingredientSeparators = ["\n", ",", ";"];
 
+const contextDelimiters = {
+  open: ["(", "{", "[", "<"],
+  close: [")", "}", "]", ">"],
+};
+
 export function parseHtml(
   html: string,
   unitList: string[],
@@ -76,7 +81,12 @@ export function parseText(
     text.includes(separator),
   );
   const separatorRegExps = separators.map(
-    (separator) => new RegExp(`${separator}(?![^({\\[<]*[)}\\]>])`),
+    (separator) =>
+      new RegExp(
+        `${separator}(?![^${RegExp.escape(
+          contextDelimiters.open.join(""),
+        )}]*[${RegExp.escape(contextDelimiters.close.join(""))}])`,
+      ),
   );
   const splitTextsBySeparator = separatorRegExps.map((separatorRegExp) =>
     text
@@ -127,7 +137,7 @@ function fromParts(
   }
   if (parts.length === 1) {
     return {
-      name: parts[0],
+      ...extractNameAndQuality(parts[0]),
     };
   }
   const extractedQuantityAndIndex = extractQuantityAndIndex(...parts);
@@ -140,17 +150,19 @@ function fromParts(
           extractUnitFromExtractedQuantity(
             extractedQuantityAndIndex.extractedQuantity,
           ) || undefined,
-        name: parts[(extractedQuantityAndIndex.index + 1) % 2],
+        ...extractNameAndQuality(
+          parts[(extractedQuantityAndIndex.index + 1) % 2],
+        ),
       };
     }
     if (extractedUnitAndIndex) {
       return {
         unit: extractedUnitAndIndex.extractedUnit.unit,
-        name: parts[(extractedUnitAndIndex.index + 1) % 2],
+        ...extractNameAndQuality(parts[(extractedUnitAndIndex.index + 1) % 2]),
       };
     }
     return {
-      name: parts.join(" "),
+      ...extractNameAndQuality(parts.join(" ")),
     };
   }
   if (extractedQuantityAndIndex) {
@@ -178,12 +190,12 @@ function fromParts(
       return {
         quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
         unit,
-        name,
+        ...extractNameAndQuality(name),
       };
     }
     return {
       quantity: extractedQuantityAndIndex.extractedQuantity.quantity,
-      name,
+      ...extractNameAndQuality(name),
     };
   }
   if (extractedUnitAndIndex) {
@@ -192,11 +204,38 @@ function fromParts(
       .join(" ");
     return {
       unit: extractedUnitAndIndex.extractedUnit.unit,
-      name,
+      ...extractNameAndQuality(name),
     };
   }
   return {
-    name: parts.join(" "),
+    ...extractNameAndQuality(parts.join(" ")),
+  };
+}
+
+type NameAndQuality = {
+  name: string;
+  quality?: string;
+};
+
+function extractNameAndQuality(name: string): NameAndQuality {
+  const qualityRegex = new RegExp(
+    `[${RegExp.escape(
+      contextDelimiters.open.join(""),
+    )}](?<quality>.+)[${RegExp.escape(contextDelimiters.close.join(""))}]`,
+    "d",
+  );
+  const regexpMatchArray = name.match(qualityRegex);
+  const quality = regexpMatchArray?.groups?.quality;
+  if (quality) {
+    name =
+      // @ts-expect-error indices is defined
+      name.slice(0, regexpMatchArray.indices[0][0]) +
+      // @ts-expect-error indices is defined
+      name.slice(regexpMatchArray.indices[0][1]);
+  }
+  return {
+    name,
+    quality,
   };
 }
 

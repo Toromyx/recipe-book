@@ -83,12 +83,19 @@
               <FieldListItem id="{i}">
                 <RecipeIngredientEdit
                   on:edit="{({
-                    detail: { quantity, unit, ingredientName, ingredientId },
+                    detail: {
+                      quantity,
+                      unit,
+                      ingredientName,
+                      ingredientId,
+                      quality,
+                    },
                   }) => {
                     parsedRecipeIngredient.quantity = quantity || undefined;
                     parsedRecipeIngredient.unit = unit || undefined;
                     parsedRecipeIngredient.name = ingredientName;
                     parsedRecipeIngredient.id = ingredientId;
+                    parsedRecipeIngredient.quality = quality;
                     pastedParsedRecipeIngredients =
                       pastedParsedRecipeIngredients;
                   }}"
@@ -96,6 +103,7 @@
                   unit="{parsedRecipeIngredient.unit}"
                   ingredientName="{parsedRecipeIngredient.name}"
                   ingredientId="{parsedRecipeIngredient.id}"
+                  quality="{parsedRecipeIngredient.quality}"
                   usedIngredientIds="{[
                     ...$usedIngredientsList,
                     ...pastedIngredientIds,
