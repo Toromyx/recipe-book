@@ -58,7 +58,10 @@ export function parseHtml(
         .map((listItem): ParsedRecipeIngredient | null => {
           return fromParts(
             unitList,
-            ...listItem.innerText.split(/\s+/).filter(Boolean),
+            ...listItem.innerText
+              .split(/\s+/)
+              .map((part) => part.trim())
+              .filter(Boolean),
           );
         })
         .filter(Boolean) as ParsedRecipeIngredient[];
@@ -122,7 +125,15 @@ export function parseText(
   const splitText = splitTextsBySeparator[0];
   recipeIngredients.push(
     ...(splitText
-      .map((line) => fromParts(unitList, ...line.split(/\s+/).filter(Boolean)))
+      .map((line) =>
+        fromParts(
+          unitList,
+          ...line
+            .split(/\s+/)
+            .map((part) => part.trim())
+            .filter(Boolean),
+        ),
+      )
       .filter(Boolean) as ParsedRecipeIngredient[]),
   );
   return recipeIngredients;
@@ -227,11 +238,13 @@ function extractNameAndQuality(name: string): NameAndQuality {
   const regexpMatchArray = name.match(qualityRegex);
   const quality = regexpMatchArray?.groups?.quality;
   if (quality) {
-    name =
+    name = `${
       // @ts-expect-error indices is defined
-      name.slice(0, regexpMatchArray.indices[0][0]) +
+      name.slice(0, regexpMatchArray.indices[0][0]).trim()
+    } ${
       // @ts-expect-error indices is defined
-      name.slice(regexpMatchArray.indices[0][1]);
+      name.slice(regexpMatchArray.indices[0][1]).trim()
+    }`;
   }
   return {
     name,
@@ -334,10 +347,10 @@ function extractQuantity(string: string): ExtractedQuantity | null {
   }
   return {
     // @ts-expect-error indices is defined
-    prefix: string.slice(0, match.indices[0][0]),
+    prefix: string.slice(0, match.indices[0][0]).trim(),
     quantity,
     // @ts-expect-error indices is defined
-    suffix: string.slice(match.indices[0][1]),
+    suffix: string.slice(match.indices[0][1]).trim(),
   };
 }
 
