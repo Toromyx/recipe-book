@@ -4,7 +4,6 @@ mod m20230306_214922_1_0_0;
 
 pub struct Migrator;
 
-#[async_trait::async_trait]
 impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![Box::new(m20230306_214922_1_0_0::Migration)]
