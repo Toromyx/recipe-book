@@ -1,3 +1,7 @@
+//! This module implements logic for logging.
+//!
+//! This application uses [`log4rs`] with [`log`].
+
 use log::LevelFilter;
 use log4rs::{
     append::rolling_file::{
@@ -13,6 +17,7 @@ use log4rs::{
 
 use crate::path::app_data_dir;
 
+/// Initialize the logger.
 pub fn init() {
     let pattern_encoder = PatternEncoder::default();
     let mut config_builder = Config::builder();

@@ -1,3 +1,5 @@
+//! This module contains the [`sea_orm`] entities.
+
 pub mod ingredient;
 pub mod recipe;
 pub mod recipe_file;

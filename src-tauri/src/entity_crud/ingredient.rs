@@ -1,3 +1,5 @@
+//! This module implements [`EntityCrudTrait`] for [`crate::entity::ingredient`].
+
 use sea_orm::{
     sea_query::IntoCondition,
     ActiveValue::{NotSet, Set, Unchanged},

@@ -1,6 +1,14 @@
+//! This module implements the recipe entity.
+//!
+//! See [`Model`] for more information.
+
 use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
+/// This struct represents a recipe.
+///
+/// A recipe is a series of instructions.
+/// A recipe is identifiable by its name.
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
 #[serde(rename_all = "camelCase")]
 #[sea_orm(table_name = "recipe")]

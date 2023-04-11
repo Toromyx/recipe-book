@@ -1,3 +1,5 @@
+//! This module contains the [`std::error::Error`] for the [`crate::protocol::recipe_file`] module.
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]

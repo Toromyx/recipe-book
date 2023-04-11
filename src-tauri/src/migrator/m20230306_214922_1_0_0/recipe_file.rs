@@ -1,3 +1,5 @@
+//! This module implements the creation of [`crate::entity::recipe_file`].
+
 use sea_orm_migration::prelude::*;
 
 use crate::migrator::{index_name, m20230306_214922_1_0_0::recipe_step::RecipeStep};

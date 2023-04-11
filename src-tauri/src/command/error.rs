@@ -1,3 +1,5 @@
+//! This module implements [`EntityCrudTrait`] for [`crate::command`].
+
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 use thiserror::Error;

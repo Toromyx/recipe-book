@@ -1,3 +1,5 @@
+//! This module implements the creation of [`crate::entity::ingredient`].
+
 use sea_orm_migration::prelude::*;
 
 use crate::migrator::index_name;

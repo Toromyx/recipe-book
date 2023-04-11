@@ -1,3 +1,5 @@
+//! This module implements create, read, update, delete, list, and count operations for the entities in [`crate::entity`].  
+
 use async_trait::async_trait;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
@@ -16,11 +18,15 @@ pub mod recipe_file;
 pub mod recipe_ingredient;
 pub mod recipe_step;
 
+/// This struct represents just getting the id column of a database table.
+///
+/// This is needed for listing entity ids.
 #[derive(FromQueryResult)]
 pub struct IdColumn {
     id: i64,
 }
 
+/// This enum is used to specify how to order results when listing an entity.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Order {
@@ -43,6 +49,10 @@ impl From<Order> for sea_query::Order {
     }
 }
 
+/// This struct represents a single ordering instruction when listing entities.
+///
+/// The type parameter [`OrderByColumn`] represents the column to be sorted.
+/// This struct is used in [`Filter`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OrderByItem<OrderByColumn> {
@@ -51,6 +61,9 @@ pub struct OrderByItem<OrderByColumn> {
     order: Order,
 }
 
+/// This struct combines conditional filtering and ordering when listing entities.
+///
+/// This struct is used in [`EntityCrudTrait`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Filter<Condition, OrderBy> {
@@ -58,6 +71,9 @@ pub struct Filter<Condition, OrderBy> {
     pub order_by: Option<Vec<OrderByItem<OrderBy>>>,
 }
 
+/// Get a [`sea_query::Order`] for each [`Column`].
+///
+/// This function is used when listing entities in [`EntityCrudTrait`].
 fn get_order_by<OrderBy, Column: From<OrderBy>>(
     order_by: Option<Vec<OrderByItem<OrderBy>>>,
 ) -> Vec<(Column, sea_query::Order)> {
@@ -75,8 +91,16 @@ fn get_order_by<OrderBy, Column: From<OrderBy>>(
         .collect()
 }
 
+/// This trait implements create, read, update, delete, list, and count operation for an entity.
+///
+/// When implementing this trait, only the associated types and some simple helper function need to be implemented.
+///
+/// This trait currently uses [`async_trait`] but also works with `#![feature(async_fn_in_trait)]`.
+/// It should drop the usage of [`async_trait`] once `async_fn_in_trait` is stabilized.
+/// For more information see <https://github.com/rust-lang/rust/issues/91611>.
 #[async_trait]
 pub trait EntityCrudTrait {
+    /// the entity, implementing [`EntityTrait`]
     type Entity: EntityTrait<
         Model = Self::Model,
         Column = Self::Column,
@@ -84,26 +108,38 @@ pub trait EntityCrudTrait {
         PrimaryKey = Self::PrimaryKey,
     >;
 
+    /// the entity's model, implementing [`ModelTrait`]
     type Model: ModelTrait<Entity = Self::Entity>
         + FromQueryResult
         + IntoActiveModel<Self::ActiveModel>;
 
+    /// the entity's active model, implementing [`ActiveModelTrait`]
     type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send;
 
+    /// the entity's column enum, implementing [`ColumnTrait`] and [`From<Self::EntityOrderBy>`]
     type Column: ColumnTrait + From<Self::EntityOrderBy>;
 
+    /// the entity's relation enum, implementing [`RelationTrait`]
     type Relation: RelationTrait;
 
+    /// the entity's primary key, its value type needs to be `i64`
     type PrimaryKey: PrimaryKeyTrait<ValueType = i64> + PrimaryKeyToColumn<Column = Self::Column>;
 
+    /// the struct with which to create an entity, implementing [`IntoActiveModel<Self::ActiveModel>`]
     type EntityCreate: IntoActiveModel<Self::ActiveModel> + Send;
 
+    /// the struct with which to update an entity, implementing [`IntoActiveModel<Self::ActiveModel>`]
     type EntityUpdate: IntoActiveModel<Self::ActiveModel> + Send;
 
+    /// the struct with which to filter an entity list or count, implementing [`IntoCondition`]
     type EntityCondition: IntoCondition + Send;
 
+    /// used when ordering an entity list
     type EntityOrderBy: Send;
 
+    /// Implement this to run code before creating the entity.
+    ///
+    /// see [`Self::create`]
     async fn pre_create(
         create: Self::EntityCreate,
         _txn: &DatabaseTransaction,
@@ -111,6 +147,13 @@ pub trait EntityCrudTrait {
         Ok(create.into_active_model())
     }
 
+    /// Create an entity.
+    ///
+    /// # Errors
+    ///
+    /// - [`EntityCrudError::Db`] when there is any problem with the database
+    /// - [`EntityCrudError::Tauri`] when the tauri window can't be messaged about the created entity
+    /// - when there is an error in [`Self::pre_create`] or [`Self::post_create`]
     async fn create(
         create: Self::EntityCreate,
     ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType, EntityCrudError> {
@@ -124,6 +167,9 @@ pub trait EntityCrudTrait {
         Ok(Self::primary_key_value(&model))
     }
 
+    /// Implement this to run code after creating the entity.
+    ///
+    /// see [`Self::create`]
     async fn post_create(
         model: Self::Model,
         _txn: &DatabaseTransaction,
@@ -131,6 +177,11 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
+    /// Read an entity.
+    ///
+    /// # Errors
+    ///
+    /// - [`EntityCrudError::Db`] when there is any problem with the database
     async fn read(
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
     ) -> Result<Option<Self::Model>, EntityCrudError> {
@@ -139,6 +190,12 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
+    /// Update an entity.
+    ///
+    /// # Errors
+    ///
+    /// - [`EntityCrudError::Db`] when there is any problem with the database
+    /// - [`EntityCrudError::Tauri`] when the tauri window can't be messaged about the updated entity
     async fn update(update: Self::EntityUpdate) -> Result<Self::Model, EntityCrudError> {
         let db = database::connect().await;
         let txn = db.begin().await?;
@@ -151,6 +208,9 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
+    /// Implement this to run code before deleting the entity.
+    ///
+    /// see [`Self::delete`]
     async fn pre_delete(
         model: Self::Model,
         _txn: &DatabaseTransaction,
@@ -158,6 +218,13 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
+    /// Delete an entity.
+    ///
+    /// # Errors
+    ///
+    /// - [`EntityCrudError::Db`] when there is any problem with the database
+    /// - [`EntityCrudError::Tauri`] when the tauri window can't be messaged about the deleted entity
+    /// - when there is an error in [`Self::pre_delete`]
     async fn delete(
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
     ) -> Result<(), EntityCrudError> {
@@ -174,6 +241,11 @@ pub trait EntityCrudTrait {
         Ok(())
     }
 
+    /// List entities.
+    ///
+    /// # Errors
+    ///
+    /// - [`EntityCrudError::Db`] when there is any problem with the database
     async fn list(
         filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
     ) -> Result<Vec<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType>, EntityCrudError> {
@@ -191,6 +263,11 @@ pub trait EntityCrudTrait {
         Ok(models.iter().map(|id_column| id_column.id).collect())
     }
 
+    /// Count entities.
+    ///
+    /// # Errors
+    ///
+    /// - [`EntityCrudError::Db`] when there is any problem with the database
     async fn count(
         filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
     ) -> Result<i64, EntityCrudError> {
@@ -209,13 +286,18 @@ pub trait EntityCrudTrait {
         Ok(count)
     }
 
+    /// Get the primary key value from the entity model.
     fn primary_key_value(model: &Self::Model) -> <Self::PrimaryKey as PrimaryKeyTrait>::ValueType;
 
+    /// Get the primary key column.
     fn primary_key_colum() -> Self::Column;
 
+    /// Get the tauri event channel for a created entity.
     fn entity_action_created_channel() -> &'static str;
 
+    /// Get the tauri event channel for an update entity.
     fn entity_action_updated_channel() -> &'static str;
 
+    /// Get the tauri event channel for a deleted entity.
     fn entity_action_deleted_channel() -> &'static str;
 }

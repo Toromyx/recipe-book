@@ -1,3 +1,5 @@
+//! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_file`].
+
 use async_trait::async_trait;
 use log;
 use mime_guess::mime;

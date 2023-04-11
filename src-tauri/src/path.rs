@@ -1,3 +1,5 @@
+//! This module is a wrapper for [`tauri::PathResolver`], resolving different paths dependent on whether the binary was compiled with `debug_assertions`, `test`, or not.
+
 use std::{fs::create_dir_all, path::PathBuf};
 
 use crate::get_app_handle;
@@ -12,6 +14,13 @@ macro_rules! mutable_or_immutable {
     };
 }
 
+/// Get the application's data directory.
+///
+/// # Panics
+///
+/// This function panics...
+/// - ...when [`tauri::PathResolver::app_data_dir`] does return [`None`].
+/// - ...when the directory cannot be created with [`create_dir_all`].
 pub fn app_data_dir() -> PathBuf {
     mutable_or_immutable!(
         dir,

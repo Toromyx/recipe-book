@@ -46,11 +46,21 @@ mod protocol;
 mod recipe_file_storage;
 mod window;
 
+/// This static variable holds the app handle once the tauri app has started.
 static mut APP_HANDLE: Option<AppHandle> = None;
 
+/// Get and unwrap the static app handle [`APP_HANDLE`].
+///
+/// See [`try_get_app_handle`] for a non-panicing version.
+///
+/// # Panics
+///
+/// This function panics when [`APP_HANDLE`] is [`None`]. this is the case when the tauri app is un-initialized.
 pub fn get_app_handle() -> &'static AppHandle {
     try_get_app_handle().expect("Could not get the app handle.")
 }
+
+/// Get the static app handle [`APP_HANDLE`].
 pub fn try_get_app_handle() -> Option<&'static AppHandle> {
     unsafe { APP_HANDLE.as_ref() }
 }

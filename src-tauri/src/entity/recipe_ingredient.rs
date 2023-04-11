@@ -1,6 +1,13 @@
+//! This module implements the recipe ingredient entity.
+//!
+//! See [`Model`] for more information.
+
 use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
+/// This struct represents a recipe ingredient.
+///
+/// A recipe ingredient describes the quantity and quality of an [`super::ingredient::Model`] to be used in a [`super::recipe::Model`].
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize)]
 #[serde(rename_all = "camelCase")]
 #[sea_orm(table_name = "recipe_ingredient")]

@@ -1,3 +1,7 @@
+//! This module implements the initial database migration for version 1.0.
+//!
+//! It creates all entities.
+
 use sea_orm_migration::prelude::*;
 
 mod ingredient;

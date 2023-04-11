@@ -1,6 +1,13 @@
+//! This module implements the recipe step entity.
+//!
+//! See [`Model`] for more information.
+
 use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
+/// This struct represents a recipe step.
+///
+/// A recipe step is a part of a [`super::recipe::Model`].
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
 #[serde(rename_all = "camelCase")]
 #[sea_orm(table_name = "recipe_step")]

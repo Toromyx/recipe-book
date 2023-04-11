@@ -5,6 +5,7 @@ use crate::{
     recipe_file_storage,
 };
 
+/// Get the optically recognized characters from the specified recipe file.
 #[tauri::command]
 pub async fn ocr(recipe_file_id: i64) -> Result<String, CommandError> {
     let model_option = entity_crud::recipe_file::RecipeFileCrud::read(recipe_file_id).await?;
