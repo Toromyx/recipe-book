@@ -11,8 +11,8 @@
 
 {#if edit}
   <SvelteForm
-    on:submit="{({ detail: { values, changed } }) => {
-      dispatch('edit', { values, changed });
+    on:submit="{({ detail }) => {
+      dispatch('edit', { ...detail });
       edit = false;
     }}"
   >
