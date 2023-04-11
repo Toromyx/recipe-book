@@ -7,16 +7,16 @@ window.addEventListener("mousemove", () => {
   fileDropPayload = undefined;
 });
 
-export function fileDrop(node: HTMLElement): ActionReturn {
+export function fileDrop(element: HTMLElement): ActionReturn {
   const onMouseEnter = () => {
     if (fileDropPayload) {
-      node.dispatchEvent(
+      element.dispatchEvent(
         new CustomEvent("fileDrop", { detail: fileDropPayload }),
       );
       fileDropPayload = undefined;
     }
   };
-  node.addEventListener("mouseenter", onMouseEnter);
+  element.addEventListener("mouseenter", onMouseEnter);
   const unListenFnPromise = listen(TauriEvent.WINDOW_FILE_DROP, (event) => {
     fileDropPayload = event.payload as string[];
   });
@@ -24,7 +24,7 @@ export function fileDrop(node: HTMLElement): ActionReturn {
   return {
     destroy() {
       void unListenFnPromise.then((unListenFn) => unListenFn());
-      node.removeEventListener("mouseenter", onMouseEnter);
+      element.removeEventListener("mouseenter", onMouseEnter);
     },
   };
 }
