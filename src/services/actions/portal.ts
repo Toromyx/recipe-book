@@ -1,7 +1,9 @@
 import type { ActionReturn } from "svelte/action";
 
 /**
- * @see https://github.com/sveltejs/svelte/issues/1133
+ * Moves every child of a node to a target node.
+ *
+ * @see https://github.com/sveltejs/svelte/issues/1133#issuecomment-682131447
  */
 export function portal(node: HTMLElement, target: HTMLElement): ActionReturn {
   const childNodes = [...node.childNodes];
