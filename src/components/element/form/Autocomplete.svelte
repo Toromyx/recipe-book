@@ -25,19 +25,21 @@
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
   const getResults = debounce(async () => {
-    if (!userInput) {
+    if (!innerUserInput) {
       return;
     }
-    results = await callback(userInput);
+    results = await callback(innerUserInput);
   }, debounceWait);
   const createAndSelect = async () => {
-    const createValue = await createCallback(userInput);
+    const createValue = await createCallback(innerUserInput);
     if (createValue) {
       select(createValue);
     }
-    results = await callback(userInput);
+    results = await callback(innerUserInput);
   };
 
+  let innerValue;
+  let innerUserInput;
   let setValue = () => {};
   let setChanged = () => {};
   /** @type {unknown[]} */
@@ -48,14 +50,18 @@
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
-      value = [];
-      userInput = "";
+      innerValue = [];
+      dispatch("select", innerValue);
+      innerUserInput = "";
+      dispatch("input", innerUserInput);
     });
   }
   getResults();
 
-  $: setValue(value);
-  $: filteredResults = results.filter((result) => !value.includes(result));
+  $: innerValue = value;
+  $: setValue(innerValue);
+  $: innerUserInput = userInput;
+  $: filteredResults = results.filter((result) => !innerValue.includes(result));
   $: truncatedResults = filteredResults.slice(0, maxResults);
   $: {
     if (input) {
@@ -63,11 +69,11 @@
         input,
         ...[
           () =>
-            value.length < min
+            innerValue.length < min
               ? messages.validity.autocomplete.min.format({ min })
               : undefined,
           () =>
-            value.length > max
+            innerValue.length > max
               ? messages.validity.autocomplete.max.format({ max })
               : undefined,
         ],
@@ -76,21 +82,21 @@
   }
 
   function onInputOrChange(event) {
-    userInput = event.target.value;
+    innerUserInput = event.target.value;
     getResults();
-    dispatch(event.type, userInput);
+    dispatch(event.type, innerUserInput);
   }
 
   function select(item) {
-    value = [...value, item];
+    innerValue = [...innerValue, item];
     setChanged();
-    dispatch("select", value);
+    dispatch("select", innerValue);
   }
 
   function deselect(item) {
-    value = value.filter((valueItem) => valueItem !== item);
+    innerValue = innerValue.filter((valueItem) => valueItem !== item);
     setChanged();
-    dispatch("select", value);
+    dispatch("select", innerValue);
   }
 
   onDestroy(() => {
@@ -100,7 +106,7 @@
 
 <div class="autocomplete">
   <span
-    >{#each value as item}<span
+    >{#each innerValue as item}<span
         ><slot item="{item}" /><SvelteButton on:click="{() => deselect(item)}"
           >{messages.labels.actions.delete.format()}</SvelteButton
         ></span
@@ -112,28 +118,28 @@
     on:change="{onInputOrChange}"
     on:paste
     name="{fullName}"
-    value="{userInput}"
+    value="{innerUserInput}"
     type="text"
     placeholder="{placeholder}"
     aria-label="{label}"
-    disabled="{value.length >= max}"
-    required="{value.length < min}"
+    disabled="{innerValue.length >= max}"
+    required="{innerValue.length < min}"
   />
   <ul>
     {#each truncatedResults as item}
       <li>
         <SvelteButton
           on:click="{() => select(item)}"
-          disabled="{value.length >= max || excludedValues.includes(item)}"
+          disabled="{innerValue.length >= max || excludedValues.includes(item)}"
           ><slot item="{item}" /></SvelteButton
         >
       </li>
     {/each}
-    {#if createCallback && userInput}
+    {#if createCallback && innerUserInput}
       <li>
         <SvelteButton
           on:click="{() => createAndSelect()}"
-          disabled="{value.length >= max}"
+          disabled="{innerValue.length >= max}"
           >{messages.labels.actions.create.format()}</SvelteButton
         >
       </li>
