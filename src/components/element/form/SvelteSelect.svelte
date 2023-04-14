@@ -17,6 +17,7 @@
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
+  let innerValue;
   let setValue = () => {};
   let setChanged = () => {};
 
@@ -24,16 +25,17 @@
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
-      value = undefined;
+      innerValue = undefined;
     });
   }
 
-  $: setValue(value);
+  $: innerValue = value;
+  $: setValue(innerValue);
 
   function onInputOrChange(event) {
-    value = options[event.target.value].value;
+    innerValue = options[event.target.value].value;
     setChanged();
-    dispatch(event.type, value);
+    dispatch(event.type, innerValue);
   }
 
   onDestroy(() => {
