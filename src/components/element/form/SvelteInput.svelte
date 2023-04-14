@@ -28,6 +28,7 @@
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
+  let innerValue;
   let setValue = () => {};
   let setChanged = () => {};
 
@@ -35,15 +36,15 @@
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
-      value = undefined;
+      innerValue = undefined;
     });
   }
 
-  $: setValue(value);
-  $: htmlValue = value || "";
+  $: innerValue = value || "";
+  $: setValue(innerValue);
 
   function onInputOrChange(event) {
-    value = ((eventTarget) => {
+    innerValue = ((eventTarget) => {
       switch (type) {
         case "number":
         case "range":
@@ -59,7 +60,7 @@
       }
     })(event.target);
     setChanged();
-    dispatch(event.type, value);
+    dispatch(event.type, innerValue);
   }
 
   onDestroy(() => {
@@ -73,7 +74,7 @@
   on:paste
   name="{fullName}"
   type="{type}"
-  value="{htmlValue}"
+  value="{innerValue}"
   placeholder="{placeholder}"
   required="{required}"
   aria-label="{label}"
