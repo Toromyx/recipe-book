@@ -16,6 +16,7 @@
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
+  let innerValue;
   let input;
   let setValue = () => {};
   let setChanged = () => {};
@@ -24,11 +25,12 @@
     setValue = (v) => formContext.setValue(name, v);
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
-      value = "";
+      innerValue = "";
     });
   }
 
-  $: setValue(value);
+  $: innerValue = value;
+  $: setValue(innerValue);
 
   function onDialogOrFileDrop(userValue) {
     onUserInput(userValue);
@@ -39,9 +41,9 @@
   }
 
   function onUserInput(userValue, eventType = "input") {
-    value = userValue;
+    innerValue = userValue;
     setChanged();
-    dispatch(eventType, value);
+    dispatch(eventType, innerValue);
   }
 
   onDestroy(() => {
@@ -70,7 +72,7 @@
     on:input="{onInputOrChange}"
     on:change="{onInputOrChange}"
     name="{fullName}"
-    value="{value}"
+    value="{innerValue}"
     placeholder="{placeholder}"
     required="{required}"
     aria-label="{label}"
