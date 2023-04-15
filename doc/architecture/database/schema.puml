@@ -1,5 +1,7 @@
 @startuml
 
+'The field types are from <https://www.sqlite.org/datatype3.html>.
+
 entity "Recipe" as recipe {
   id: INTEGER
   --
