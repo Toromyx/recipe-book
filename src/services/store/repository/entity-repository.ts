@@ -312,7 +312,14 @@ export class EntityRepository<
     this.subscribers[identifier]?.add(subscriber);
 
     return (): void => {
-      this.subscribers[identifier]?.delete(subscriber);
+      const set = this.subscribers[identifier];
+      if (!set) {
+        return;
+      }
+      set.delete(subscriber);
+      if (!set.size) {
+        delete this.subscribers[identifier];
+      }
     };
   }
 
@@ -424,7 +431,14 @@ export class EntityRepository<
     this.filteredListSubscribers[filterKey]?.set.add(subscriber);
 
     return (): void => {
-      this.filteredListSubscribers[filterKey]?.set.delete(subscriber);
+      const set = this.filteredListSubscribers[filterKey]?.set;
+      if (!set) {
+        return;
+      }
+      set.delete(subscriber);
+      if (!set.size) {
+        delete this.filteredListSubscribers[filterKey];
+      }
     };
   }
 
@@ -468,7 +482,14 @@ export class EntityRepository<
     this.filteredCountSubscribers[filterKey]?.set.add(subscriber);
 
     return (): void => {
-      this.filteredCountSubscribers[filterKey]?.set.delete(subscriber);
+      const set = this.filteredCountSubscribers[filterKey]?.set;
+      if (!set) {
+        return;
+      }
+      set.delete(subscriber);
+      if (!set.size) {
+        delete this.filteredCountSubscribers[filterKey];
+      }
     };
   }
 
