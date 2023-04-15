@@ -1,3 +1,6 @@
+/**
+ * Delete an item/entry in an array/object.
+ */
 export function deleteEntry<T>(
   objectOrArray: object | Array<T>,
   key: keyof typeof objectOrArray,

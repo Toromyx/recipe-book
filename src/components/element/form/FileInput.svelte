@@ -1,3 +1,16 @@
+<!--
+@component
+This component implement a file input form field with a button to open a file dialog.
+
+File dropping is possible.
+
+The value will be a local path.
+
+# Events
+
+The `input` or `change` events are fired when the user sets the value of the field.
+-->
+
 <script>
   import { open } from "@tauri-apps/api/dialog";
   import { createEventDispatcher, getContext, onDestroy } from "svelte";
@@ -6,10 +19,30 @@
   import SvelteButton from "../SvelteButton.svelte";
   import { FORM } from "./SvelteForm.svelte";
 
+  /**
+   * the form element label
+   * @type {string}
+   */
   export let label;
+  /**
+   * the form element name
+   * @type {string}
+   */
   export let name;
+  /**
+   * the form element value
+   * @type {string}
+   */
   export let value = "";
+  /**
+   * the form element placeholder
+   * @type {string}
+   */
   export let placeholder = label;
+  /**
+   * whether the form element is required or not
+   * @type {boolean}
+   */
   export let required = false;
 
   const formContext = getContext(FORM);

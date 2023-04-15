@@ -1,14 +1,23 @@
+<!--
+This component display a recipe file.
+
+It includes functionality to optically recognize characters in the recipe file.
+-->
+
 <script>
   import { convertFileSrc } from "@tauri-apps/api/tauri";
-  import { client } from "../../../../../services/command/client.ts";
+  import { invoke } from "../../../../../services/command/client.ts";
   import { Command } from "../../../../../services/command/command.ts";
   import { RECIPE_FILE_URI_SCHEME } from "../../../../../services/protocol.ts";
   import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { createId } from "../../../../../services/util/create-id.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { isLoading } from "../../../../../services/util/loadable.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
 
+  /**
+   * the id of the recipe file
+   */
   export let id;
 
   const uuid = createId();
@@ -47,7 +56,7 @@
   <SvelteButton
     id="{buttonId}"
     on:click="{() =>
-      void client.invoke(Command.OCR, { recipeFileId: id }).then((result) => {
+      void invoke(Command.OCR, { recipeFileId: id }).then((result) => {
         output = result;
       })}">{messages.labels.actions.ocr.format()}</SvelteButton
   >

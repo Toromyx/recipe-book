@@ -1,10 +1,21 @@
+<!--
+@component
+This component displays the content of recipe ingredient.
+
+The recipe ingredient is editable.
+-->
+
 <script>
   import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { isLoading } from "../../../../../services/util/loadable.ts";
   import Editable from "../../../../layout/Editable.svelte";
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
   import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
 
+  /**
+   * the recipe ingredient id
+   * @type {number}
+   */
   export let id;
 
   /** @type {Readable<Loadable<RecipeIngredientInterface>>} */

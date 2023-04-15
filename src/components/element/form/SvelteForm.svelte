@@ -1,3 +1,22 @@
+<!--
+@component
+This component implements an custom `<form>` tag.
+
+Each component registers a form context.
+This context provides methods to manage the form elements:
+- their values
+- whether they have been changed
+- registering their reset function
+- a method to reset the whole form
+- deleting their data from the context
+
+A form element is always identified by its name.
+
+# Events
+
+The `submit` event is fired when the form is submitted. The details contain the values, their changed state and the complete form context.
+-->
+
 <script context="module">
   export const FORM = Symbol("Form");
 </script>
@@ -6,7 +25,7 @@
   import { createEventDispatcher, setContext } from "svelte";
   import { deleteEntry } from "../../../services/util/delete-entry.ts";
 
-  /** @type {{[name: string]: any}} */
+  /** @type {{[name: string]: unknown}} */
   const values = {};
   /** @type {{[name: string]: boolean}} */
   const changed = {};

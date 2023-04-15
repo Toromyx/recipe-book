@@ -1,16 +1,52 @@
+<!--
+@component
+This component implements form fields for editing an recipe ingredient.
+
+# Events
+
+The event `edit` is fired when the user makes yn change to any field. The event detail is all the form values.
+-->
+
 <script>
   import { createEventDispatcher } from "svelte";
-  import { apiClient } from "../../../../../services/command/entity.ts";
+  import {
+    createIngredient,
+    listIngredient,
+  } from "../../../../../services/command/entity.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import Autocomplete from "../../../../element/form/Autocomplete.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
 
+  /**
+   * the existing recipe ingredient's quantity
+   * @type {?number}
+   */
   export let quantity = undefined;
+  /**
+   * the existing recipe ingredient's unit
+   * @type {?string}
+   */
   export let unit = undefined;
+  /**
+   * the existing recipe ingredient's ingredient id
+   * @type {?number}
+   */
   export let ingredientId = undefined;
+  /**
+   * the existing recipe ingredient's ingredient name
+   * @type {string}
+   */
   export let ingredientName = "";
+  /**
+   * the existing recipe ingredient's quality
+   * @type {?string}
+   */
   export let quality = undefined;
+  /**
+   * already used ingredient ids
+   * @type {?string}
+   */
   export let usedIngredientIds = undefined;
 
   const values = {
@@ -80,12 +116,11 @@
   excludedValues="{usedIngredientIds}"
   label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
   callback="{(userInput) =>
-    apiClient.listIngredient({
+    listIngredient({
       condition: { name: userInput },
       orderBy: [{ column: 'name' }],
     })}"
-  createCallback="{(userInput) =>
-    apiClient.createIngredient({ name: userInput })}"
+  createCallback="{(userInput) => createIngredient({ name: userInput })}"
   ><svelte:fragment let:item>
     <IngredientViewName id="{item}" />
   </svelte:fragment></Autocomplete

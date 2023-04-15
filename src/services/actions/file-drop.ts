@@ -7,6 +7,9 @@ window.addEventListener("mousemove", () => {
   fileDropPayload = undefined;
 });
 
+/**
+ * Dispatch a `fileDrop` event on the element when the user drops a file on it.
+ */
 export function fileDrop(element: HTMLElement): ActionReturn {
   const onMouseEnter = () => {
     if (fileDropPayload) {

@@ -1,4 +1,10 @@
 /* eslint-disable no-console */
+/*
+ * This module implement logging functionality in the frontend.
+ *
+ * Logging is only enabled when the frontend is not built for prod.
+ */
+
 export const enum LogLevel {
   ERROR = 1,
   WARN = 2,

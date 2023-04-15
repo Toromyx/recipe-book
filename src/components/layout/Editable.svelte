@@ -1,3 +1,13 @@
+<!--
+@component
+This component provides two slots `edit` and `display` and a button to switch between them.
+
+# Events
+
+The `edit` slot content is wrapped in a `<form>` tag with a submit button.
+The `edit` event is fired on submitting this form. The detail of this event is the same as the detail of the submit event.
+-->
+
 <script>
   import { createEventDispatcher } from "svelte";
   import { messages } from "../../services/translation/en.ts";

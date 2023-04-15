@@ -1,13 +1,32 @@
+<!--
+@component
+This component creates a form context for a structured subset of form elements.
+
+This structured subset can be an object or array.
+-->
+
 <script>
   import { getContext, onDestroy, setContext } from "svelte";
   import { deleteEntry } from "../../../services/util/delete-entry.ts";
   import { FORM } from "./SvelteForm.svelte";
 
+  /**
+   * the form element subset name
+   * @type {string}
+   */
   export let name;
+  /**
+   * the form element subset label
+   * @type {?string}
+   */
   export let label = undefined;
+  /**
+   * whether the form element subset is an object or array
+   * @type {boolean}
+   */
   export let isList = false;
 
-  /** @type {{[name: string]: any}|any[]} */
+  /** @type {{[name: string]: unknown}|unknown[]} */
   const values = isList ? [] : {};
   /** @type {{[name: string]: boolean}} */
   const changed = {};

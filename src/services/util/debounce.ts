@@ -1,3 +1,8 @@
+/**
+ * Create a trailing debounced version of the given asynchronous function by wait amount of milliseconds.
+ *
+ * The next execution always awaits the previous execution before adding the wait time on top.
+ */
 export function debounce(
   func: (...args: unknown[]) => Promise<void>,
   wait: number,

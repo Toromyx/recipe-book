@@ -4,37 +4,43 @@ import type {
   RecipeUpdateInterface,
 } from "../../../types/entity/recipe-interface.ts";
 import type { RecipeFilterInterface } from "../../../types/filter/recipe-filter-interface.ts";
-import { apiClient } from "../../command/entity.ts";
-import { client } from "../../event/client.ts";
+import {
+  countRecipe,
+  createRecipe,
+  deleteRecipe,
+  listRecipe,
+  readRecipe,
+  updateRecipe,
+} from "../../command/entity.ts";
+import { listen } from "../../event/client.ts";
 import { EventChannel } from "../../event/event-channel.ts";
-import type { EntityRepositoryInterface } from "./entity-repository.ts";
 import { EntityRepository } from "./entity-repository.ts";
 
-export const recipeRepository: EntityRepositoryInterface<
+export const recipeRepository: EntityRepository<
   RecipeInterface,
   RecipeCreateInterface,
   RecipeUpdateInterface,
   RecipeFilterInterface
 > = new EntityRepository(
-  (entityCreate) => apiClient.createRecipe(entityCreate),
-  (identifier) => apiClient.readRecipe(identifier),
-  (entityUpdate) => apiClient.updateRecipe(entityUpdate),
-  (identifier) => apiClient.deleteRecipe(identifier),
-  (filter) => apiClient.listRecipe(filter),
-  (filter) => apiClient.countRecipe(filter),
+  (entityCreate) => createRecipe(entityCreate),
+  (identifier) => readRecipe(identifier),
+  (entityUpdate) => updateRecipe(entityUpdate),
+  (identifier) => deleteRecipe(identifier),
+  (filter) => listRecipe(filter),
+  (filter) => countRecipe(filter),
   {},
   (reactFunction) => {
-    void client.listen(EventChannel.ENTITY_ACTION_UPDATED_RECIPE, (event) => {
+    void listen(EventChannel.ENTITY_ACTION_UPDATED_RECIPE, (event) => {
       reactFunction(event.payload);
     });
   },
   (reactFunction) => {
-    void client.listen(EventChannel.ENTITY_ACTION_CREATED_RECIPE, () => {
+    void listen(EventChannel.ENTITY_ACTION_CREATED_RECIPE, () => {
       reactFunction();
     });
   },
   (reactFunction) => {
-    void client.listen(EventChannel.ENTITY_ACTION_DELETED_RECIPE, (event) => {
+    void listen(EventChannel.ENTITY_ACTION_DELETED_RECIPE, (event) => {
       reactFunction(event.payload);
     });
   },

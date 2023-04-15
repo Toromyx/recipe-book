@@ -1,3 +1,8 @@
+<!--
+@component
+This root component contains the router and other components which are only needed once.
+-->
+
 <script>
   import Router from "svelte-spa-router";
   import UnitList from "./components/content/UnitList.svelte";

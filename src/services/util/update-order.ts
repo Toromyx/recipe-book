@@ -1,11 +1,16 @@
 import type { IdentifiableInterface } from "../../types/identifiable-interface.ts";
-import type { Loadable } from "../../types/loadable.ts";
 import type { SortableUpdateInterface } from "../../types/sortable-interface.ts";
-import type { EntityRepositoryInterface } from "../store/repository/entity-repository.ts";
-import { isLoading } from "./is-loading.ts";
+import type { EntityRepository } from "../store/repository/entity-repository.js";
+import type { Loadable } from "./loadable.ts";
+import { isLoading } from "./loadable.ts";
 
+/**
+ * Update the order of all entities of the repository in an identifier ist by their order in this identifier list.
+ *
+ * One id will be skipped.
+ */
 export function updateOrder(
-  entityRepository: EntityRepositoryInterface<
+  entityRepository: EntityRepository<
     never,
     never,
     IdentifiableInterface & SortableUpdateInterface,

@@ -1,3 +1,10 @@
+<!--
+@component
+This component displays an ordered list of recipe ingredients of a recipe step.
+
+It provides functionality to add a new recipe ingredient and integrates with the recipe ingredient parser.
+-->
+
 <script>
   import {
     parseHtml,
@@ -10,7 +17,7 @@
   import {
     whenLoadingDefault,
     isLoading,
-  } from "../../../../../services/util/is-loading.ts";
+  } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import FieldListItem from "../../../../element/form/FieldListItem.svelte";
@@ -19,6 +26,10 @@
   import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
   import RecipeIngredientView from "../view/RecipeIngredientView.svelte";
 
+  /**
+   * the recipe step id
+   * @type {number}
+   */
   export let recipeStepId;
 
   /** @type {Readable<Loadable<number[]>>} */
@@ -80,7 +91,7 @@
         <ol>
           {#each pastedParsedRecipeIngredients as parsedRecipeIngredient, i}
             <li>
-              <FieldListItem id="{i}">
+              <FieldListItem index="{i}">
                 <RecipeIngredientEdit
                   on:edit="{({
                     detail: {

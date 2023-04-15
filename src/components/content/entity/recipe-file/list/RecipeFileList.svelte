@@ -1,13 +1,22 @@
+<!--
+@component
+This component display an ordered list of all recipe files of a recipe step.
+-->
+
 <script>
   import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { isLoading } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import RecipeFileEdit from "../edit/RecipeFileEdit.svelte";
   import RecipeFileView from "../view/RecipeFileView.svelte";
 
+  /**
+   * the id of the recipe step
+   * @type {number}
+   */
   export let recipeStepId;
 
   /**

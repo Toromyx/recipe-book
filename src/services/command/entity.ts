@@ -29,7 +29,7 @@ import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-int
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
 import { stringifyFilter } from "../store/repository/entity-repository.ts";
-import { client } from "./client.ts";
+import { invoke } from "./client.ts";
 import type { CommandAnswer } from "./command-answer.ts";
 import { Command } from "./command.ts";
 
@@ -54,11 +54,6 @@ type CommandEntityCount =
   | Command.ENTITY_COUNT_RECIPE_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE_STEP;
 
-/**
- * when there are duplicate requests to the same entity, the existing promise is returned
- *
- * this promise is deleted once resolved, this is not a cache!
- */
 const entityReadPromiseCollector: {
   [T in CommandEntityRead]: {
     [id: number]: Promise<CommandAnswer<T>>;
@@ -95,154 +90,212 @@ const entityCountPromiseCollector: {
   [Command.ENTITY_COUNT_RECIPE_STEP]: {},
 };
 
+/**
+ * Read an entity, returning the already existing promise if it already being read.
+ */
 function readCollected<T extends CommandEntityRead>(
   command: T,
   id: number,
 ): Promise<CommandAnswer<T>> {
   if (entityReadPromiseCollector[command][id] === undefined) {
-    entityReadPromiseCollector[command][id] = client
-      .invoke(command, { id })
-      .then((value: CommandAnswer<T>) => {
+    entityReadPromiseCollector[command][id] = invoke(command, { id }).then(
+      (value: CommandAnswer<T>) => {
         delete entityReadPromiseCollector[command][id];
         return value;
-      });
+      },
+    );
   }
   return entityReadPromiseCollector[command][id];
 }
 
+/**
+ * List entities, returning the already existing promise if they are already being listed.
+ */
 function listCollected<Filter extends object>(
   command: CommandEntityList,
   filter: Filter,
 ): Promise<CommandAnswer<typeof command>> {
   const filterKey = stringifyFilter(filter);
   if (entityListPromiseCollector[command][filterKey] === undefined) {
-    entityListPromiseCollector[command][filterKey] = client
-      .invoke(command, { filter })
-      .then((value: CommandAnswer<typeof command>) => {
-        delete entityListPromiseCollector[command][filterKey];
-        return value;
-      });
+    entityListPromiseCollector[command][filterKey] = invoke(command, {
+      filter,
+    }).then((value: CommandAnswer<typeof command>) => {
+      delete entityListPromiseCollector[command][filterKey];
+      return value;
+    });
   }
   return entityListPromiseCollector[command][filterKey];
 }
 
+/**
+ * Count entities, returning the already existing promise if they are already being counted.
+ */
 function countCollected<Filter extends object>(
   command: CommandEntityCount,
   filter: Filter,
 ): Promise<CommandAnswer<typeof command>> {
   const filterKey = stringifyFilter(filter);
   if (entityCountPromiseCollector[command][filterKey] === undefined) {
-    entityCountPromiseCollector[command][filterKey] = client
-      .invoke(command, { filter })
-      .then((value: CommandAnswer<typeof command>) => {
-        delete entityCountPromiseCollector[command][filterKey];
-        return value;
-      });
+    entityCountPromiseCollector[command][filterKey] = invoke(command, {
+      filter,
+    }).then((value: CommandAnswer<typeof command>) => {
+      delete entityCountPromiseCollector[command][filterKey];
+      return value;
+    });
   }
   return entityCountPromiseCollector[command][filterKey];
 }
 
-export const apiClient = {
-  createIngredient(create: IngredientCreateInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_CREATE_INGREDIENT, { create });
-  },
-  readIngredient(id: number): Promise<IngredientInterface> {
-    return readCollected(Command.ENTITY_READ_INGREDIENT, id);
-  },
-  updateIngredient(update: IngredientUpdateInterface): Promise<void> {
-    return client.invoke(Command.ENTITY_UPDATE_INGREDIENT, { update });
-  },
-  deleteIngredient(id: number): Promise<void> {
-    return client.invoke(Command.ENTITY_DELETE_INGREDIENT, { id });
-  },
-  listIngredient(filter: IngredientFilterInterface): Promise<number[]> {
-    return listCollected(Command.ENTITY_LIST_INGREDIENT, filter);
-  },
-  countIngredient(filter: IngredientFilterInterface): Promise<number> {
-    return countCollected(Command.ENTITY_COUNT_INGREDIENT, filter);
-  },
+export function createIngredient(
+  create: IngredientCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_INGREDIENT, { create });
+}
 
-  createRecipe(create: RecipeCreateInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_CREATE_RECIPE, { create });
-  },
-  readRecipe(id: number): Promise<RecipeInterface> {
-    return readCollected(Command.ENTITY_READ_RECIPE, id);
-  },
-  updateRecipe(update: RecipeUpdateInterface): Promise<void> {
-    return client.invoke(Command.ENTITY_UPDATE_RECIPE, { update });
-  },
-  deleteRecipe(id: number): Promise<void> {
-    return client.invoke(Command.ENTITY_DELETE_RECIPE, { id });
-  },
-  listRecipe(filter: RecipeFilterInterface): Promise<number[]> {
-    return listCollected(Command.ENTITY_LIST_RECIPE, filter);
-  },
-  countRecipe(filter: RecipeFilterInterface): Promise<number> {
-    return countCollected(Command.ENTITY_COUNT_RECIPE, filter);
-  },
+export function readIngredient(id: number): Promise<IngredientInterface> {
+  return readCollected(Command.ENTITY_READ_INGREDIENT, id);
+}
 
-  createRecipeFile(create: RecipeFileCreateInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_CREATE_RECIPE_FILE, { create });
-  },
-  readRecipeFile(id: number): Promise<RecipeFileInterface> {
-    return readCollected(Command.ENTITY_READ_RECIPE_FILE, id);
-  },
-  updateRecipeFile(update: RecipeFileUpdateInterface): Promise<void> {
-    return client.invoke(Command.ENTITY_UPDATE_RECIPE_FILE, { update });
-  },
-  deleteRecipeFile(id: number): Promise<void> {
-    return client.invoke(Command.ENTITY_DELETE_RECIPE_FILE, { id });
-  },
-  listRecipeFile(filter: RecipeFileFilterInterface): Promise<number[]> {
-    return listCollected(Command.ENTITY_LIST_RECIPE_FILE, filter);
-  },
-  countRecipeFile(filter: RecipeFileFilterInterface): Promise<number> {
-    return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, filter);
-  },
+export function updateIngredient(
+  update: IngredientUpdateInterface,
+): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_INGREDIENT, { update });
+}
 
-  createRecipeIngredient(
-    create: RecipeIngredientCreateInterface,
-  ): Promise<number> {
-    return client.invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT, { create });
-  },
-  readRecipeIngredient(id: number): Promise<RecipeIngredientInterface> {
-    return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT, id);
-  },
-  updateRecipeIngredient(
-    update: RecipeIngredientUpdateInterface,
-  ): Promise<void> {
-    return client.invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT, { update });
-  },
-  deleteRecipeIngredient(id: number): Promise<void> {
-    return client.invoke(Command.ENTITY_DELETE_RECIPE_INGREDIENT, { id });
-  },
-  listRecipeIngredient(
-    filter: RecipeIngredientFilterInterface,
-  ): Promise<number[]> {
-    return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT, filter);
-  },
-  countRecipeIngredient(
-    filter: RecipeIngredientFilterInterface,
-  ): Promise<number> {
-    return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, filter);
-  },
+export function deleteIngredient(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_INGREDIENT, { id });
+}
 
-  createRecipeStep(create: RecipeStepCreateInterface): Promise<number> {
-    return client.invoke(Command.ENTITY_CREATE_RECIPE_STEP, { create });
-  },
-  readRecipeStep(id: number): Promise<RecipeStepInterface> {
-    return readCollected(Command.ENTITY_READ_RECIPE_STEP, id);
-  },
-  updateRecipeStep(update: RecipeStepUpdateInterface): Promise<void> {
-    return client.invoke(Command.ENTITY_UPDATE_RECIPE_STEP, { update });
-  },
-  deleteRecipeStep(id: number): Promise<void> {
-    return client.invoke(Command.ENTITY_DELETE_RECIPE_STEP, { id });
-  },
-  listRecipeStep(filter: RecipeStepFilterInterface): Promise<number[]> {
-    return listCollected(Command.ENTITY_LIST_RECIPE_STEP, filter);
-  },
-  countRecipeStep(filter: RecipeStepFilterInterface): Promise<number> {
-    return countCollected(Command.ENTITY_COUNT_RECIPE_STEP, filter);
-  },
-};
+export function listIngredient(
+  filter: IngredientFilterInterface,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_INGREDIENT, filter);
+}
+
+export function countIngredient(
+  filter: IngredientFilterInterface,
+): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_INGREDIENT, filter);
+}
+
+export function createRecipe(create: RecipeCreateInterface): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_RECIPE, { create });
+}
+
+export function readRecipe(id: number): Promise<RecipeInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE, id);
+}
+
+export function updateRecipe(update: RecipeUpdateInterface): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_RECIPE, { update });
+}
+
+export function deleteRecipe(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE, { id });
+}
+
+export function listRecipe(filter: RecipeFilterInterface): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE, filter);
+}
+
+export function countRecipe(filter: RecipeFilterInterface): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_RECIPE, filter);
+}
+
+export function createRecipeFile(
+  create: RecipeFileCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_RECIPE_FILE, { create });
+}
+
+export function readRecipeFile(id: number): Promise<RecipeFileInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_FILE, id);
+}
+
+export function updateRecipeFile(
+  update: RecipeFileUpdateInterface,
+): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_RECIPE_FILE, { update });
+}
+
+export function deleteRecipeFile(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_FILE, { id });
+}
+
+export function listRecipeFile(
+  filter: RecipeFileFilterInterface,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE_FILE, filter);
+}
+
+export function countRecipeFile(
+  filter: RecipeFileFilterInterface,
+): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, filter);
+}
+
+export function createRecipeIngredient(
+  create: RecipeIngredientCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT, { create });
+}
+
+export function readRecipeIngredient(
+  id: number,
+): Promise<RecipeIngredientInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT, id);
+}
+
+export function updateRecipeIngredient(
+  update: RecipeIngredientUpdateInterface,
+): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT, { update });
+}
+
+export function deleteRecipeIngredient(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_INGREDIENT, { id });
+}
+
+export function listRecipeIngredient(
+  filter: RecipeIngredientFilterInterface,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT, filter);
+}
+
+export function countRecipeIngredient(
+  filter: RecipeIngredientFilterInterface,
+): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, filter);
+}
+
+export function createRecipeStep(
+  create: RecipeStepCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_RECIPE_STEP, { create });
+}
+
+export function readRecipeStep(id: number): Promise<RecipeStepInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_STEP, id);
+}
+
+export function updateRecipeStep(
+  update: RecipeStepUpdateInterface,
+): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_RECIPE_STEP, { update });
+}
+
+export function deleteRecipeStep(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_STEP, { id });
+}
+
+export function listRecipeStep(
+  filter: RecipeStepFilterInterface,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE_STEP, filter);
+}
+
+export function countRecipeStep(
+  filter: RecipeStepFilterInterface,
+): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_RECIPE_STEP, filter);
+}

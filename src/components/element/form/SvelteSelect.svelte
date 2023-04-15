@@ -1,16 +1,46 @@
+<!--
+@component
+This component implements a single select form element.
+
+# Events
+
+The `input` or `change` events are fired when the user selects an option.
+-->
+
 <script>
   import { createEventDispatcher, getContext, onDestroy } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
   import { FORM } from "./SvelteForm.svelte";
 
-  /** @type {{value: unknown, label: string}[]} */
+  /**
+   * the selectable options
+   * @type {{value: unknown, label: string}[]}
+   */
   export let options;
+  /**
+   * the form element label
+   */
   export let label;
+  /**
+   * the form element name
+   */
   export let name;
+  /**
+   * the form element placeholder
+   * @type {string}
+   */
   export let placeholder = messages.imperatives.selectPlaceholder.format({
     label,
   });
+  /**
+   * whether the form element is required or not
+   * @type {boolean}
+   */
   export let required = false;
+  /**
+   * the form element value
+   * @type {?unknown}
+   */
   export let value = undefined;
 
   const formContext = getContext(FORM);

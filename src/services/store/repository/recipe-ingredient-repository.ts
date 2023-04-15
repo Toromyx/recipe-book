@@ -4,27 +4,33 @@ import type {
   RecipeIngredientUpdateInterface,
 } from "../../../types/entity/recipe-ingredient-interface.ts";
 import type { RecipeIngredientFilterInterface } from "../../../types/filter/recipe-ingredient-filter-interface.ts";
-import { apiClient } from "../../command/entity.ts";
-import { client } from "../../event/client.ts";
+import {
+  countRecipeIngredient,
+  createRecipeIngredient,
+  deleteRecipeIngredient,
+  listRecipeIngredient,
+  readRecipeIngredient,
+  updateRecipeIngredient,
+} from "../../command/entity.ts";
+import { listen } from "../../event/client.ts";
 import { EventChannel } from "../../event/event-channel.ts";
-import type { EntityRepositoryInterface } from "./entity-repository.ts";
 import { EntityRepository } from "./entity-repository.ts";
 
-export const recipeIngredientRepository: EntityRepositoryInterface<
+export const recipeIngredientRepository: EntityRepository<
   RecipeIngredientInterface,
   RecipeIngredientCreateInterface,
   RecipeIngredientUpdateInterface,
   RecipeIngredientFilterInterface
 > = new EntityRepository(
-  (entityCreate) => apiClient.createRecipeIngredient(entityCreate),
-  (identifier) => apiClient.readRecipeIngredient(identifier),
-  (entityUpdate) => apiClient.updateRecipeIngredient(entityUpdate),
-  (identifier) => apiClient.deleteRecipeIngredient(identifier),
-  (filter) => apiClient.listRecipeIngredient(filter),
-  (filter) => apiClient.countRecipeIngredient(filter),
+  (entityCreate) => createRecipeIngredient(entityCreate),
+  (identifier) => readRecipeIngredient(identifier),
+  (entityUpdate) => updateRecipeIngredient(entityUpdate),
+  (identifier) => deleteRecipeIngredient(identifier),
+  (filter) => listRecipeIngredient(filter),
+  (filter) => countRecipeIngredient(filter),
   {},
   (reactFunction) => {
-    void client.listen(
+    void listen(
       EventChannel.ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT,
       (event) => {
         reactFunction(event.payload);
@@ -32,15 +38,12 @@ export const recipeIngredientRepository: EntityRepositoryInterface<
     );
   },
   (reactFunction) => {
-    void client.listen(
-      EventChannel.ENTITY_ACTION_CREATED_RECIPE_INGREDIENT,
-      () => {
-        reactFunction();
-      },
-    );
+    void listen(EventChannel.ENTITY_ACTION_CREATED_RECIPE_INGREDIENT, () => {
+      reactFunction();
+    });
   },
   (reactFunction) => {
-    void client.listen(
+    void listen(
       EventChannel.ENTITY_ACTION_DELETED_RECIPE_INGREDIENT,
       (event) => {
         reactFunction(event.payload);

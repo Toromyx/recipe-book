@@ -1,11 +1,20 @@
+<!--
+@component
+This component only creates a new form context for usage as an item in a value array of a field set.
+-->
+
 <script>
   import { getContext, onDestroy, setContext } from "svelte";
   import { deleteEntry } from "../../../services/util/delete-entry.ts";
   import { FORM } from "./SvelteForm.svelte";
 
-  export let id;
+  /**
+   * the index of the item in the value array
+   * @type {number}
+   */
+  export let index;
 
-  /** @type {{[id: number]: any}} */
+  /** @type {{[id: number]: unknown}} */
   const values = {};
   /** @type {{[id: number]: boolean}} */
   const changed = {};
@@ -16,12 +25,14 @@
   let setFormValue = () => {};
   let setFormChanged = () => {};
   let formOnDestroy = () => {};
-  const fullName = formContext?.name ? `${formContext.name}_${id}` : `${id}`;
+  const fullName = formContext?.name
+    ? `${formContext.name}_${index}`
+    : `${index}`;
 
   if (formContext) {
-    setFormValue = (value) => formContext.setValue(id, value);
-    setFormChanged = () => formContext.setChanged(id);
-    formOnDestroy = () => formContext.onDestroy(id);
+    setFormValue = (value) => formContext.setValue(index, value);
+    setFormChanged = () => formContext.setChanged(index);
+    formOnDestroy = () => formContext.onDestroy(index);
   }
 
   const context = setContext(FORM, {
@@ -50,7 +61,7 @@
   });
 
   if (formContext) {
-    formContext.registerReset(id, () => {
+    formContext.registerReset(index, () => {
       context.reset();
     });
   }

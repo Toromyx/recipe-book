@@ -1,141 +1,38 @@
 import type { Readable } from "svelte/store";
 import type { IdentifiableInterface } from "../../../types/identifiable-interface.ts";
-import type { Loadable } from "../../../types/loadable.ts";
 import { equalArray } from "../../util/compare.ts";
+import type { Loadable } from "../../util/loadable.ts";
+
+type ApiCreate<EntityCreate> = (entityCreate: EntityCreate) => Promise<number>;
+
+type ApiRead<Entity> = (identifier: number) => Promise<Entity>;
+
+type ApiUpdate<EntityUpdate> = (entityUpdate: EntityUpdate) => Promise<void>;
+
+type ApiDelete = (identifier: number) => Promise<void>;
+
+type ApiList<Filter> = (filter: Filter) => Promise<number[]>;
+
+type ApiCount<Filter> = (filter: Filter) => Promise<number>;
 
 type EntityRepositorySubscriber<Entity> = (entity: Entity) => void;
 
-export type EntityRepositoryListSubscriber = (list: number[]) => void;
+type EntityRepositoryListSubscriber = (list: number[]) => void;
 
-export type EntityRepositoryCountSubscriber = (count: number) => void;
+type EntityRepositoryCountSubscriber = (count: number) => void;
 
 type EntityRepositoryUpdater<Entity, EntityUpdate> = (
   entity: Entity,
 ) => EntityUpdate;
 
-export type EntityRepositoryUnsubscriber = () => void;
+type EntityRepositoryUnsubscriber = () => void;
 
-export interface EntityRepositoryInterface<
-  Entity extends IdentifiableInterface,
-  EntityCreate extends object,
-  EntityUpdate extends IdentifiableInterface,
-  Filter extends object,
-> {
-  /**
-   * subscribes to changes of the entity with the specified identifier
-   *
-   * always remember to unsubscribe when the subscription is not needed anymore
-   *
-   * @param identifier - identifies the entity
-   * @param subscriber - this function is called on changes to the entity, with the entity as parameter
-   *
-   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity changes
-   */
-  subscribe(
-    identifier: number,
-    subscriber: EntityRepositorySubscriber<Entity>,
-  ): EntityRepositoryUnsubscriber;
-
-  createStore(identifier: number): Readable<Loadable<Entity>>;
-
-  /**
-   * subscribes to changes of the complete entity list
-   *
-   * always remember to unsubscribe when the subscription is not needed anymore
-   *
-   * @param subscriber - this function is called on changes to the entity list, with the list as parameter
-   *
-   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity list changes
-   */
-  subscribeList(
-    subscriber: EntityRepositoryListSubscriber,
-  ): EntityRepositoryUnsubscriber;
-
-  createListStore(): Readable<Loadable<number[]>>;
-
-  /**
-   * subscribes to changes of the complete entity count
-   *
-   * always remember to unsubscribe when the subscription is not needed anymore
-   *
-   * @param subscriber - this function is called on changes to the entity count, with the count as parameter
-   *
-   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity count changes
-   */
-  subscribeCount(
-    subscriber: EntityRepositoryCountSubscriber,
-  ): EntityRepositoryUnsubscriber;
-
-  createCountStore(): Readable<Loadable<number>>;
-
-  /**
-   * subscribes to changes of a filtered entity list
-   *
-   * always remember to unsubscribe when the subscription is not needed anymore
-   *
-   * @param filter - the list filter
-   * @param subscriber - this function is called on changes to the filtered entity list, with the list as parameter
-   *
-   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from filtered entity list changes
-   */
-  subscribeListFiltered(
-    filter: Filter,
-    subscriber: EntityRepositoryListSubscriber,
-  ): EntityRepositoryUnsubscriber;
-
-  createListFilteredStore(filter: Filter): Readable<Loadable<number[]>>;
-
-  /**
-   * subscribes to changes of a filtered entity count
-   *
-   * always remember to unsubscribe when the subscription is not needed anymore
-   *
-   * @param filter - the list filter
-   * @param subscriber - this function is called on changes to the filtered entity count, with the count as parameter
-   *
-   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from filtered entity count changes
-   */
-  subscribeCountFiltered(
-    filter: Filter,
-    subscriber: EntityRepositoryCountSubscriber,
-  ): EntityRepositoryUnsubscriber;
-
-  createCountFilteredStore(filter: Filter): Readable<Loadable<number>>;
-
-  /**
-   * create an entity based on partial data via API
-   *
-   * adds the entity to the state
-   *
-   * @param entityCreate - the entity data for creation
-   */
-  create(entityCreate: EntityCreate): Promise<number>;
-
-  /**
-   * call this method to update the entity with the specified identifier based on the previous entity
-   *
-   * the updater callback receives the current entity as parameter
-   *
-   * this method calls all subscribers after updating the entity
-   *
-   * @param identifier - identifies the entity
-   * @param updater - is called with the current entity
-   */
-  update(
-    identifier: number,
-    updater: EntityRepositoryUpdater<Entity, EntityUpdate>,
-  ): Promise<void>;
-
-  /**
-   * deletes the entity from the state and all its subscribers, and via API
-   *
-   * does not notify subscribers in any way
-   *
-   * @param identifier - identifies the entity
-   */
-  delete(identifier: number): Promise<void>;
-}
-
+/**
+ * Stringify a filter object in JSON.
+ *
+ * This is achieved by first recursively getting all its keys via JSON.stringify and then JSON-stringifying it again with the sorted keys.
+ * @param filter
+ */
 export function stringifyFilter(filter: object): string {
   const allKeys: Set<string> = new Set();
   JSON.stringify(filter, (key, value) => {
@@ -146,38 +43,69 @@ export function stringifyFilter(filter: object): string {
   return JSON.stringify(filter, [...allKeys].sort());
 }
 
+/**
+ * This class implements a reactive entity repository for CRUD+L+Count operations.
+ *
+ * It provides methods to create a reactive store for a specific entity, the entity list or count, and a filtered entity list or count.
+ * Ths entity list is always an array of entity identifiers. The entity data itself needs to be subscribed to separately.
+ */
 export class EntityRepository<
   Entity extends IdentifiableInterface,
   EntityCreate extends object,
   EntityUpdate extends IdentifiableInterface,
   Filter extends object,
-> implements
-    EntityRepositoryInterface<Entity, EntityCreate, EntityUpdate, Filter>
-{
+> {
+  /**
+   * The state contains the entity data, keyed by their identifier.
+   */
   state: {
     [identifier: number]: Entity;
   } = {};
 
+  /**
+   * The list state contains a list of all entity identifiers.
+   */
   listState: number[] = [];
 
+  /**
+   * The count state contains the count of all entities.
+   */
   countState = NaN;
 
+  /**
+   * The filtered list state contains multiple lists of entity identifiers, keyed by their corresponding filter.
+   */
   filteredListState: {
     [filterKey: string]: number[];
   } = {};
 
+  /**
+   * The filtered count state contains multiple entity counts, keyed by their corresponding filter.
+   */
   filteredCountState: {
     [filterKey: string]: number;
   } = {};
 
+  /**
+   * This object contains a set of active subscriber functions for each entity, keyed by the entity identifier.
+   */
   subscribers: {
     [identifier: number]: Set<EntityRepositorySubscriber<Entity>>;
   } = {};
 
+  /**
+   * This set contains all active list subscriber functions.
+   */
   listSubscribers: Set<EntityRepositoryListSubscriber> = new Set();
 
+  /**
+   * This set contains all active count subscriber functions.
+   */
   countSubscribers: Set<EntityRepositoryCountSubscriber> = new Set();
 
+  /**
+   * This object contains a set of active filtered list subscriber functions for each filter in use.
+   */
   filteredListSubscribers: {
     [filterKey: string]: {
       filter: Filter;
@@ -185,6 +113,9 @@ export class EntityRepository<
     };
   } = {};
 
+  /**
+   * This object contains a set of active filtered count subscriber functions for each filter in use.
+   */
   filteredCountSubscribers: {
     [filterKey: string]: {
       filter: Filter;
@@ -192,40 +123,63 @@ export class EntityRepository<
     };
   } = {};
 
-  apiRead: (identifier: number) => Promise<Entity>;
+  /**
+   * Read an entity via the API.
+   */
+  apiRead: ApiRead<Entity>;
 
-  apiCreate: (entityCreate: EntityCreate) => Promise<number>;
+  /**
+   * Create an entity via the API.
+   */
+  apiCreate: ApiCreate<EntityCreate>;
 
-  apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>;
+  /**
+   * Update an entity via the API.
+   */
+  apiUpdate: ApiUpdate<EntityUpdate>;
 
-  apiDelete: (identifier: number) => Promise<void>;
+  /**
+   * Delete an entity via the API.
+   */
+  apiDelete: ApiDelete;
 
-  apiList: (filter: Filter) => Promise<number[]>;
+  /**
+   * List entities via the API.
+   */
+  apiList: ApiList<Filter>;
 
-  apiCount: (filter: Filter) => Promise<number>;
+  /**
+   * Count entities via the API.
+   */
+  apiCount: ApiCount<Filter>;
 
+  /**
+   * The default filter is used for the unfiltered list and count state.
+   */
   defaultFilter: Filter;
 
   /**
-   * @param apiCreate - create a new entity via the API
-   * @param apiRead - get the entity from the API
-   * @param apiUpdate - update an existing entity via the API
-   * @param apiDelete - delete an existing entity via the API
-   * @param apiList - get a filtered list of entities from the API
-   * @param apiCount - get a filtered count of entities from the API
-   * @param defaultFilter - the default filter
+   * Construct an entity repository for a specific entity and a specific API implementation.
+   *
+   * @param apiCreate - {@see apiCreate}
+   * @param apiRead - {@see apiRead}
+   * @param apiUpdate - {@see apiUpdate}
+   * @param apiDelete - {@see apiDelete}
+   * @param apiList - {@see apiList}
+   * @param apiCount - {@see apiCount}
+   * @param defaultFilter - {@see defaultFilter}
    * @param registerUpdate - register callbacks for reacting to entity updates
    * @param registerCreate - register callbacks for reacting to entity creations
    * @param registerDelete - register callbacks for reacting to entity deletions
    * @param registerFilterRelatedActions - register callbacks for reacting to related entity actions which might influence filtered lists and counts
    */
   constructor(
-    apiCreate: (entityCreate: EntityCreate) => Promise<number>,
-    apiRead: (identifier: number) => Promise<Entity>,
-    apiUpdate: (entityUpdate: EntityUpdate) => Promise<void>,
-    apiDelete: (identifier: number) => Promise<void>,
-    apiList: (filter: Filter) => Promise<number[]>,
-    apiCount: (filter: Filter) => Promise<number>,
+    apiCreate: ApiCreate<EntityCreate>,
+    apiRead: ApiRead<Entity>,
+    apiUpdate: ApiUpdate<EntityUpdate>,
+    apiDelete: ApiDelete,
+    apiList: ApiList<Filter>,
+    apiCount: ApiCount<Filter>,
     defaultFilter: Filter,
     registerUpdate: (reactFunction: (identifier: number) => void) => void,
     registerCreate: (reactFunction: () => void) => void,
@@ -334,6 +288,16 @@ export class EntityRepository<
     }
   }
 
+  /**
+   * Subscribe to changes of the entity with the specified identifier.
+   *
+   * Always remember to unsubscribe when the subscription is not needed anymore!
+   *
+   * @param identifier - identifies the entity
+   * @param subscriber - this function is called on changes to the entity, with the entity as parameter
+   *
+   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity changes
+   */
   subscribe(
     identifier: number,
     subscriber: EntityRepositorySubscriber<Entity>,
@@ -352,6 +316,9 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Create a reactive store of a single entity.
+   */
   createStore(identifier: number): Readable<Loadable<Entity>> {
     return {
       subscribe: (subscriber) =>
@@ -361,6 +328,15 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Subscribe to changes of the complete entity list.
+   *
+   * Always remember to unsubscribe when the subscription is not needed anymore.
+   *
+   * @param subscriber - this function is called on changes to the entity list, with the list as parameter
+   *
+   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity list changes
+   */
   subscribeList(
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
@@ -374,6 +350,9 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Create a reactive store of the complete entity list.
+   */
   createListStore(): Readable<Loadable<number[]>> {
     return {
       subscribe: (subscriber) =>
@@ -383,6 +362,15 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Subscribe to changes of the complete entity count.
+   *
+   * Always remember to unsubscribe when the subscription is not needed anymore.
+   *
+   * @param subscriber - this function is called on changes to the entity count, with the count as parameter
+   *
+   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity count changes
+   */
   subscribeCount(
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
@@ -396,6 +384,9 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Create a reactive store of the complete entity count.
+   */
   createCountStore(): Readable<Loadable<number>> {
     return {
       subscribe: (subscriber) =>
@@ -405,6 +396,16 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Subscribe to changes of a filtered entity list.
+   *
+   * Always remember to unsubscribe when the subscription is not needed anymore.
+   *
+   * @param filter - the list filter
+   * @param subscriber - this function is called on changes to the filtered entity list, with the list as parameter
+   *
+   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from filtered entity list changes
+   */
   subscribeListFiltered(
     filter: Filter,
     subscriber: EntityRepositoryListSubscriber,
@@ -427,6 +428,9 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Create a reactive store of a filtered entity list.
+   */
   createListFilteredStore(filter: Filter): Readable<Loadable<number[]>> {
     return {
       subscribe: (subscriber) =>
@@ -436,6 +440,16 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Subscribe to changes of a filtered entity count.
+   *
+   * Always remember to unsubscribe when the subscription is not needed anymore.
+   *
+   * @param filter - the list filter
+   * @param subscriber - this function is called on changes to the filtered entity count, with the count as parameter
+   *
+   * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from filtered entity count changes
+   */
   subscribeCountFiltered(
     filter: Filter,
     subscriber: EntityRepositoryCountSubscriber,
@@ -458,6 +472,9 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Create a reactive store of a filtered entity count.
+   */
   createCountFilteredStore(filter: Filter): Readable<Loadable<number>> {
     return {
       subscribe: (subscriber) =>
@@ -467,10 +484,23 @@ export class EntityRepository<
     };
   }
 
+  /**
+   * Create an entity based on partial data via API.
+   *
+   * @param entityCreate - the entity data for creation
+   */
   async create(entityCreate: EntityCreate): Promise<number> {
     return this.apiCreate(entityCreate);
   }
 
+  /**
+   * Update the entity with the specified identifier based on the previous entity.
+   *
+   * The updater callback receives the current entity as parameter.
+   *
+   * @param identifier - identifies the entity
+   * @param updater - is called with the current entity
+   */
   async update(
     identifier: number,
     updater: EntityRepositoryUpdater<Entity, EntityUpdate>,
@@ -482,14 +512,19 @@ export class EntityRepository<
     return this.apiUpdate(updater(entity));
   }
 
+  /**
+   * Delete the entity via API.
+   *
+   * @param identifier - identifies the entity
+   */
   async delete(identifier: number): Promise<void> {
     await this.apiDelete(identifier);
   }
 
   /**
-   * calls current subscribers of the entity with the specified identifier
+   * Call active subscribers of the entity with the specified identifier.
    *
-   * this method is to be called after the state of that entity has changed
+   * This method is called after the state of that entity has changed.
    */
   run(identifier: number): void {
     const entity = this.state[identifier];
@@ -497,27 +532,27 @@ export class EntityRepository<
   }
 
   /**
-   * calls current subscribers of the entity list
+   * Calls active subscribers of the complete entity list.
    *
-   * this method is to be called after change of the list state
+   * This method is called after change to the list state.
    */
   runList(): void {
     this.listSubscribers.forEach((subscriber) => subscriber(this.listState));
   }
 
   /**
-   * calls current subscribers of the entity count
+   * Call active subscribers of the complete entity count.
    *
-   * this method is to be called after change of the count state
+   * This method is called after change to the count state.
    */
   runCount(): void {
     this.countSubscribers.forEach((subscriber) => subscriber(this.countState));
   }
 
   /**
-   * calls current subscribers of a filtered entity list
+   * Call active subscribers of a filtered entity list.
    *
-   * this method is to be called after change of the filtered list state
+   * This method is called after change to the filtered list state with the specified filter.
    */
   runListFiltered(filterKey: string): void {
     const list = this.filteredListState[filterKey];
@@ -529,9 +564,9 @@ export class EntityRepository<
   }
 
   /**
-   * calls current subscribers of a filtered entity count
+   * Call active subscribers of a filtered entity count.
    *
-   * this method is to be called after change of the filtered count state
+   * This method is called after change to the filtered count state with the specified filter.
    */
   runCountFiltered(filterKey: string): void {
     const count = this.filteredCountState[filterKey];
@@ -543,7 +578,7 @@ export class EntityRepository<
   }
 
   /**
-   * loads the entity and adds it to the state if not already present
+   * Read the entity via the API and add it to the state if it is not already present.
    */
   async read(identifier: number): Promise<void> {
     if (!this.state[identifier]) {
@@ -552,7 +587,7 @@ export class EntityRepository<
   }
 
   /**
-   * loads the entity list and sets the state if not already present
+   * Read the complete entity list and set the list state if not already set.
    */
   async list(): Promise<void> {
     if (!this.listState.length) {
@@ -561,7 +596,7 @@ export class EntityRepository<
   }
 
   /**
-   * loads the entity count and sets the count state
+   * Read the complete entity count and set the count state if not already set.
    */
   async count(): Promise<void> {
     if (Number.isNaN(this.countState)) {
@@ -570,7 +605,7 @@ export class EntityRepository<
   }
 
   /**
-   * loads a filtered entity list and adds them to the state and filtered state if not already present
+   * Read a filtered entity list and add it to the filtered list state if not already present.
    */
   async listFiltered(filter: Filter): Promise<void> {
     const filterKey = stringifyFilter(filter);
@@ -580,7 +615,7 @@ export class EntityRepository<
   }
 
   /**
-   * loads a filtered entity count and sets the filtered count state if not already present
+   * Read a filtered entity count and add it to the filtered count state if not already present.
    */
   async countFiltered(filter: Filter): Promise<void> {
     const filterKey = stringifyFilter(filter);

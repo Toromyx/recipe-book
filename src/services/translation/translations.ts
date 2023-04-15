@@ -62,12 +62,22 @@ type Translations<T> = {
 };
 
 /**
+ * This type describes the language-specific messages to be parsed.
+ *
  * @see https://unicode-org.github.io/icu/userguide/format_parse/messages/
  */
 export type TranslationStrings = Translations<string>;
 
+/**
+ * This type describes the created message format objects of the language-specific messages to be formatted.
+ */
 export type TranslationFormats = Translations<IntlMessageFormat>;
 
+/**
+ * Take in message strings and parse them into message format objects.
+ *
+ * This is implemented via a new proxy object.
+ */
 export const constructMessageProxy = (
   target: TranslationStrings,
   path = "",

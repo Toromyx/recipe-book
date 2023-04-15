@@ -1,13 +1,22 @@
+<!--
+@component
+This component displays an ordered list of recipe steps of a recipe.
+-->
+
 <script>
   import { recipeStepRepository } from "../../../../../services/store/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { isLoading } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import RecipeStepEdit from "../edit/RecipeStepEdit.svelte";
   import RecipeStepView from "../view/RecipeStepView.svelte";
 
+  /**
+   * the recipe id
+   * @type {number}
+   */
   export let recipeId;
 
   /** @type {Readable<Loadable<number[]>>} */

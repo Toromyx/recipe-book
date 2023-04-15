@@ -1,7 +1,16 @@
+<!--
+@component
+This component displays the name of an ingredient.
+-->
+
 <script>
   import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { isLoading } from "../../../../../services/util/loadable.ts";
 
+  /**
+   * the id of the ingredient
+   * @type {number}
+   */
   export let id;
 
   /** @type {Readable<Loadable<IngredientInterface>>} */

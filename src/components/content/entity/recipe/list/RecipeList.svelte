@@ -1,8 +1,13 @@
+<!--
+@component
+This component lists all recipes with a form to create a new recipe.
+-->
+
 <script>
   import { recipeRoute } from "../../../../../services/router.ts";
   import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/is-loading.ts";
+  import { isLoading } from "../../../../../services/util/loadable.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";

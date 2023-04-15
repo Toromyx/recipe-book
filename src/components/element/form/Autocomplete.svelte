@@ -1,3 +1,22 @@
+<!--
+@component
+This component implements autocomplete functionality in a custom select field, allowing multiple values.
+
+It integrates with the form context to write its value there under its specified name.
+Each value can be selected only once.
+Possible values are computed via a given callback function which receives the user input as parameter.
+
+# Slots
+
+This component's slot implements the display of a single value. It is given the value as `item`.
+
+# Events
+
+The `input` and `change` events are fired when the user input is changed. Their detail is the user input.
+
+The `select` event is fired when a value is selected or deselected. Its detail is the value array.
+-->
+
 <script>
   import { createEventDispatcher, getContext, onDestroy } from "svelte";
   import { messages } from "../../../services/translation/en.ts";
@@ -6,19 +25,67 @@
   import SvelteButton from "../SvelteButton.svelte";
   import { FORM } from "./SvelteForm.svelte";
 
+  /**
+   * The form element label
+   * @type {string}
+   */
   export let label;
+  /**
+   * The form element name
+   * @type {string}
+   */
   export let name;
-  /** @type {(string) => Promise<unknown[]>} */
+  /**
+   * A function to get possible values from user input
+   * @type {(string) => Promise<unknown[]>}
+   */
   export let callback;
-  /** @type {(string) => Promise<void>} */
+  /**
+   * This is the function to create a new value from user input.
+   *
+   * The option to create a new value is only presented to the user when this property is defined.
+   * @type {(string) => Promise<void>|undefined}
+   */
   export let createCallback = undefined;
+  /**
+   * The value array
+   * @type {unknown[]}
+   */
   export let value = [];
+  /**
+   * The user input
+   * @type {string}
+   */
   export let userInput = "";
+  /**
+   * The values which are not allowed to be selected by the user
+   * @type {unknown[]}
+   */
   export let excludedValues = [];
+  /**
+   * The form element placeholder
+   * @type {string}
+   */
   export let placeholder = label;
+  /**
+   * The minimum number of value items
+   * @type {number}
+   */
   export let min = 0;
+  /**
+   * The maximum number of value items
+   * @type {number}
+   */
   export let max = 1;
+  /**
+   * The maximum number of results to display to the user
+   * @type {number}
+   */
   export let maxResults = 10;
+  /**
+   * The amount of milliseconds to debounce the result callback
+   * @type {number}
+   */
   export let debounceWait = 200;
 
   const formContext = getContext(FORM);

@@ -1,8 +1,17 @@
+<!--
+@component
+This component implements form fields for editing a recipe file.
+-->
+
 <script>
   import { messages } from "../../../../../services/translation/en.ts";
   import FileInput from "../../../../element/form/FileInput.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
 
+  /**
+   * the existing recipe file's name
+   * @type {?string}
+   */
   export let name = undefined;
 </script>
 

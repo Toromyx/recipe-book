@@ -4,44 +4,44 @@ import type {
   RecipeStepUpdateInterface,
 } from "../../../types/entity/recipe-step-interface.ts";
 import type { RecipeStepFilterInterface } from "../../../types/filter/recipe-step-filter-interface.ts";
-import { apiClient } from "../../command/entity.ts";
-import { client } from "../../event/client.ts";
+import {
+  countRecipeStep,
+  createRecipeStep,
+  deleteRecipeStep,
+  listRecipeStep,
+  readRecipeStep,
+  updateRecipeStep,
+} from "../../command/entity.ts";
+import { listen } from "../../event/client.ts";
 import { EventChannel } from "../../event/event-channel.ts";
-import type { EntityRepositoryInterface } from "./entity-repository.ts";
 import { EntityRepository } from "./entity-repository.ts";
 
-export const recipeStepRepository: EntityRepositoryInterface<
+export const recipeStepRepository: EntityRepository<
   RecipeStepInterface,
   RecipeStepCreateInterface,
   RecipeStepUpdateInterface,
   RecipeStepFilterInterface
 > = new EntityRepository(
-  (entityCreate) => apiClient.createRecipeStep(entityCreate),
-  (identifier) => apiClient.readRecipeStep(identifier),
-  (entityUpdate) => apiClient.updateRecipeStep(entityUpdate),
-  (identifier) => apiClient.deleteRecipeStep(identifier),
-  (filter) => apiClient.listRecipeStep(filter),
-  (filter) => apiClient.countRecipeStep(filter),
+  (entityCreate) => createRecipeStep(entityCreate),
+  (identifier) => readRecipeStep(identifier),
+  (entityUpdate) => updateRecipeStep(entityUpdate),
+  (identifier) => deleteRecipeStep(identifier),
+  (filter) => listRecipeStep(filter),
+  (filter) => countRecipeStep(filter),
   {},
   (reactFunction) => {
-    void client.listen(
-      EventChannel.ENTITY_ACTION_UPDATED_RECIPE_STEP,
-      (event) => {
-        reactFunction(event.payload);
-      },
-    );
+    void listen(EventChannel.ENTITY_ACTION_UPDATED_RECIPE_STEP, (event) => {
+      reactFunction(event.payload);
+    });
   },
   (reactFunction) => {
-    void client.listen(EventChannel.ENTITY_ACTION_CREATED_RECIPE_STEP, () => {
+    void listen(EventChannel.ENTITY_ACTION_CREATED_RECIPE_STEP, () => {
       reactFunction();
     });
   },
   (reactFunction) => {
-    void client.listen(
-      EventChannel.ENTITY_ACTION_DELETED_RECIPE_STEP,
-      (event) => {
-        reactFunction(event.payload);
-      },
-    );
+    void listen(EventChannel.ENTITY_ACTION_DELETED_RECIPE_STEP, (event) => {
+      reactFunction(event.payload);
+    });
   },
 );

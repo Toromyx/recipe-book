@@ -1,13 +1,13 @@
 import type { Readable } from "svelte/store";
 import { writable } from "svelte/store";
-import type { Loadable } from "../../types/loadable.ts";
-import { client as commandClient } from "../command/client.ts";
+import { invoke } from "../command/client.ts";
 import { Command } from "../command/command.ts";
-import { client as eventClient } from "../event/client.ts";
+import { listen } from "../event/client.ts";
 import { EventChannel } from "../event/event-channel.ts";
+import type { Loadable } from "../util/loadable.ts";
 
 async function getUnitList(): Promise<string[]> {
-  return commandClient.invoke(Command.UNIT_LIST_GET, undefined);
+  return invoke(Command.UNIT_LIST_GET, undefined);
 }
 
 function createUnitList(): Readable<Loadable<string[]>> {
@@ -23,7 +23,7 @@ function createUnitList(): Readable<Loadable<string[]>> {
     EventChannel.ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT,
     EventChannel.ENTITY_ACTION_DELETED_RECIPE_INGREDIENT,
   ]) {
-    void eventClient.listen(channel, () => {
+    void listen(channel, () => {
       setUnitList();
     });
   }
@@ -33,4 +33,7 @@ function createUnitList(): Readable<Loadable<string[]>> {
   };
 }
 
+/**
+ * A readable store of the loadable unit list
+ */
 export const unitList = createUnitList();
