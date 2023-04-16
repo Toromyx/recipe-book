@@ -87,8 +87,9 @@ The `input` or `change` events are fired when the user sets the value of the fie
     });
   }
 
-  $: innerValue = value || "";
+  $: innerValue = value;
   $: setValue(innerValue);
+  $: htmlValue = innerValue || "";
 
   function onInputOrChange(event) {
     innerValue = ((eventTarget) => {
@@ -121,7 +122,7 @@ The `input` or `change` events are fired when the user sets the value of the fie
   on:paste
   name="{fullName}"
   type="{type}"
-  value="{innerValue}"
+  value="{htmlValue}"
   placeholder="{placeholder}"
   required="{required}"
   aria-label="{label}"
