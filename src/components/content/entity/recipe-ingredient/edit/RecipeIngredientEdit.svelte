@@ -16,6 +16,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   import { messages } from "../../../../../services/translation/en.ts";
   import Autocomplete from "../../../../element/form/Autocomplete.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
+  import { UNIT_LIST_ID } from "../../../UnitList.svelte";
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
 
   /**
@@ -101,7 +102,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   name="unit"
   value="{unit}"
   label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
-  list="unit-list"
+  list="{UNIT_LIST_ID}"
 />
 <Autocomplete
   on:input="{onIngredientName}"
