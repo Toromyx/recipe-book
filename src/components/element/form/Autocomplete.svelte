@@ -121,6 +121,7 @@ The `select` event is fired when a value is selected or deselected. Its detail i
       dispatch("select", innerValue);
       innerUserInput = "";
       dispatch("input", innerUserInput);
+      dispatch("change", innerUserInput);
     });
   }
   getResults();

@@ -56,6 +56,8 @@ The `input` or `change` events are fired when the user selects an option.
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
       innerValue = undefined;
+      dispatch("input", innerValue);
+      dispatch("change", innerValue);
     });
   }
 

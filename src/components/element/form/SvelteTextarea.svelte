@@ -50,6 +50,8 @@ The `input` or `change` events are fired when the user changes the value.
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
       innerValue = undefined;
+      dispatch("input", innerValue);
+      dispatch("change", innerValue);
     });
   }
 

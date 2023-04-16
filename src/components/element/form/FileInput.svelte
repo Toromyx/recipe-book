@@ -59,6 +59,8 @@ The `input` or `change` events are fired when the user sets the value of the fie
     setChanged = () => formContext.setChanged(name);
     formContext.registerReset(name, () => {
       innerValue = "";
+      dispatch("input", innerValue);
+      dispatch("change", innerValue);
     });
   }
 
