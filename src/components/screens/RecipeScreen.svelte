@@ -13,7 +13,7 @@ It acquires a wake lock on initialization to avoid the screen going dark while d
 
   export let params;
 
-  const wakeLockSentinelPromise = navigator.wakeLock?.request();
+  const wakeLockSentinelPromise = navigator.wakeLock?.request("screen");
 
   onDestroy(() => {
     void wakeLockSentinelPromise?.then((wakeLockSentinel) =>
