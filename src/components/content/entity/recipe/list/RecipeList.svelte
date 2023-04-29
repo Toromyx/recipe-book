@@ -4,6 +4,7 @@ This component lists all recipes with a form to create a new recipe.
 -->
 
 <script>
+  import { link } from "svelte-spa-router";
   import { recipeRoute } from "../../../../../services/router.ts";
   import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
@@ -20,7 +21,7 @@ This component lists all recipes with a form to create a new recipe.
   <ul>
     {#each $list as id}
       <li>
-        <a href="#{recipeRoute(id)}"><RecipeViewName id="{id}" /></a
+        <a href="{recipeRoute(id)}" use:link><RecipeViewName id="{id}" /></a
         ><SvelteButton
           on:click="{() => recipeRepository.delete(id)}"
           confirmation="{true}"
