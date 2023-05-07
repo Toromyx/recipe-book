@@ -431,7 +431,7 @@ type ExtractedUnit = {
 } & Extracted;
 
 /**
- * Try to find a unit in am ingredient part.
+ * Try to find a unit in an ingredient part.
  *
  * The unit must be included in the provided unit list.
  * The non-unit parts of the string are returned as prefix and suffix.
