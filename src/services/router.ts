@@ -1,4 +1,4 @@
-import type { ComponentType } from "svelte";
+import type { RouteDefinition } from "svelte-spa-router";
 import RecipeListScreen from "../components/screens/RecipeListScreen.svelte";
 import RecipeScreen from "../components/screens/RecipeScreen.svelte";
 
@@ -19,7 +19,7 @@ export function recipeRoute(id: number | string, doEscape = true) {
 /**
  * This object contains all the app's routes for constructing the router.
  */
-export const routes: { [route: string]: ComponentType } = {
+export const routes: RouteDefinition = {
   [recipeListRoute()]: RecipeListScreen,
   [recipeRoute(":id", false)]: RecipeScreen,
 };
