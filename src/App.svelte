@@ -10,6 +10,6 @@ This root component contains the router and other components which are only need
 </script>
 
 <main>
-  <Router routes="{routes}" />
+  <Router routes="{routes}" restoreScrollState="{true}" />
   <UnitList />
 </main>
