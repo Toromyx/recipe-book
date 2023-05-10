@@ -55,7 +55,7 @@ async fn get_connection() -> DatabaseConnection {
     let path = get_path().await;
     let database_url = String::from("sqlite://") + &path;
     let mut opt = ConnectOptions::new(database_url);
-    opt.max_connections(100)
+    opt.max_connections(1)
         .acquire_timeout(Duration::from_millis(100))
         .sqlx_logging(true)
         .sqlx_logging_level(LevelFilter::Trace);
