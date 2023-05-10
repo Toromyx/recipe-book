@@ -96,7 +96,7 @@ export function parseHtml(
 }
 
 /**
- * Parse a provided  string into recipe ingredients.
+ * Parse a provided string into recipe ingredients.
  *
  * The provided unit list is used to find the ingredient units. It should be a list of known units.
  */
