@@ -32,6 +32,13 @@ const groupingSymbols = {
   close: [")", "}", "]", ">"],
 };
 
+const getSeparatorButNotInsideGroupingSymbols = (separator: string) =>
+  new RegExp(
+    `${separator}(?![^${RegExp.escape(
+      groupingSymbols.open.join(""),
+    )}]*[${RegExp.escape(groupingSymbols.close.join(""))}])`,
+  );
+
 /**
  * Parse a provided html string into recipe ingredients.
  *
@@ -111,12 +118,7 @@ export function parseText(
   );
   // The separator regular expressions contain a negative lookahead for grouping symbols to not split the text in the middle of grouped text.
   const separatorRegExps = separators.map(
-    (separator) =>
-      new RegExp(
-        `${separator}(?![^${RegExp.escape(
-          groupingSymbols.open.join(""),
-        )}]*[${RegExp.escape(groupingSymbols.close.join(""))}])`,
-      ),
+    getSeparatorButNotInsideGroupingSymbols,
   );
   // split the text for each separator
   const splitTextsBySeparator = separatorRegExps.map((separatorRegExp) =>
@@ -162,21 +164,41 @@ export function parseText(
   });
   // the best split is the first element
   const splitText = splitTextsBySeparator[0];
-  recipeIngredients.push(
-    ...(splitText
-      .map((line) =>
-        fromParts(
-          unitList,
-          // each text part is once again split by whitespace into ingredient parts
-          ...line
-            .split(/\s+/)
-            .map((part) => part.trim())
-            .filter(Boolean),
-        ),
-      )
-      .filter(Boolean) as ParsedRecipeIngredient[]),
-  );
+  recipeIngredients.push(...parseStrings(splitText, unitList));
   return recipeIngredients;
+}
+
+/**
+ * Parse the provided strings into recipe ingredients.
+ *
+ * Each string must be known to be one ingredient.
+ * The provided unit list is used to find the ingredient units. It should be a list of known units.
+ */
+export function parseStrings(
+  strings: string[],
+  unitList: string[],
+): ParsedRecipeIngredient[] {
+  return strings
+    .map((string) => parseString(string, unitList))
+    .filter(Boolean) as ParsedRecipeIngredient[];
+}
+
+/**
+ * Parse a provided string into a single recipe ingredient.
+ *
+ * The provided unit list is used to find the ingredient units. It should be a list of known units.
+ */
+export function parseString(
+  string: string,
+  unitList: string[],
+): ParsedRecipeIngredient | null {
+  return fromParts(
+    unitList,
+    ...string
+      .split(getSeparatorButNotInsideGroupingSymbols("\\s"))
+      .map((part) => part.trim())
+      .filter(Boolean),
+  );
 }
 
 /**
