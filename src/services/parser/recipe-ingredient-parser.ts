@@ -299,7 +299,7 @@ function extractNameAndQuality(name: string): NameAndQuality {
     } ${
       // @ts-expect-error indices is defined
       name.slice(regexpMatchArray.indices[0][1]).trim()
-    }`;
+    }`.trim();
   }
   return {
     name,
