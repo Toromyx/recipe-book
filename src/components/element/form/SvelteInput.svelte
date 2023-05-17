@@ -18,7 +18,12 @@ The `input` or `change` events are fired when the user sets the value of the fie
 <script>
   import { Temporal } from "@js-temporal/polyfill";
   import { createEventDispatcher, getContext, onDestroy } from "svelte";
+  import { setCustomValidity } from "../../../services/util/validity.ts";
   import { FORM } from "./SvelteForm.svelte";
+
+  /**
+   * @typedef {string|number|Temporal.PlainDate|Temporal.PlainTime|Temporal.PlainDateTime|undefined} ValueType
+   */
 
   /**
    * the form element label
@@ -32,7 +37,7 @@ The `input` or `change` events are fired when the user sets the value of the fie
   export let name;
   /**
    * the form element value
-   * @type {string|number|Temporal.PlainDate|Temporal.PlainTime|Temporal.PlainDateTime|undefined}
+   * @type ValueType
    */
   export let value = undefined;
   /**
@@ -70,11 +75,20 @@ The `input` or `change` events are fired when the user sets the value of the fie
    * @type {?string}
    */
   export let list = undefined;
+  /**
+   * The validator functions to run on every change of the value.
+   * @type {Array<(value: ValueType) => ?string>}
+   */
+  export let validators = [];
 
   const formContext = getContext(FORM);
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
 
+  /**
+   * @type {?HTMLInputElement}
+   */
+  let input;
   let innerValue;
   let setValue = () => {};
   let setChanged = () => {};
@@ -91,6 +105,7 @@ The `input` or `change` events are fired when the user sets the value of the fie
 
   $: innerValue = value;
   $: setValue(innerValue);
+  $: setCustomValidity(input, innerValue, ...validators);
   $: htmlValue = innerValue || "";
 
   function onInputOrChange(event) {
@@ -119,6 +134,7 @@ The `input` or `change` events are fired when the user sets the value of the fie
 </script>
 
 <input
+  bind:this="{input}"
   on:input="{onInputOrChange}"
   on:change="{onInputOrChange}"
   on:paste
