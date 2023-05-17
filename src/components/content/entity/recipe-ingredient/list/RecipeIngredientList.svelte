@@ -179,7 +179,7 @@ It provides functionality to add a new recipe ingredient and integrates with the
           whenLoadingDefault($unitList, []),
         );
       }}"
-      usedIngredientIds="{$usedIngredientsList || []}"
+      usedIngredientIds="{whenLoadingDefault($usedIngredientsList, [])}"
     />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
