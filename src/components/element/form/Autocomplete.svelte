@@ -26,6 +26,10 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   import { FORM } from "./SvelteForm.svelte";
 
   /**
+   * @typedef {unknown} ValueType
+   */
+
+  /**
    * The form element label
    * @type {string}
    */
@@ -49,7 +53,7 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   export let createCallback = undefined;
   /**
    * The value array
-   * @type {unknown[]}
+   * @type {ValueType[]}
    */
   export let value = [];
   /**
@@ -59,7 +63,7 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   export let userInput = "";
   /**
    * The values which are not allowed to be selected by the user
-   * @type {unknown[]}
+   * @type {ValueType[]}
    */
   export let excludedValues = [];
   /**
