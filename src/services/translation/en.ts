@@ -46,6 +46,7 @@ const translationStrings: TranslationStrings = {
     autocomplete: {
       max: "At most {max} {max,plural,one{element needs}other{elements need}} to be selected.",
       min: "At least {min} {min,plural,one{element needs}other{elements need}} to be selected.",
+      includesExcluded: "The current selection includes an excluded value.",
     },
   },
   questions: {

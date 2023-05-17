@@ -145,6 +145,13 @@ The `select` event is fired when a value is selected or deselected. Its detail i
             value.length > max
               ? messages.validity.autocomplete.max.format({ max })
               : undefined,
+          (value) => {
+            for (const item of value) {
+              if (excludedValues.includes(item)) {
+                return messages.validity.autocomplete.includesExcluded.format();
+              }
+            }
+          },
         ],
       );
     }
