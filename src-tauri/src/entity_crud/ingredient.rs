@@ -51,6 +51,7 @@ pub type IngredientFilter = Filter<IngredientCondition, IngredientOrderBy>;
 #[serde(rename_all = "camelCase")]
 pub struct IngredientCondition {
     pub name: Option<String>,
+    pub name_exact: Option<String>,
     pub recipe_step_id: Option<i64>,
 }
 
@@ -61,6 +62,7 @@ impl IntoCondition for IngredientCondition {
                 self.name
                     .map(|name| Column::Name.like(&format!("%{name}%"))),
             )
+            .add_option(self.name_exact.map(|name| Column::Name.eq(name)))
             .add_option(self.recipe_step_id.map(|recipe_step_id| {
                 Column::Id.in_subquery(
                     recipe_ingredient::Entity::find()

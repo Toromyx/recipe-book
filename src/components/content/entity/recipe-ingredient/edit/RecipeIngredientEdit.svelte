@@ -9,6 +9,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
 
 <script>
   import { createEventDispatcher } from "svelte";
+  import { listIngredient } from "../../../../../services/command/entity.ts";
   import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { whenLoadingDefault } from "../../../../../services/util/loadable.ts";
@@ -71,6 +72,17 @@ The event `edit` is fired when the user makes yn change to any field. The event 
     condition: { name: ingredientIdUserInput },
     orderBy: [{ column: "name" }],
   });
+
+  // if no ingredient id is provided, try to find an exact match and set it
+  if (!ingredientId && ingredientName) {
+    void listIngredient({
+      condition: { nameExact: ingredientName },
+    }).then((list) => {
+      if (list.length === 1) {
+        innerIngredientId = list[0];
+      }
+    });
+  }
 
   function onQuantity({ detail }) {
     innerQuantity = detail;
