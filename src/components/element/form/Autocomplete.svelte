@@ -111,7 +111,7 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   let setChanged = () => {};
   /** @type {unknown[]} */
   let results = [];
-  let input;
+  let hiddenInput;
 
   if (formContext) {
     setValue = (v) => formContext.setValue(name, v);
@@ -132,16 +132,17 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   $: filteredResults = results.filter((result) => !innerValue.includes(result));
   $: truncatedResults = filteredResults.slice(0, maxResults);
   $: {
-    if (input) {
+    if (hiddenInput) {
       setCustomValidity(
-        input,
+        hiddenInput,
+        innerValue,
         ...[
-          () =>
-            innerValue.length < min
+          (value) =>
+            value.length < min
               ? messages.validity.autocomplete.min.format({ min })
               : undefined,
-          () =>
-            innerValue.length > max
+          (value) =>
+            value.length > max
               ? messages.validity.autocomplete.max.format({ max })
               : undefined,
         ],
@@ -180,7 +181,12 @@ The `select` event is fired when a value is selected or deselected. Its detail i
       >{/each}</span
   >
   <input
-    bind:this="{input}"
+    bind:this="{hiddenInput}"
+    class="autocomplete__hidden-input"
+    tabindex="-1"
+    aria-hidden="true"
+  />
+  <input
     on:input="{onInputOrChange}"
     on:change="{onInputOrChange}"
     on:paste
@@ -221,5 +227,13 @@ The `select` event is fired when a value is selected or deselected. Its detail i
 
   .autocomplete:focus-within ul {
     display: block;
+  }
+
+  .autocomplete__hidden-input {
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    pointer-events: none;
   }
 </style>
