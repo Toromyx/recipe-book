@@ -9,6 +9,11 @@ import type {
   RecipeFileUpdateInterface,
 } from "../../types/entity/recipe-file-interface.ts";
 import type {
+  RecipeIngredientDraftCreateInterface,
+  RecipeIngredientDraftInterface,
+  RecipeIngredientDraftUpdateInterface,
+} from "../../types/entity/recipe-ingredient-draft-interface.js";
+import type {
   RecipeIngredientCreateInterface,
   RecipeIngredientInterface,
   RecipeIngredientUpdateInterface,
@@ -26,6 +31,7 @@ import type {
 import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
 import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-filter-interface.ts";
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
+import type { RecipeIngredientDraftFilterInterface } from "../../types/filter/recipe-ingredient-draft-filter-interface.js";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
 import { stringifyFilter } from "../store/repository/entity-repository.ts";
@@ -38,6 +44,7 @@ type CommandEntityRead =
   | Command.ENTITY_READ_RECIPE
   | Command.ENTITY_READ_RECIPE_FILE
   | Command.ENTITY_READ_RECIPE_INGREDIENT
+  | Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT
   | Command.ENTITY_READ_RECIPE_STEP;
 
 type CommandEntityList =
@@ -45,6 +52,7 @@ type CommandEntityList =
   | Command.ENTITY_LIST_RECIPE
   | Command.ENTITY_LIST_RECIPE_FILE
   | Command.ENTITY_LIST_RECIPE_INGREDIENT
+  | Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT
   | Command.ENTITY_LIST_RECIPE_STEP;
 
 type CommandEntityCount =
@@ -52,6 +60,7 @@ type CommandEntityCount =
   | Command.ENTITY_COUNT_RECIPE
   | Command.ENTITY_COUNT_RECIPE_FILE
   | Command.ENTITY_COUNT_RECIPE_INGREDIENT
+  | Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT
   | Command.ENTITY_COUNT_RECIPE_STEP;
 
 const entityReadPromiseCollector: {
@@ -63,6 +72,7 @@ const entityReadPromiseCollector: {
   [Command.ENTITY_READ_RECIPE]: {},
   [Command.ENTITY_READ_RECIPE_FILE]: {},
   [Command.ENTITY_READ_RECIPE_INGREDIENT]: {},
+  [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_READ_RECIPE_STEP]: {},
 };
 
@@ -75,6 +85,7 @@ const entityListPromiseCollector: {
   [Command.ENTITY_LIST_RECIPE]: {},
   [Command.ENTITY_LIST_RECIPE_FILE]: {},
   [Command.ENTITY_LIST_RECIPE_INGREDIENT]: {},
+  [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_LIST_RECIPE_STEP]: {},
 };
 
@@ -87,6 +98,7 @@ const entityCountPromiseCollector: {
   [Command.ENTITY_COUNT_RECIPE]: {},
   [Command.ENTITY_COUNT_RECIPE_FILE]: {},
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: {},
+  [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP]: {},
 };
 
@@ -266,6 +278,40 @@ export function countRecipeIngredient(
   filter: RecipeIngredientFilterInterface,
 ): Promise<number> {
   return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, filter);
+}
+
+export function createRecipeIngredientDraft(
+  create: RecipeIngredientDraftCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT, { create });
+}
+
+export function readRecipeIngredientDraft(
+  id: number,
+): Promise<RecipeIngredientDraftInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT, id);
+}
+
+export function updateRecipeIngredientDraft(
+  update: RecipeIngredientDraftUpdateInterface,
+): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT_DRAFT, { update });
+}
+
+export function deleteRecipeIngredientDraft(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT, { id });
+}
+
+export function listRecipeIngredientDraft(
+  filter: RecipeIngredientDraftFilterInterface,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT, filter);
+}
+
+export function countRecipeIngredientDraft(
+  filter: RecipeIngredientDraftFilterInterface,
+): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT, filter);
 }
 
 export function createRecipeStep(

@@ -8,6 +8,7 @@ mod ingredient;
 mod recipe;
 mod recipe_file;
 mod recipe_ingredient;
+mod recipe_ingredient_draft;
 mod recipe_step;
 
 #[derive(DeriveMigrationName)]
@@ -21,6 +22,7 @@ impl MigrationTrait for Migration {
         recipe_step::up(manager).await?;
         recipe_file::up(manager).await?;
         recipe_ingredient::up(manager).await?;
+        recipe_ingredient_draft::up(manager).await?;
         Ok(())
     }
 }

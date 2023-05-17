@@ -1,5 +1,6 @@
 import type { IngredientInterface } from "../../types/entity/ingredient-interface.ts";
 import type { RecipeFileInterface } from "../../types/entity/recipe-file-interface.ts";
+import type { RecipeIngredientDraftInterface } from "../../types/entity/recipe-ingredient-draft-interface.ts";
 import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.ts";
 import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
 import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
@@ -33,6 +34,13 @@ type CommandAnswerMap = {
   [Command.ENTITY_DELETE_RECIPE_INGREDIENT]: void;
   [Command.ENTITY_LIST_RECIPE_INGREDIENT]: number[];
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: number;
+
+  [Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT]: number;
+  [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: RecipeIngredientDraftInterface;
+  [Command.ENTITY_UPDATE_RECIPE_INGREDIENT_DRAFT]: void;
+  [Command.ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT]: void;
+  [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: number[];
+  [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: number;
 
   [Command.ENTITY_CREATE_RECIPE_STEP]: number;
   [Command.ENTITY_READ_RECIPE_STEP]: RecipeStepInterface;

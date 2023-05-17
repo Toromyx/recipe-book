@@ -27,6 +27,14 @@ entity "Recipe Ingredient" as recipe_ingredient {
 }
 recipe_ingredient }o--|| "step_id" recipe_step
 
+entity "Recipe Ingredient Draft" as recipe_ingredient_draft {
+  id: INTEGER
+  --
+  order: INTEGER
+  text: TEXT
+}
+recipe_ingredient_draft }o--|| "step_id" recipe_step
+
 entity "Ingredient" as ingredient {
   id: INTEGER
   --
