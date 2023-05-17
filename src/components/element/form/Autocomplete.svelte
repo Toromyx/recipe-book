@@ -91,11 +91,11 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   const formContext = getContext(FORM);
   const dispatch = createEventDispatcher();
   const fullName = formContext?.name ? `${formContext.name}_${name}` : name;
-  const getResults = debounce(async () => {
-    if (!innerUserInput) {
+  const getResults = debounce(async (userInput) => {
+    if (!userInput) {
       return;
     }
-    results = await callback(innerUserInput);
+    results = await callback(userInput);
   }, debounceWait);
   const createAndSelect = async () => {
     const createValue = await createCallback(innerUserInput);
@@ -124,11 +124,11 @@ The `select` event is fired when a value is selected or deselected. Its detail i
       dispatch("change", innerUserInput);
     });
   }
-  getResults();
 
   $: innerValue = value;
   $: setValue(innerValue);
   $: innerUserInput = userInput;
+  $: getResults(innerUserInput);
   $: filteredResults = results.filter((result) => !innerValue.includes(result));
   $: truncatedResults = filteredResults.slice(0, maxResults);
   $: {
@@ -151,7 +151,6 @@ The `select` event is fired when a value is selected or deselected. Its detail i
 
   function onInputOrChange(event) {
     innerUserInput = event.target.value;
-    getResults();
     dispatch(event.type, innerUserInput);
   }
 
