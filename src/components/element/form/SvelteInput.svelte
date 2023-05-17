@@ -108,6 +108,18 @@ The `input` or `change` events are fired when the user sets the value of the fie
   $: setCustomValidity(input, innerValue, ...validators);
   $: htmlValue = innerValue || "";
 
+  /**
+   * Set and report the custom validity on the HTML input.
+   *
+   * @param {string} error
+   * @see HTMLInputElement.setCustomValidity
+   * @see HTMLInputElement.reportValidity
+   */
+  export function setAndReportCustomValidity(error) {
+    input?.setCustomValidity(error);
+    input?.reportValidity();
+  }
+
   function onInputOrChange(event) {
     innerValue = ((eventTarget) => {
       switch (type) {
