@@ -37,6 +37,8 @@ It also displays displays the ingredients recipes drafts.
    * @type {number}
    */
   export let recipeStepId;
+  /** @type {number} */
+  export let factor = 1;
 
   /** @type {Readable<Loadable<number[]>>} */
   let list;
@@ -100,7 +102,7 @@ It also displays displays the ingredients recipes drafts.
   <ol>
     {#each $list as id}
       <li>
-        <RecipeIngredientView id="{id}" /><SvelteButton
+        <RecipeIngredientView id="{id}" factor="{factor}" /><SvelteButton
           on:click="{async () => {
             await recipeIngredientRepository.delete(id);
             updateOrder(recipeIngredientRepository, $list, id);

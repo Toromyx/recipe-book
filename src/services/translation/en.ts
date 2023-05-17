@@ -41,6 +41,7 @@ const translationStrings: TranslationStrings = {
     descriptions: {
       ocrOutput: "OCR output",
     },
+    factor: "Factor",
   },
   validity: {
     autocomplete: {

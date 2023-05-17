@@ -17,6 +17,8 @@ This component displays the content of a recipe step.
    * @type {number}
    */
   export let id;
+  /** @type {number} */
+  export let factor = 1;
 
   /** @type {Readable<Loadable<RecipeStepInterface>>} */
   let recipeStep;
@@ -29,7 +31,7 @@ This component displays the content of a recipe step.
     {messages.headings.recipeStep.format({ number: $recipeStep.order })}
   </h2>
   <h3>{messages.headings.ingredients.format()}</h3>
-  <RecipeIngredientList recipeStepId="{id}" />
+  <RecipeIngredientList recipeStepId="{id}" factor="{factor}" />
   <h3>{messages.headings.description.format()}</h3>
   <Editable
     on:edit="{async ({ detail: { values, changed } }) => {

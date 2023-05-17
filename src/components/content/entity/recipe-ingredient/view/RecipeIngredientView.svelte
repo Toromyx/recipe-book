@@ -17,13 +17,15 @@ The recipe ingredient is editable.
    * @type {number}
    */
   export let id;
+  /**  @type {number} */
+  export let factor = 1;
 
   /** @type {Readable<Loadable<RecipeIngredientInterface>>} */
   let recipeIngredient;
 
   $: recipeIngredient = recipeIngredientRepository.createStore(id);
   $: quantifiers = [
-    $recipeIngredient?.quantity,
+    $recipeIngredient?.quantity * factor,
     $recipeIngredient?.unit,
   ].filter(Boolean);
 </script>

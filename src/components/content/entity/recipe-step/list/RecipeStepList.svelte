@@ -18,6 +18,8 @@ This component displays an ordered list of recipe steps of a recipe.
    * @type {number}
    */
   export let recipeId;
+  /** @type {number} */
+  export let factor = 1;
 
   /** @type {Readable<Loadable<number[]>>} */
   let list;
@@ -34,7 +36,7 @@ This component displays an ordered list of recipe steps of a recipe.
 
 {#if !isLoading($list)}
   {#each $list as id}
-    <RecipeStepView id="{id}" /><SvelteButton
+    <RecipeStepView id="{id}" factor="{factor}" /><SvelteButton
       on:click="{async () => {
         await recipeStepRepository.delete(id);
         updateOrder(recipeStepRepository, $list, id);

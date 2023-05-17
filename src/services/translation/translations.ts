@@ -40,6 +40,7 @@ type Translations<T> = {
     descriptions: {
       ocrOutput: T;
     };
+    factor: T;
   };
   validity: {
     autocomplete: {
