@@ -97,6 +97,8 @@ type CommandParameterMap = {
   [Command.ENTITY_LIST_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
   [Command.ENTITY_COUNT_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
 
+  [Command.EXTERNAL_RECIPE]: { url: string };
+
   [Command.OCR]: { recipeFileId: number };
 
   [Command.UNIT_LIST_GET]: undefined;

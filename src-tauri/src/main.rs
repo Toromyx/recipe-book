@@ -34,6 +34,7 @@ use crate::command::{
             entity_list_recipe_step, entity_read_recipe_step, entity_update_recipe_step,
         },
     },
+    external_recipe::external_recipe,
     ocr::ocr,
     unit_list::unit_list_get,
 };
@@ -43,6 +44,7 @@ mod database;
 mod entity;
 mod entity_crud;
 mod event;
+mod external_recipe;
 mod fs;
 mod log;
 mod migrator;
@@ -121,6 +123,7 @@ async fn main() {
             entity_delete_recipe_step,
             entity_list_recipe_step,
             entity_count_recipe_step,
+            external_recipe,
             ocr,
             unit_list_get,
         ])

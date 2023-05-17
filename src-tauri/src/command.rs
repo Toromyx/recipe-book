@@ -2,5 +2,6 @@
 
 pub mod entity;
 mod error;
+pub mod external_recipe;
 pub mod ocr;
 pub mod unit_list;

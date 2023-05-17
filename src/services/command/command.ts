@@ -41,6 +41,8 @@ export const enum Command {
   ENTITY_LIST_RECIPE_STEP = "entity_list_recipe_step",
   ENTITY_COUNT_RECIPE_STEP = "entity_count_recipe_step",
 
+  EXTERNAL_RECIPE = "external_recipe",
+
   OCR = "ocr",
 
   UNIT_LIST_GET = "unit_list_get",

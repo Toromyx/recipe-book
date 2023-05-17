@@ -1,5 +1,6 @@
 //! This module implements create, read, update, delete, list, and count operations for the entities in [`crate::entity`].  
 
+use anyhow::Result;
 use async_trait::async_trait;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
@@ -9,9 +10,8 @@ use sea_orm::{
 };
 use serde::Deserialize;
 
-use crate::{database, entity_crud::error::EntityCrudError, window::get_window};
+use crate::{database, window::get_window};
 
-pub mod error;
 pub mod ingredient;
 pub mod recipe;
 pub mod recipe_file;
@@ -144,7 +144,7 @@ pub trait EntityCrudTrait {
     async fn pre_create(
         create: Self::EntityCreate,
         _txn: &DatabaseTransaction,
-    ) -> Result<Self::ActiveModel, EntityCrudError> {
+    ) -> Result<Self::ActiveModel> {
         Ok(create.into_active_model())
     }
 
@@ -152,12 +152,12 @@ pub trait EntityCrudTrait {
     ///
     /// # Errors
     ///
-    /// - [`EntityCrudError::Db`] when there is any problem with the database
-    /// - [`EntityCrudError::Tauri`] when the tauri window can't be messaged about the created entity
+    /// - when there is any problem with the database
+    /// - when the tauri window can't be messaged about the created entity
     /// - when there is an error in [`Self::pre_create`] or [`Self::post_create`]
     async fn create(
         create: Self::EntityCreate,
-    ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType, EntityCrudError> {
+    ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType> {
         let db = database::connect().await;
         let txn = db.begin().await?;
         let active_model = Self::pre_create(create, &txn).await?;
@@ -171,10 +171,7 @@ pub trait EntityCrudTrait {
     /// Implement this to run code after creating the entity.
     ///
     /// see [`Self::create`]
-    async fn post_create(
-        model: Self::Model,
-        _txn: &DatabaseTransaction,
-    ) -> Result<Self::Model, EntityCrudError> {
+    async fn post_create(model: Self::Model, _txn: &DatabaseTransaction) -> Result<Self::Model> {
         Ok(model)
     }
 
@@ -182,10 +179,10 @@ pub trait EntityCrudTrait {
     ///
     /// # Errors
     ///
-    /// - [`EntityCrudError::Db`] when there is any problem with the database
+    /// - when there is any problem with the database
     async fn read(
         id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
-    ) -> Result<Option<Self::Model>, EntityCrudError> {
+    ) -> Result<Option<Self::Model>> {
         let db = database::connect().await;
         let model = Self::Entity::find_by_id(id).one(db).await?;
         Ok(model)
@@ -195,9 +192,9 @@ pub trait EntityCrudTrait {
     ///
     /// # Errors
     ///
-    /// - [`EntityCrudError::Db`] when there is any problem with the database
-    /// - [`EntityCrudError::Tauri`] when the tauri window can't be messaged about the updated entity
-    async fn update(update: Self::EntityUpdate) -> Result<Self::Model, EntityCrudError> {
+    /// - when there is any problem with the database
+    /// - when the tauri window can't be messaged about the updated entity
+    async fn update(update: Self::EntityUpdate) -> Result<Self::Model> {
         let db = database::connect().await;
         let txn = db.begin().await?;
         let model = update.into_active_model().update(&txn).await?;
@@ -212,10 +209,7 @@ pub trait EntityCrudTrait {
     /// Implement this to run code before deleting the entity.
     ///
     /// see [`Self::delete`]
-    async fn pre_delete(
-        model: Self::Model,
-        _txn: &DatabaseTransaction,
-    ) -> Result<Self::Model, EntityCrudError> {
+    async fn pre_delete(model: Self::Model, _txn: &DatabaseTransaction) -> Result<Self::Model> {
         Ok(model)
     }
 
@@ -223,12 +217,10 @@ pub trait EntityCrudTrait {
     ///
     /// # Errors
     ///
-    /// - [`EntityCrudError::Db`] when there is any problem with the database
-    /// - [`EntityCrudError::Tauri`] when the tauri window can't be messaged about the deleted entity
+    /// - when there is any problem with the database
+    /// - when the tauri window can't be messaged about the deleted entity
     /// - when there is an error in [`Self::pre_delete`]
-    async fn delete(
-        id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType,
-    ) -> Result<(), EntityCrudError> {
+    async fn delete(id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType) -> Result<()> {
         let db = database::connect().await;
         let txn = db.begin().await?;
         let model_option = Self::Entity::find_by_id(id).one(&txn).await?;
@@ -246,10 +238,10 @@ pub trait EntityCrudTrait {
     ///
     /// # Errors
     ///
-    /// - [`EntityCrudError::Db`] when there is any problem with the database
+    /// - when there is any problem with the database
     async fn list(
         filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
-    ) -> Result<Vec<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType>, EntityCrudError> {
+    ) -> Result<Vec<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType>> {
         let db = database::connect().await;
         let mut select = Self::Entity::find()
             .select_only()
@@ -268,10 +260,8 @@ pub trait EntityCrudTrait {
     ///
     /// # Errors
     ///
-    /// - [`EntityCrudError::Db`] when there is any problem with the database
-    async fn count(
-        filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
-    ) -> Result<i64, EntityCrudError> {
+    /// - when there is any problem with the database
+    async fn count(filter: Filter<Self::EntityCondition, Self::EntityOrderBy>) -> Result<i64> {
         let db = database::connect().await;
         let mut select = Self::Entity::find()
             .select_only()

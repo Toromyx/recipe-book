@@ -1,5 +1,6 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_file`].
 
+use anyhow::Result;
 use async_trait::async_trait;
 use log;
 use mime_guess::mime;
@@ -13,7 +14,7 @@ use serde::Deserialize;
 
 use crate::{
     entity::recipe_file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-    entity_crud::{error::EntityCrudError, EntityCrudTrait, Filter},
+    entity_crud::{EntityCrudTrait, Filter},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE_FILE, ENTITY_ACTION_DELETED_RECIPE_FILE,
         ENTITY_ACTION_UPDATED_RECIPE_FILE,
@@ -106,7 +107,7 @@ impl EntityCrudTrait for RecipeFileCrud {
     async fn pre_create(
         create: RecipeFileCreate,
         _txn: &DatabaseTransaction,
-    ) -> Result<ActiveModel, EntityCrudError> {
+    ) -> Result<ActiveModel> {
         let mime = mime_guess::from_path(&create.path)
             .first_or(mime::APPLICATION_OCTET_STREAM)
             .to_string();
@@ -115,10 +116,7 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(active_model)
     }
 
-    async fn post_create(
-        model: Model,
-        txn: &DatabaseTransaction,
-    ) -> Result<Model, EntityCrudError> {
+    async fn post_create(model: Model, txn: &DatabaseTransaction) -> Result<Model> {
         recipe_file_storage::create(&model).await?;
         let path_segments = recipe_file_storage::path_segments(&model).await?;
         let path = path_segments.join("/");
@@ -128,10 +126,7 @@ impl EntityCrudTrait for RecipeFileCrud {
         Ok(model)
     }
 
-    async fn pre_delete(
-        model: Model,
-        _txn: &DatabaseTransaction,
-    ) -> Result<Model, EntityCrudError> {
+    async fn pre_delete(model: Model, _txn: &DatabaseTransaction) -> Result<Model> {
         if let Err(err) = recipe_file_storage::delete(&model).await {
             log::warn!("Could not delete recipe file from storage: {}", err);
         }

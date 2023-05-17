@@ -4,6 +4,7 @@ import type { RecipeIngredientDraftInterface } from "../../types/entity/recipe-i
 import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.ts";
 import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
 import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
+import type { ExternalRecipeData } from "../external-recipe.ts";
 import type { Command } from "./command.ts";
 
 type CommandAnswerMap = {
@@ -48,6 +49,8 @@ type CommandAnswerMap = {
   [Command.ENTITY_DELETE_RECIPE_STEP]: void;
   [Command.ENTITY_LIST_RECIPE_STEP]: number[];
   [Command.ENTITY_COUNT_RECIPE_STEP]: number;
+
+  [Command.EXTERNAL_RECIPE]: ExternalRecipeData;
 
   [Command.OCR]: string;
 

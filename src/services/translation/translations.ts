@@ -47,6 +47,7 @@ type Translations<T> = {
       min: T;
       includesExcluded: T;
     };
+    externalRecipeUrlNotSupported: T;
   };
   questions: {
     confirmation: T;

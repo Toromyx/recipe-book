@@ -4,7 +4,7 @@ use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 use thiserror::Error;
 
-use crate::entity_crud::error::EntityCrudError;
+use crate::external_recipe::error::ExternalRecipeError;
 
 #[serde_as]
 #[derive(Debug, Error, Serialize)]
@@ -34,11 +34,22 @@ pub enum CommandError {
         tesseract::plumbing::TessBaseApiGetHocrTextError,
     ),
     #[error(transparent)]
-    EntityCrud(
+    Anyhow(
         #[serde_as(as = "DisplayFromStr")]
         #[from]
-        EntityCrudError,
+        anyhow::Error,
     ),
+    #[error(transparent)]
+    ExternalRecipeUrlNotSupported(#[serde_as(as = "DisplayFromStr")] ExternalRecipeError),
     #[error("Entity was not found.")]
     NotFound,
+}
+
+impl From<ExternalRecipeError> for CommandError {
+    fn from(value: ExternalRecipeError) -> Self {
+        match value {
+            ExternalRecipeError::Anyhow(anyhow) => Self::Anyhow(anyhow),
+            ExternalRecipeError::UrlNotSupported() => Self::ExternalRecipeUrlNotSupported(value),
+        }
+    }
 }
