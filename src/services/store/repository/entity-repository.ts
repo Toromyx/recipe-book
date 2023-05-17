@@ -438,6 +438,7 @@ export class EntityRepository<
       set.delete(subscriber);
       if (!set.size) {
         delete this.filteredListSubscribers[filterKey];
+        delete this.filteredListState[filterKey];
       }
     };
   }
@@ -489,6 +490,7 @@ export class EntityRepository<
       set.delete(subscriber);
       if (!set.size) {
         delete this.filteredCountSubscribers[filterKey];
+        delete this.filteredCountState[filterKey];
       }
     };
   }
