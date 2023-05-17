@@ -50,38 +50,49 @@ The event `edit` is fired when the user makes yn change to any field. The event 
    */
   export let usedIngredientIds = [];
 
-  const values = {
-    quantity,
-    unit,
-    ingredientName,
-    ingredientId,
-    quality,
-  };
   const dispatch = createEventDispatcher();
 
+  let innerQuantity;
+  let innerUnit;
+  let innerIngredientName;
+  let innerIngredientId;
+  let innerQuality;
+
+  $: innerQuantity = quantity;
+  $: innerUnit = unit;
+  $: innerIngredientName = ingredientName;
+  $: innerIngredientId = ingredientId;
+  $: innerQuality = quality;
+
   function onQuantity({ detail }) {
-    values.quantity = detail;
+    innerQuantity = detail;
     onUserInput();
   }
   function onUnit({ detail }) {
-    values.unit = detail;
+    innerUnit = detail;
     onUserInput();
   }
   function onIngredientName({ detail }) {
-    values.ingredientName = detail;
+    innerIngredientName = detail;
     onUserInput();
   }
   function onIngredientId({ detail }) {
-    values.ingredientId = detail[0];
+    innerIngredientId = detail[0];
     onUserInput();
   }
   function onQuality({ detail }) {
-    values.quality = detail;
+    innerQuality = detail;
     onUserInput();
   }
 
   function onUserInput() {
-    dispatch("edit", values);
+    dispatch("edit", {
+      quantity: innerQuantity,
+      unit: innerUnit,
+      ingredientName: innerIngredientName,
+      ingredientId: innerIngredientId,
+      quality: innerQuality,
+    });
   }
 </script>
 
@@ -91,7 +102,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   on:paste
   name="quantity"
   type="number"
-  value="{quantity}"
+  value="{innerQuantity}"
   label="{messages.labels.entityFields.recipeIngredient.quantity.format()}"
   min="0"
 />
@@ -100,7 +111,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   on:change="{onUnit}"
   on:paste
   name="unit"
-  value="{unit}"
+  value="{innerUnit}"
   label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
   list="{UNIT_LIST_ID}"
 />
@@ -112,8 +123,8 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   name="ingredientId"
   min="{1}"
   max="{1}"
-  value="{ingredientId ? [ingredientId] : []}"
-  userInput="{ingredientName}"
+  value="{innerIngredientId ? [innerIngredientId] : []}"
+  userInput="{innerIngredientName}"
   excludedValues="{usedIngredientIds}"
   label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
   callback="{(userInput) =>
@@ -131,6 +142,6 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   on:change="{onQuality}"
   on:paste
   name="quality"
-  value="{quality}"
+  value="{innerQuality}"
   label="{messages.labels.entityFields.recipeIngredient.quality.format()}"
 />
