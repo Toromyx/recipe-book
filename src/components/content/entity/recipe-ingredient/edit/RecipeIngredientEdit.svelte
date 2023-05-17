@@ -9,11 +9,9 @@ The event `edit` is fired when the user makes yn change to any field. The event 
 
 <script>
   import { createEventDispatcher } from "svelte";
-  import {
-    createIngredient,
-    listIngredient,
-  } from "../../../../../services/command/entity.ts";
+  import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
+  import { whenLoadingDefault } from "../../../../../services/util/loadable.ts";
   import Autocomplete from "../../../../element/form/Autocomplete.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
   import { UNIT_LIST_ID } from "../../../UnitList.svelte";
@@ -58,11 +56,21 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   let innerIngredientId;
   let innerQuality;
 
+  let ingredientIdUserInput = ingredientName;
+  /**
+   * @type {Readable<Loadable<number[]>>}
+   */
+  let ingredientIdResults;
+
   $: innerQuantity = quantity;
   $: innerUnit = unit;
   $: innerIngredientName = ingredientName;
   $: innerIngredientId = ingredientId;
   $: innerQuality = quality;
+  $: ingredientIdResults = ingredientRepository.createListFilteredStore({
+    condition: { name: ingredientIdUserInput },
+    orderBy: [{ column: "name" }],
+  });
 
   function onQuantity({ detail }) {
     innerQuantity = detail;
@@ -127,12 +135,10 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   userInput="{innerIngredientName}"
   excludedValues="{usedIngredientIds}"
   label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
-  callback="{(userInput) =>
-    listIngredient({
-      condition: { name: userInput },
-      orderBy: [{ column: 'name' }],
-    })}"
-  createCallback="{(userInput) => createIngredient({ name: userInput })}"
+  callback="{async (userInput) => (ingredientIdUserInput = userInput)}"
+  results="{whenLoadingDefault($ingredientIdResults, [])}"
+  createCallback="{(userInput) =>
+    ingredientRepository.create({ name: userInput })}"
   ><svelte:fragment let:item>
     <IngredientViewName id="{item}" />
   </svelte:fragment></Autocomplete

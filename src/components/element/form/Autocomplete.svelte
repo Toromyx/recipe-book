@@ -40,10 +40,15 @@ The `select` event is fired when a value is selected or deselected. Its detail i
    */
   export let name;
   /**
-   * A function to get possible values from user input
-   * @type {(string) => Promise<unknown[]>}
+   * A function to set the {@see results} in the parent component from a user input.
+   * @type {(string) => Promise<void>}
    */
   export let callback;
+  /**
+   * The result set via the {@see callback} function in the parent component.
+   * @type {ValueType[]}
+   */
+  export let results;
   /**
    * This is the function to create a new value from user input.
    *
@@ -99,22 +104,20 @@ The `select` event is fired when a value is selected or deselected. Its detail i
     if (!userInput) {
       return;
     }
-    results = await callback(userInput);
+    await callback(userInput);
   }, debounceWait);
   const createAndSelect = async () => {
     const createValue = await createCallback(innerUserInput);
     if (createValue) {
       select(createValue);
     }
-    results = await callback(innerUserInput);
+    await callback(innerUserInput);
   };
 
   let innerValue;
   let innerUserInput;
   let setValue = () => {};
   let setChanged = () => {};
-  /** @type {unknown[]} */
-  let results = [];
   let hiddenInput;
 
   if (formContext) {
