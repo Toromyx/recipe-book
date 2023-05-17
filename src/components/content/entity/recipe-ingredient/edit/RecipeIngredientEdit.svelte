@@ -46,9 +46,9 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   export let quality = undefined;
   /**
    * already used ingredient ids
-   * @type {?string}
+   * @type {number[]}
    */
-  export let usedIngredientIds = undefined;
+  export let usedIngredientIds = [];
 
   const values = {
     quantity,
