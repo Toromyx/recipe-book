@@ -11,7 +11,7 @@ The source code for the backend lives in [src-tauri](./src-tauri) and is written
 
 Recipes need to be stored locally. The solution chosen for this project is an embedded relational database. This is supported by simple file storage for binary files like images.
 
-The database needs to implement the data schema outlined in the [PlantUML](https://plantuml.com/) file [schema.puml](./doc/architecture/database/schema.puml).
+The database needs to implement the data schema outlined in the [PlantUML](https://plantuml.com/) file [schema.puml](docs/architecture/database/schema.puml).
 
 #### Database
 
