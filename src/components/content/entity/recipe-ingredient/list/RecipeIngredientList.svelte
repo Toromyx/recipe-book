@@ -3,14 +3,21 @@
 This component displays an ordered list of recipe ingredients of a recipe step.
 
 It provides functionality to add a new recipe ingredient and integrates with the recipe ingredient parser.
+It also displays displays the ingredients recipes drafts.
 -->
 
 <script>
   import {
+    listRecipeIngredientDraft,
+    readRecipeIngredientDraft,
+  } from "../../../../../services/command/entity.ts";
+  import {
     parseHtml,
     parseText,
+    parseString,
   } from "../../../../../services/parser/recipe-ingredient-parser.ts";
   import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
+  import { recipeIngredientDraftRepository } from "../../../../../services/store/repository/recipe-ingredient-draft-repository.ts";
   import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
   import { unitList } from "../../../../../services/store/unit-list.ts";
   import { messages } from "../../../../../services/translation/en.ts";
@@ -20,11 +27,10 @@ It provides functionality to add a new recipe ingredient and integrates with the
   } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
-  import FieldListItem from "../../../../element/form/FieldListItem.svelte";
-  import SvelteFieldset from "../../../../element/form/SvelteFieldset.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
   import RecipeIngredientView from "../view/RecipeIngredientView.svelte";
+  import AdditionalIngredientsForm from "./RecipeIngredientList/AdditionalIngredientsForm.svelte";
 
   /**
    * the recipe step id
@@ -39,6 +45,26 @@ It provides functionality to add a new recipe ingredient and integrates with the
   /** @type {(ParsedRecipeIngredient & {id?: number})[]} */
   let pastedParsedRecipeIngredients = [];
 
+  let recipeIngredientDraftIdsPromise = listRecipeIngredientDraft({
+    condition: { recipeStepId },
+    orderBy: [
+      {
+        column: "order",
+      },
+    ],
+  });
+  let draftedParsedRecipeIngredientsPromise =
+    recipeIngredientDraftIdsPromise.then((recipeIngredientDraftIds) =>
+      Promise.all(
+        recipeIngredientDraftIds.map(async (recipeIngredientDraftId) => {
+          const recipeIngredientDraft = await readRecipeIngredientDraft(
+            recipeIngredientDraftId,
+          );
+          return parseString(recipeIngredientDraft.text, $unitList);
+        }),
+      ),
+    );
+
   $: list = recipeIngredientRepository.createListFilteredStore({
     condition: { recipeStepId },
     orderBy: [
@@ -50,12 +76,27 @@ It provides functionality to add a new recipe ingredient and integrates with the
   $: usedIngredientsList = ingredientRepository.createListFilteredStore({
     condition: { recipeStepId },
   });
-  $: pastedIngredientIds = pastedParsedRecipeIngredients
-    .map((ingredient) => ingredient.id)
-    .filter(Boolean);
 </script>
 
 {#if !isLoading($list)}
+  {#await draftedParsedRecipeIngredientsPromise then draftedParsedRecipeIngredients}
+    {#if draftedParsedRecipeIngredients.length}
+      <AdditionalIngredientsForm
+        on:done="{async () => {
+          for (const recipeIngredientDraftId of await recipeIngredientDraftIdsPromise) {
+            void recipeIngredientDraftRepository.delete(
+              recipeIngredientDraftId,
+            );
+          }
+          draftedParsedRecipeIngredients = [];
+        }}"
+        numIngredients="{$list.length}"
+        recipeStepId="{recipeStepId}"
+        usedIngredientIds="{$usedIngredientsList}"
+        parsedRecipeIngredients="{draftedParsedRecipeIngredients}"
+      />
+    {/if}
+  {/await}
   <ol>
     {#each $list as id}
       <li>
@@ -71,83 +112,13 @@ It provides functionality to add a new recipe ingredient and integrates with the
     {/each}
   </ol>
   {#if pastedParsedRecipeIngredients.length}
-    <SvelteForm
-      on:submit="{({ detail: { values } }) => {
-        for (let i = 0; i < values.ingredients.length; i++) {
-          const ingredient = values.ingredients[i];
-          recipeIngredientRepository.create({
-            order: $list.length + 1 + i,
-            quantity: ingredient.quantity || null,
-            unit: ingredient.unit || null,
-            quality: ingredient.quality || null,
-            ingredientId: ingredient.ingredientId[0],
-            recipeStepId,
-          });
-        }
-        pastedParsedRecipeIngredients = [];
-      }}"
-    >
-      <SvelteFieldset name="ingredients" isList="{true}">
-        <ol>
-          {#each pastedParsedRecipeIngredients as parsedRecipeIngredient, i}
-            <li>
-              <FieldListItem index="{i}">
-                <RecipeIngredientEdit
-                  on:edit="{({
-                    detail: {
-                      quantity,
-                      unit,
-                      ingredientName,
-                      ingredientId,
-                      quality,
-                    },
-                  }) => {
-                    parsedRecipeIngredient.quantity = quantity || undefined;
-                    parsedRecipeIngredient.unit = unit || undefined;
-                    parsedRecipeIngredient.name = ingredientName;
-                    parsedRecipeIngredient.id = ingredientId;
-                    parsedRecipeIngredient.quality = quality;
-                    pastedParsedRecipeIngredients =
-                      pastedParsedRecipeIngredients;
-                  }}"
-                  quantity="{parsedRecipeIngredient.quantity}"
-                  unit="{parsedRecipeIngredient.unit}"
-                  ingredientName="{parsedRecipeIngredient.name}"
-                  ingredientId="{parsedRecipeIngredient.id}"
-                  quality="{parsedRecipeIngredient.quality}"
-                  usedIngredientIds="{[
-                    ...$usedIngredientsList,
-                    ...pastedIngredientIds,
-                  ]}"
-                />
-              </FieldListItem>
-              <SvelteButton
-                on:click="{() => {
-                  pastedParsedRecipeIngredients.splice(i, 1);
-                  pastedParsedRecipeIngredients = pastedParsedRecipeIngredients;
-                }}"
-                confirmation="{true}"
-                >{messages.labels.actions.remove.format()}</SvelteButton
-              >
-            </li>
-          {/each}
-        </ol>
-        <SvelteButton
-          on:click="{() => {
-            pastedParsedRecipeIngredients = [
-              ...pastedParsedRecipeIngredients,
-              { name: '' },
-            ];
-          }}">{messages.labels.actions.add.format()}</SvelteButton
-        >
-      </SvelteFieldset>
-      <SvelteButton type="submit"
-        >{messages.labels.actions.create.format()}</SvelteButton
-      >
-      <SvelteButton on:click="{() => (pastedParsedRecipeIngredients = [])}"
-        >{messages.labels.actions.cancel.format()}</SvelteButton
-      >
-    </SvelteForm>
+    <AdditionalIngredientsForm
+      on:done="{() => (pastedParsedRecipeIngredients = [])}"
+      numIngredients="{$list.length}"
+      recipeStepId="{recipeStepId}"
+      usedIngredientIds="{$usedIngredientsList}"
+      parsedRecipeIngredients="{pastedParsedRecipeIngredients}"
+    />
   {/if}
   <SvelteForm
     on:submit="{async ({ detail: { values, context } }) => {
