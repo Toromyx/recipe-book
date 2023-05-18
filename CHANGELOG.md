@@ -21,6 +21,7 @@ Types of changes:
 - Implement recipe editing
 - Implement recipe files (image/video/audio) with optical character recognition
 - Add field "quality" to recipe ingredients
+- Implement getting external recipes
 
 ### Changed
 
