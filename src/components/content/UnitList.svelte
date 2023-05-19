@@ -10,11 +10,11 @@ Just reference the exported id. This component can only be used once in the docu
 
 <script>
   import { unitList } from "../../services/store/unit-list.ts";
-  import { isLoading } from "../../services/util/loadable.ts";
+  import { isLoaded } from "../../services/util/loadable.ts";
 </script>
 
 <datalist id="{UNIT_LIST_ID}">
-  {#if !isLoading($unitList)}
+  {#if isLoaded($unitList)}
     {#each $unitList as unit}
       <option value="{unit}"></option>
     {/each}

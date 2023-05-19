@@ -6,7 +6,7 @@ This component displays the content of a recipe step.
 <script>
   import { recipeStepRepository } from "../../../../../services/store/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
   import Editable from "../../../../layout/Editable.svelte";
   import RecipeFileList from "../../recipe-file/list/RecipeFileList.svelte";
   import RecipeIngredientList from "../../recipe-ingredient/list/RecipeIngredientList.svelte";
@@ -26,7 +26,7 @@ This component displays the content of a recipe step.
   $: recipeStep = recipeStepRepository.createStore(id);
 </script>
 
-{#if !isLoading($recipeStep)}
+{#if isLoaded($recipeStep)}
   <h2>
     {messages.headings.recipeStep.format({ number: $recipeStep.order })}
   </h2>

@@ -6,7 +6,7 @@ This component displays the content of a recipe.
 <script>
   import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
   import RecipeStepList from "../../recipe-step/list/RecipeStepList.svelte";
 
@@ -24,7 +24,7 @@ This component displays the content of a recipe.
   $: recipe = recipeRepository.createStore(id);
 </script>
 
-{#if !isLoading($recipe)}
+{#if isLoaded($recipe)}
   <div>
     <h1>{$recipe.name}</h1>
     <SvelteInput

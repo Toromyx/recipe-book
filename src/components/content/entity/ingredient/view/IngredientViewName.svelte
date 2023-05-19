@@ -5,7 +5,7 @@ This component displays the name of an ingredient.
 
 <script>
   import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
 
   /**
    * the id of the ingredient
@@ -19,6 +19,6 @@ This component displays the name of an ingredient.
   $: ingredient = ingredientRepository.createStore(id);
 </script>
 
-{#if !isLoading($ingredient)}
+{#if isLoaded($ingredient)}
   <span>{$ingredient.name}</span>
 {/if}

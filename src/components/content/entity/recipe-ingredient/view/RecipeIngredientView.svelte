@@ -7,7 +7,7 @@ The recipe ingredient is editable.
 
 <script>
   import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
   import Editable from "../../../../layout/Editable.svelte";
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
   import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
@@ -30,7 +30,7 @@ The recipe ingredient is editable.
   ].filter(Boolean);
 </script>
 
-{#if !isLoading($recipeIngredient)}
+{#if isLoaded($recipeIngredient)}
   <Editable
     on:edit="{({ detail: { values, changed } }) => {
       const update = { id };

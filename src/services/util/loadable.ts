@@ -13,6 +13,13 @@ export function isLoading<T>(loadable: Loadable<T>): loadable is undefined {
 }
 
 /**
+ * @return true when the parameter is in the loaded state
+ */
+export function isLoaded<T>(loadable: Loadable<T>): loadable is T {
+  return loadable !== undefined;
+}
+
+/**
  * @return either the loadable value when loaded or the given default value if not
  */
 export function whenLoadingDefault<T, D>(

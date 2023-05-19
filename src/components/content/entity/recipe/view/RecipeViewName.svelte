@@ -5,7 +5,7 @@ This component displays the name of an recipe.
 
 <script>
   import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
 
   /**
    * the id of the recipe
@@ -19,6 +19,6 @@ This component displays the name of an recipe.
   $: recipe = recipeRepository.createStore(id);
 </script>
 
-{#if !isLoading($recipe)}
+{#if isLoaded($recipe)}
   <span>{$recipe.name}</span>
 {/if}

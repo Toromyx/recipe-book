@@ -12,7 +12,7 @@ It includes functionality to optically recognize characters in the recipe file.
   import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { createId } from "../../../../../services/util/create-id.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
 
   /**
@@ -41,7 +41,7 @@ It includes functionality to optically recognize characters in the recipe file.
   $: iframeDisplay = output ? "block" : "none";
 </script>
 
-{#if !isLoading($recipeFile)}
+{#if isLoaded($recipeFile)}
   {#if mimeType === "image"}
     <img src="{src}" alt="{$recipeFile.name}" />
   {:else if mimeType === "video"}

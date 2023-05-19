@@ -23,7 +23,7 @@ It also displays displays the ingredients recipes drafts.
   import { messages } from "../../../../../services/translation/en.ts";
   import {
     whenLoadingDefault,
-    isLoading,
+    isLoaded,
   } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
@@ -80,7 +80,7 @@ It also displays displays the ingredients recipes drafts.
   });
 </script>
 
-{#if !isLoading($list)}
+{#if isLoaded($list)}
   {#await draftedParsedRecipeIngredientsPromise then draftedParsedRecipeIngredients}
     {#if draftedParsedRecipeIngredients.length}
       <AdditionalIngredientsForm

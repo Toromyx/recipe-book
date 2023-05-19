@@ -13,7 +13,7 @@ This component lists all recipes with a form to create a new recipe.
   import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
   import { recipeStepRepository } from "../../../../../services/store/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
-  import { isLoading } from "../../../../../services/util/loadable.ts";
+  import { isLoaded } from "../../../../../services/util/loadable.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
@@ -72,7 +72,7 @@ This component lists all recipes with a form to create a new recipe.
   }
 </script>
 
-{#if !isLoading($list)}
+{#if isLoaded($list)}
   <ul>
     {#each $list as id}
       <li>
