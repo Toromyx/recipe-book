@@ -106,7 +106,15 @@ The `input` or `change` events are fired when the user sets the value of the fie
   $: innerValue = value;
   $: setValue(innerValue);
   $: setCustomValidity(input, innerValue, ...validators);
-  $: htmlValue = innerValue ?? "";
+  $: htmlValue = (() => {
+    switch (type) {
+      case "number":
+      case "range":
+        return !isNaN(innerValue) ? innerValue : "";
+      default:
+        return innerValue ?? "";
+    }
+  })();
 
   /**
    * Set and report the custom validity on the HTML input.
