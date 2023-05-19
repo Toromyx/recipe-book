@@ -10,6 +10,7 @@
     "build:typescript": "tsc -p tsconfig.json",
     "build:bundle": "vite build -c vite.config.js",
     "build": "npm run build:typescript && npm run build:bundle",
+    "test": "cd src-tauri && cargo test",
     "lint:backend": "cd src-tauri && cargo clippy --no-deps -- --deny warnings",
     "lint:frontend": "eslint ./**/*.* --max-warnings 0",
     "lint": "concurrently -c yellow,blue \"npm:lint:*\"",
