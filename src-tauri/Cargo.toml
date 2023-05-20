@@ -58,7 +58,7 @@ version = "^1.0"
 version = "^1.0"
 
 [dependencies.serde_with]
-version = "^2.2"
+version = "^3.0"
 
 [dependencies.tauri]
 version = "^1.2"
