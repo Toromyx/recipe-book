@@ -4184,9 +4184,9 @@ dependencies = [
 
 [[package]]
 name = "tesseract"
-version = "0.13.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50ddd63873a3dfc9966138457d320ff327414597e253bc4954dff519dce41b8a"
+checksum = "2ee0c2c608b63817b095f7fded5c50add36a29e2be2b2fc4901357163329290a"
 dependencies = [
  "tesseract-plumbing",
  "tesseract-sys",
@@ -4195,9 +4195,9 @@ dependencies = [
 
 [[package]]
 name = "tesseract-plumbing"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fd126488bfd02aed61285b6255e010c330d3ca3908d0fa80cb48edcab180c7c"
+checksum = "3e496d3e29eba540a276975394b85dccb5fd344b3eefb743d9286c8150f766d5"
 dependencies = [
  "leptonica-plumbing",
  "tesseract-sys",
