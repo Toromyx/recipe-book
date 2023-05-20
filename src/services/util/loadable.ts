@@ -32,3 +32,17 @@ export function whenLoadingDefault<T, D>(
 
   return loadable;
 }
+
+/**
+ * @return a new loadable of the value got from the original loadable once it loaded
+ */
+export function whenLoadedValue<T, V>(
+  loadable: Loadable<T>,
+  valueGetter: (loaded: T) => V,
+): Loadable<V> {
+  if (isLoading(loadable)) {
+    return undefined;
+  }
+
+  return valueGetter(loadable);
+}
