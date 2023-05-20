@@ -52,4 +52,10 @@ entity "Recipe File" as recipe_file {
 }
 recipe_file }o--|| "step_id" recipe_step
 
+entity "Unit Name" as unit_name {
+  name: TEXT
+  --
+  unit: TEXT
+}
+
 @enduml

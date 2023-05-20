@@ -33,9 +33,14 @@ use crate::command::{
             entity_count_recipe_step, entity_create_recipe_step, entity_delete_recipe_step,
             entity_list_recipe_step, entity_read_recipe_step, entity_update_recipe_step,
         },
+        unit_name::{
+            entity_count_unit_name, entity_create_unit_name, entity_delete_unit_name,
+            entity_list_unit_name, entity_read_unit_name, entity_update_unit_name,
+        },
     },
     external_recipe::external_recipe,
     ocr::ocr,
+    unit_conversion::unit_convert,
     unit_list::unit_list_get,
 };
 
@@ -51,6 +56,7 @@ mod migrator;
 mod path;
 mod protocol;
 mod recipe_file_storage;
+mod unit_conversion;
 mod window;
 
 /// This static variable holds the app handle once the tauri app has started.
@@ -123,8 +129,15 @@ async fn main() {
             entity_delete_recipe_step,
             entity_list_recipe_step,
             entity_count_recipe_step,
+            entity_create_unit_name,
+            entity_read_unit_name,
+            entity_update_unit_name,
+            entity_delete_unit_name,
+            entity_list_unit_name,
+            entity_count_unit_name,
             external_recipe,
             ocr,
+            unit_convert,
             unit_list_get,
         ])
         .run(tauri::generate_context!())

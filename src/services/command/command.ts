@@ -41,9 +41,18 @@ export const enum Command {
   ENTITY_LIST_RECIPE_STEP = "entity_list_recipe_step",
   ENTITY_COUNT_RECIPE_STEP = "entity_count_recipe_step",
 
+  ENTITY_CREATE_UNIT_NAME = "entity_create_unit_name",
+  ENTITY_READ_UNIT_NAME = "entity_read_unit_name",
+  ENTITY_UPDATE_UNIT_NAME = "entity_update_unit_name",
+  ENTITY_DELETE_UNIT_NAME = "entity_delete_unit_name",
+  ENTITY_LIST_UNIT_NAME = "entity_list_unit_name",
+  ENTITY_COUNT_UNIT_NAME = "entity_count_unit_name",
+
   EXTERNAL_RECIPE = "external_recipe",
 
   OCR = "ocr",
+
+  UNIT_CONVERT = "unit_convert",
 
   UNIT_LIST_GET = "unit_list_get",
 }

@@ -28,12 +28,18 @@ import type {
   RecipeStepInterface,
   RecipeStepUpdateInterface,
 } from "../../types/entity/recipe-step-interface.ts";
+import type {
+  UnitNameCreateInterface,
+  UnitNameInterface,
+  UnitNameUpdateInterface,
+} from "../../types/entity/unit-name-interface.js";
 import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
 import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-filter-interface.ts";
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
 import type { RecipeIngredientDraftFilterInterface } from "../../types/filter/recipe-ingredient-draft-filter-interface.js";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
+import type { UnitNameFilterInterface } from "../../types/filter/unit-name-filter-interface.js";
 import { stringifyFilter } from "../store/repository/entity-repository.ts";
 import { invoke } from "./client.ts";
 import type { CommandAnswer } from "./command-answer.ts";
@@ -45,7 +51,8 @@ type CommandEntityRead =
   | Command.ENTITY_READ_RECIPE_FILE
   | Command.ENTITY_READ_RECIPE_INGREDIENT
   | Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT
-  | Command.ENTITY_READ_RECIPE_STEP;
+  | Command.ENTITY_READ_RECIPE_STEP
+  | Command.ENTITY_READ_UNIT_NAME;
 
 type CommandEntityList =
   | Command.ENTITY_LIST_INGREDIENT
@@ -53,7 +60,8 @@ type CommandEntityList =
   | Command.ENTITY_LIST_RECIPE_FILE
   | Command.ENTITY_LIST_RECIPE_INGREDIENT
   | Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT
-  | Command.ENTITY_LIST_RECIPE_STEP;
+  | Command.ENTITY_LIST_RECIPE_STEP
+  | Command.ENTITY_LIST_UNIT_NAME;
 
 type CommandEntityCount =
   | Command.ENTITY_COUNT_INGREDIENT
@@ -61,7 +69,8 @@ type CommandEntityCount =
   | Command.ENTITY_COUNT_RECIPE_FILE
   | Command.ENTITY_COUNT_RECIPE_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT
-  | Command.ENTITY_COUNT_RECIPE_STEP;
+  | Command.ENTITY_COUNT_RECIPE_STEP
+  | Command.ENTITY_COUNT_UNIT_NAME;
 
 const entityReadPromiseCollector: {
   [T in CommandEntityRead]: {
@@ -74,6 +83,7 @@ const entityReadPromiseCollector: {
   [Command.ENTITY_READ_RECIPE_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_READ_RECIPE_STEP]: {},
+  [Command.ENTITY_READ_UNIT_NAME]: {},
 };
 
 const entityListPromiseCollector: {
@@ -87,6 +97,7 @@ const entityListPromiseCollector: {
   [Command.ENTITY_LIST_RECIPE_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_LIST_RECIPE_STEP]: {},
+  [Command.ENTITY_LIST_UNIT_NAME]: {},
 };
 
 const entityCountPromiseCollector: {
@@ -100,6 +111,7 @@ const entityCountPromiseCollector: {
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP]: {},
+  [Command.ENTITY_COUNT_UNIT_NAME]: {},
 };
 
 /**
@@ -344,4 +356,34 @@ export function countRecipeStep(
   filter: RecipeStepFilterInterface,
 ): Promise<number> {
   return countCollected(Command.ENTITY_COUNT_RECIPE_STEP, filter);
+}
+
+export function createUnitName(
+  create: UnitNameCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_UNIT_NAME, { create });
+}
+
+export function readUnitName(id: number): Promise<UnitNameInterface> {
+  return readCollected(Command.ENTITY_READ_UNIT_NAME, id);
+}
+
+export function updateUnitName(update: UnitNameUpdateInterface): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_UNIT_NAME, { update });
+}
+
+export function deleteUnitName(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_UNIT_NAME, { id });
+}
+
+export function listUnitName(
+  filter: UnitNameFilterInterface,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_UNIT_NAME, filter);
+}
+
+export function countUnitName(
+  filter: UnitNameFilterInterface,
+): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_UNIT_NAME, filter);
 }

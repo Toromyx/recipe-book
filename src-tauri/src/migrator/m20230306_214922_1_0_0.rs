@@ -10,6 +10,7 @@ mod recipe_file;
 mod recipe_ingredient;
 mod recipe_ingredient_draft;
 mod recipe_step;
+mod unit_name;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -23,6 +24,7 @@ impl MigrationTrait for Migration {
         recipe_file::up(manager).await?;
         recipe_ingredient::up(manager).await?;
         recipe_ingredient_draft::up(manager).await?;
+        unit_name::up(manager).await?;
         Ok(())
     }
 }

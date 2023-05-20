@@ -63,6 +63,14 @@ const translationStrings: TranslationStrings = {
     description: "Description",
     files: "Files",
   },
+  units: {
+    kilogram: "kg",
+    gram: "g",
+    pound: "lb",
+    litre: "l",
+    millilitre: "ml",
+    usCup: "{value,plural,one{cup}other{cups}}",
+  },
 };
 
 export const messages = constructMessageProxy(translationStrings);

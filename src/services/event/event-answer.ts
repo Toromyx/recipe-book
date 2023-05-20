@@ -19,5 +19,8 @@ type EventAnswerMap = {
   [EventChannel.ENTITY_ACTION_CREATED_RECIPE_STEP]: void;
   [EventChannel.ENTITY_ACTION_UPDATED_RECIPE_STEP]: number;
   [EventChannel.ENTITY_ACTION_DELETED_RECIPE_STEP]: number;
+  [EventChannel.ENTITY_ACTION_CREATED_UNIT_NAME]: void;
+  [EventChannel.ENTITY_ACTION_UPDATED_UNIT_NAME]: number;
+  [EventChannel.ENTITY_ACTION_DELETED_UNIT_NAME]: number;
 };
 export type EventAnswer<T extends EventChannel> = EventAnswerMap[T];

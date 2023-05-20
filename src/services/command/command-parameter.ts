@@ -22,12 +22,18 @@ import type {
   RecipeStepCreateInterface,
   RecipeStepUpdateInterface,
 } from "../../types/entity/recipe-step-interface.ts";
+import type {
+  Unit,
+  UnitNameCreateInterface,
+  UnitNameUpdateInterface,
+} from "../../types/entity/unit-name-interface.ts";
 import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
 import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-filter-interface.ts";
 import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
-import type { RecipeIngredientDraftFilterInterface } from "../../types/filter/recipe-ingredient-draft-filter-interface.js";
+import type { RecipeIngredientDraftFilterInterface } from "../../types/filter/recipe-ingredient-draft-filter-interface.ts";
 import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
 import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
+import type { UnitNameFilterInterface } from "../../types/filter/unit-name-filter-interface.ts";
 import type { Command } from "./command.ts";
 
 type CommandParameterMap = {
@@ -97,9 +103,18 @@ type CommandParameterMap = {
   [Command.ENTITY_LIST_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
   [Command.ENTITY_COUNT_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
 
+  [Command.ENTITY_CREATE_UNIT_NAME]: { create: UnitNameCreateInterface };
+  [Command.ENTITY_READ_UNIT_NAME]: { id: number };
+  [Command.ENTITY_UPDATE_UNIT_NAME]: { update: UnitNameUpdateInterface };
+  [Command.ENTITY_DELETE_UNIT_NAME]: { id: number };
+  [Command.ENTITY_LIST_UNIT_NAME]: { filter: UnitNameFilterInterface };
+  [Command.ENTITY_COUNT_UNIT_NAME]: { filter: UnitNameFilterInterface };
+
   [Command.EXTERNAL_RECIPE]: { url: string };
 
   [Command.OCR]: { recipeFileId: number };
+
+  [Command.UNIT_CONVERT]: { value: number; unit: Unit };
 
   [Command.UNIT_LIST_GET]: undefined;
 };

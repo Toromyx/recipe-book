@@ -4,6 +4,8 @@ import type { RecipeIngredientDraftInterface } from "../../types/entity/recipe-i
 import type { RecipeIngredientInterface } from "../../types/entity/recipe-ingredient-interface.ts";
 import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
 import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
+import type { UnitNameInterface } from "../../types/entity/unit-name-interface.ts";
+import type { UnitConversion } from "../../types/unit-conversion.ts";
 import type { ExternalRecipeData } from "../external-recipe.ts";
 import type { Command } from "./command.ts";
 
@@ -50,9 +52,18 @@ type CommandAnswerMap = {
   [Command.ENTITY_LIST_RECIPE_STEP]: number[];
   [Command.ENTITY_COUNT_RECIPE_STEP]: number;
 
+  [Command.ENTITY_CREATE_UNIT_NAME]: number;
+  [Command.ENTITY_READ_UNIT_NAME]: UnitNameInterface;
+  [Command.ENTITY_UPDATE_UNIT_NAME]: void;
+  [Command.ENTITY_DELETE_UNIT_NAME]: void;
+  [Command.ENTITY_LIST_UNIT_NAME]: number[];
+  [Command.ENTITY_COUNT_UNIT_NAME]: number;
+
   [Command.EXTERNAL_RECIPE]: ExternalRecipeData;
 
   [Command.OCR]: string;
+
+  [Command.UNIT_CONVERT]: UnitConversion;
 
   [Command.UNIT_LIST_GET]: string[];
 };

@@ -62,6 +62,14 @@ type Translations<T> = {
     description: T;
     files: T;
   };
+  units: {
+    kilogram: T;
+    gram: T;
+    pound: T;
+    litre: T;
+    millilitre: T;
+    usCup: T;
+  };
 };
 
 /**
