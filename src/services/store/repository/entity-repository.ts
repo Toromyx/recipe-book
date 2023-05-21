@@ -27,6 +27,8 @@ type EntityRepositoryUpdater<Entity, EntityUpdate> = (
 
 type EntityRepositoryUnsubscriber = () => void;
 
+const DELETE_DELAY = 100_000;
+
 /**
  * Stringify a filter object in JSON.
  *
@@ -80,9 +82,23 @@ export class EntityRepository<
   } = {};
 
   /**
+   * A collection of timeout ids whose timeouts are currently running to delete an entry in the filtered list state.
+   */
+  filteredListStateDeleteTimeouts: {
+    [filterKey: string]: number;
+  } = {};
+
+  /**
    * The filtered count state contains multiple entity counts, keyed by their corresponding filter.
    */
   filteredCountState: {
+    [filterKey: string]: number;
+  } = {};
+
+  /**
+   * A collection of timeout ids whose timeouts are currently running to delete an entry in the filtered count state.
+   */
+  filteredCountStateDeleteTimeouts: {
     [filterKey: string]: number;
   } = {};
 
@@ -438,7 +454,14 @@ export class EntityRepository<
       set.delete(subscriber);
       if (!set.size) {
         delete this.filteredListSubscribers[filterKey];
-        delete this.filteredListState[filterKey];
+        if (this.filteredListStateDeleteTimeouts[filterKey]) {
+          clearTimeout(this.filteredListStateDeleteTimeouts[filterKey]);
+          delete this.filteredListStateDeleteTimeouts[filterKey];
+        }
+        this.filteredListStateDeleteTimeouts[filterKey] = setTimeout(() => {
+          delete this.filteredListState[filterKey];
+          delete this.filteredListStateDeleteTimeouts[filterKey];
+        }, DELETE_DELAY);
       }
     };
   }
@@ -490,7 +513,14 @@ export class EntityRepository<
       set.delete(subscriber);
       if (!set.size) {
         delete this.filteredCountSubscribers[filterKey];
-        delete this.filteredCountState[filterKey];
+        if (this.filteredCountStateDeleteTimeouts[filterKey]) {
+          clearTimeout(this.filteredCountStateDeleteTimeouts[filterKey]);
+          delete this.filteredCountStateDeleteTimeouts[filterKey];
+        }
+        this.filteredCountStateDeleteTimeouts[filterKey] = setTimeout(() => {
+          delete this.filteredCountState[filterKey];
+          delete this.filteredCountStateDeleteTimeouts[filterKey];
+        }, DELETE_DELAY);
       }
     };
   }
@@ -632,6 +662,10 @@ export class EntityRepository<
    */
   async listFiltered(filter: Filter): Promise<void> {
     const filterKey = stringifyFilter(filter);
+    if (this.filteredListStateDeleteTimeouts[filterKey]) {
+      clearTimeout(this.filteredListStateDeleteTimeouts[filterKey]);
+      delete this.filteredListStateDeleteTimeouts[filterKey];
+    }
     if (!this.filteredListState[filterKey]) {
       this.filteredListState[filterKey] = await this.apiList(filter);
     }
@@ -642,6 +676,10 @@ export class EntityRepository<
    */
   async countFiltered(filter: Filter): Promise<void> {
     const filterKey = stringifyFilter(filter);
+    if (this.filteredCountStateDeleteTimeouts[filterKey]) {
+      clearTimeout(this.filteredCountStateDeleteTimeouts[filterKey]);
+      delete this.filteredCountStateDeleteTimeouts[filterKey];
+    }
     if (!this.filteredCountState[filterKey]) {
       this.filteredCountState[filterKey] = await this.apiCount(filter);
     }
