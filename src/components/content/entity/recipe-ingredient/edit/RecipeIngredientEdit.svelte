@@ -70,7 +70,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   $: innerQuality = quality;
   $: ingredientIdResults = ingredientRepository.createListFilteredStore({
     condition: { name: ingredientIdUserInput },
-    orderBy: [{ column: "name" }],
+    orderBy: [{ name: "asc" }],
   });
 
   // if no ingredient id is provided, try to find an exact match and set it

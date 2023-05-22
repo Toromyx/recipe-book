@@ -28,7 +28,7 @@ This component display an ordered list of all recipe files of a recipe step.
     condition: { recipeStepId },
     orderBy: [
       {
-        column: "order",
+        order: "asc",
       },
     ],
   });

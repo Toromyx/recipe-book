@@ -3,7 +3,10 @@ import type {
   RecipeInterface,
   RecipeUpdateInterface,
 } from "../../../types/entity/recipe-interface.ts";
-import type { RecipeFilterInterface } from "../../../types/filter/recipe-filter-interface.ts";
+import type {
+  RecipeCondition,
+  RecipeOrderBy,
+} from "../../../types/filter/recipe-filter.ts";
 import {
   countRecipe,
   createRecipe,
@@ -20,15 +23,17 @@ export const recipeRepository: EntityRepository<
   RecipeInterface,
   RecipeCreateInterface,
   RecipeUpdateInterface,
-  RecipeFilterInterface
+  RecipeCondition,
+  RecipeOrderBy
 > = new EntityRepository(
   (entityCreate) => createRecipe(entityCreate),
   (identifier) => readRecipe(identifier),
   (entityUpdate) => updateRecipe(entityUpdate),
   (identifier) => deleteRecipe(identifier),
   (filter) => listRecipe(filter),
-  (filter) => countRecipe(filter),
-  {},
+  (condition) => countRecipe(condition),
+  undefined,
+  undefined,
   (reactFunction) => {
     void listen(EventChannel.ENTITY_ACTION_UPDATED_RECIPE, (event) => {
       reactFunction(event.payload);

@@ -28,7 +28,7 @@ This component displays an ordered list of recipe steps of a recipe.
     condition: { recipeId },
     orderBy: [
       {
-        column: "order",
+        order: "asc",
       },
     ],
   });

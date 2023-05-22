@@ -2,7 +2,10 @@ use crate::{
     command::error::{CommandError, CommandError::NotFound},
     entity::recipe_step::Model,
     entity_crud::{
-        recipe_step::{RecipeStepCreate, RecipeStepCrud, RecipeStepFilter, RecipeStepUpdate},
+        recipe_step::{
+            RecipeStepCondition, RecipeStepCreate, RecipeStepCrud, RecipeStepFilter,
+            RecipeStepUpdate,
+        },
         EntityCrudTrait,
     },
 };
@@ -39,7 +42,9 @@ pub async fn entity_list_recipe_step(filter: RecipeStepFilter) -> Result<Vec<i64
 }
 
 #[tauri::command]
-pub async fn entity_count_recipe_step(filter: RecipeStepFilter) -> Result<i64, CommandError> {
-    let count = RecipeStepCrud::count(filter).await?;
+pub async fn entity_count_recipe_step(
+    condition: Option<RecipeStepCondition>,
+) -> Result<i64, CommandError> {
+    let count = RecipeStepCrud::count(condition).await?;
     Ok(count)
 }

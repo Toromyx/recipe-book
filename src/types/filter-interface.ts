@@ -1,7 +1,6 @@
 export interface FilterInterface<Condition, OrderBy> {
   condition?: Condition;
-  orderBy?: Array<{
-    column: OrderBy;
-    order?: "asc" | "desc";
-  }>;
+  orderBy?: Array<OrderBy>;
 }
+
+export type Order = "asc" | "desc";

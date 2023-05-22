@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
     DatabaseTransaction, EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait,
-    PrimaryKeyToColumn, PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect, RelationTrait,
+    PrimaryKeyToColumn, PrimaryKeyTrait, QueryFilter, QuerySelect, RelationTrait, Select,
     TransactionTrait,
 };
 use serde::Deserialize;
@@ -51,18 +51,6 @@ impl From<Order> for sea_query::Order {
     }
 }
 
-/// This struct represents a single ordering instruction when listing entities.
-///
-/// The type parameter [`OrderByColumn`] represents the column to be sorted.
-/// This struct is used in [`Filter`].
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OrderByItem<OrderByColumn> {
-    column: OrderByColumn,
-    #[serde(default)]
-    order: Order,
-}
-
 /// This struct combines conditional filtering and ordering when listing entities.
 ///
 /// This struct is used in [`EntityCrudTrait`].
@@ -70,27 +58,15 @@ pub struct OrderByItem<OrderByColumn> {
 #[serde(rename_all = "camelCase")]
 pub struct Filter<Condition, OrderBy> {
     pub condition: Option<Condition>,
-    pub order_by: Option<Vec<OrderByItem<OrderBy>>>,
+    pub order_by: Option<Vec<OrderBy>>,
 }
 
-/// Get a [`sea_query::Order`] for each [`Column`].
-///
-/// This function is used when listing entities in [`EntityCrudTrait`].
-fn get_order_by<OrderBy, Column: From<OrderBy>>(
-    order_by: Option<Vec<OrderByItem<OrderBy>>>,
-) -> Vec<(Column, sea_query::Order)> {
-    let Some(order_by) = order_by else {
-        return vec![];
-    };
-    order_by
-        .into_iter()
-        .map(|item| {
-            (
-                Column::from(item.column),
-                sea_query::Order::from(item.order),
-            )
-        })
-        .collect()
+/// Implementors of this trait should add their order-by statements in the [`Self::add`] function.
+pub trait OrderBy {
+    type Entity: EntityTrait;
+
+    /// Add an ordering to the select statement.
+    fn add(self, select: Select<Self::Entity>) -> Select<Self::Entity>;
 }
 
 /// This trait implements create, read, update, delete, list, and count operation for an entity.
@@ -118,8 +94,8 @@ pub trait EntityCrudTrait {
     /// the entity's active model, implementing [`ActiveModelTrait`]
     type ActiveModel: ActiveModelTrait<Entity = Self::Entity> + ActiveModelBehavior + Send;
 
-    /// the entity's column enum, implementing [`ColumnTrait`] and [`From<Self::EntityOrderBy>`]
-    type Column: ColumnTrait + From<Self::EntityOrderBy>;
+    /// the entity's column enum, implementing [`ColumnTrait`]
+    type Column: ColumnTrait;
 
     /// the entity's relation enum, implementing [`RelationTrait`]
     type Relation: RelationTrait;
@@ -136,8 +112,8 @@ pub trait EntityCrudTrait {
     /// the struct with which to filter an entity list or count, implementing [`IntoCondition`]
     type EntityCondition: IntoCondition + Send;
 
-    /// used when ordering an entity list
-    type EntityOrderBy: Send;
+    /// the struct with which to order an entity list, implementing [`OrderBy`]
+    type EntityOrderBy: OrderBy<Entity = Self::Entity> + Send;
 
     /// Implement this to run code before creating the entity.
     ///
@@ -250,8 +226,8 @@ pub trait EntityCrudTrait {
         if let Some(condition) = filter.condition {
             select = select.filter(condition);
         }
-        for order_by_item in get_order_by::<Self::EntityOrderBy, Self::Column>(filter.order_by) {
-            select = select.order_by(order_by_item.0, order_by_item.1);
+        for order_by in filter.order_by.into_iter().flatten() {
+            select = order_by.add(select);
         }
         let models = select.into_model::<IdColumn>().all(db).await?;
         Ok(models.iter().map(|id_column| id_column.id).collect())
@@ -262,12 +238,12 @@ pub trait EntityCrudTrait {
     /// # Errors
     ///
     /// - when there is any problem with the database
-    async fn count(filter: Filter<Self::EntityCondition, Self::EntityOrderBy>) -> Result<i64> {
+    async fn count(condition: Option<Self::EntityCondition>) -> Result<i64> {
         let db = database::connect().await;
         let mut select = Self::Entity::find()
             .select_only()
             .column_as(Self::primary_key_colum().count(), "id");
-        if let Some(condition) = filter.condition {
+        if let Some(condition) = condition {
             select = select.filter(condition);
         }
         let count_option = select.into_model::<IdColumn>().one(db).await?;

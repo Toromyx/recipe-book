@@ -2,7 +2,10 @@ use crate::{
     command::error::{CommandError, CommandError::NotFound},
     entity::ingredient::Model,
     entity_crud::{
-        ingredient::{IngredientCreate, IngredientCrud, IngredientFilter, IngredientUpdate},
+        ingredient::{
+            IngredientCondition, IngredientCreate, IngredientCrud, IngredientFilter,
+            IngredientUpdate,
+        },
         EntityCrudTrait,
     },
 };
@@ -39,7 +42,9 @@ pub async fn entity_list_ingredient(filter: IngredientFilter) -> Result<Vec<i64>
 }
 
 #[tauri::command]
-pub async fn entity_count_ingredient(filter: IngredientFilter) -> Result<i64, CommandError> {
-    let count = IngredientCrud::count(filter).await?;
+pub async fn entity_count_ingredient(
+    condition: Option<IngredientCondition>,
+) -> Result<i64, CommandError> {
+    let count = IngredientCrud::count(condition).await?;
     Ok(count)
 }

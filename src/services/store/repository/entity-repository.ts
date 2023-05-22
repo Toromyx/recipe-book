@@ -1,4 +1,5 @@
 import type { Readable } from "svelte/store";
+import type { FilterInterface } from "../../../types/filter-interface.js";
 import type { IdentifiableInterface } from "../../../types/identifiable-interface.ts";
 import { equalArray } from "../../util/compare.ts";
 import type { Loadable } from "../../util/loadable.ts";
@@ -13,7 +14,7 @@ type ApiDelete = (identifier: number) => Promise<void>;
 
 type ApiList<Filter> = (filter: Filter) => Promise<number[]>;
 
-type ApiCount<Filter> = (filter: Filter) => Promise<number>;
+type ApiCount<Condition> = (condition?: Condition) => Promise<number>;
 
 type EntityRepositorySubscriber<Entity> = (entity: Entity) => void;
 
@@ -35,7 +36,7 @@ const DELETE_DELAY = 100_000;
  * This is achieved by first recursively getting all its keys via JSON.stringify and then JSON-stringifying it again with the sorted keys.
  * @param filter
  */
-export function stringifyFilter(filter: object): string {
+export function stringifyFilter(filter: unknown): string {
   const allKeys: Set<string> = new Set();
   JSON.stringify(filter, (key, value) => {
     allKeys.add(key);
@@ -55,7 +56,8 @@ export class EntityRepository<
   Entity extends IdentifiableInterface,
   EntityCreate extends object,
   EntityUpdate extends IdentifiableInterface,
-  Filter extends object,
+  Condition extends object,
+  OrderBy extends object,
 > {
   /**
    * The state contains the entity data, keyed by their identifier.
@@ -92,14 +94,14 @@ export class EntityRepository<
    * The filtered count state contains multiple entity counts, keyed by their corresponding filter.
    */
   filteredCountState: {
-    [filterKey: string]: number;
+    [conditionKey: string]: number;
   } = {};
 
   /**
    * A collection of timeout ids whose timeouts are currently running to delete an entry in the filtered count state.
    */
   filteredCountStateDeleteTimeouts: {
-    [filterKey: string]: number;
+    [conditionKey: string]: number;
   } = {};
 
   /**
@@ -124,7 +126,7 @@ export class EntityRepository<
    */
   filteredListSubscribers: {
     [filterKey: string]: {
-      filter: Filter;
+      filter: FilterInterface<Condition, OrderBy>;
       set: Set<EntityRepositoryListSubscriber>;
     };
   } = {};
@@ -133,8 +135,8 @@ export class EntityRepository<
    * This object contains a set of active filtered count subscriber functions for each filter in use.
    */
   filteredCountSubscribers: {
-    [filterKey: string]: {
-      filter: Filter;
+    [conditionKey: string]: {
+      condition?: Condition;
       set: Set<EntityRepositoryCountSubscriber>;
     };
   } = {};
@@ -162,17 +164,28 @@ export class EntityRepository<
   /**
    * List entities via the API.
    */
-  apiList: ApiList<Filter>;
+  apiList: ApiList<FilterInterface<Condition, OrderBy>>;
 
   /**
    * Count entities via the API.
    */
-  apiCount: ApiCount<Filter>;
+  apiCount: ApiCount<Condition>;
 
   /**
-   * The default filter is used for the unfiltered list and count state.
+   * The default condition is used for the unfiltered list and count state.
    */
-  defaultFilter: Filter;
+  defaultCondition: Condition | undefined;
+
+  /**
+   * The default order-by is used for the unfiltered list state.
+   */
+  defaultOrderBy: OrderBy[] | undefined;
+
+  /**
+   * The default filter is used for the unfiltered list state.
+   * It is built from the {@see defaultCondition} and {@see defaultOrderBy}.
+   */
+  defaultFilter: FilterInterface<Condition, OrderBy>;
 
   /**
    * Construct an entity repository for a specific entity and a specific API implementation.
@@ -183,7 +196,8 @@ export class EntityRepository<
    * @param apiDelete - {@see apiDelete}
    * @param apiList - {@see apiList}
    * @param apiCount - {@see apiCount}
-   * @param defaultFilter - {@see defaultFilter}
+   * @param defaultCondition - {@see defaultCondition}
+   * @param defaultOrderBy - {@see defaultOrderBy}
    * @param registerUpdate - register callbacks for reacting to entity updates
    * @param registerCreate - register callbacks for reacting to entity creations
    * @param registerDelete - register callbacks for reacting to entity deletions
@@ -194,9 +208,10 @@ export class EntityRepository<
     apiRead: ApiRead<Entity>,
     apiUpdate: ApiUpdate<EntityUpdate>,
     apiDelete: ApiDelete,
-    apiList: ApiList<Filter>,
-    apiCount: ApiCount<Filter>,
-    defaultFilter: Filter,
+    apiList: ApiList<FilterInterface<Condition, OrderBy>>,
+    apiCount: ApiCount<Condition>,
+    defaultCondition: Condition | undefined,
+    defaultOrderBy: OrderBy[] | undefined,
     registerUpdate: (reactFunction: (identifier: number) => void) => void,
     registerCreate: (reactFunction: () => void) => void,
     registerDelete: (reactFunction: (identifier: number) => void) => void,
@@ -208,7 +223,12 @@ export class EntityRepository<
     this.apiDelete = apiDelete;
     this.apiList = apiList;
     this.apiCount = apiCount;
-    this.defaultFilter = defaultFilter;
+    this.defaultCondition = defaultCondition;
+    this.defaultOrderBy = defaultOrderBy;
+    this.defaultFilter = {
+      condition: this.defaultCondition,
+      orderBy: this.defaultOrderBy,
+    };
 
     const react = async (identifier: number): Promise<void> => {
       if (!this.state[identifier]) {
@@ -242,7 +262,7 @@ export class EntityRepository<
       if (!this.countSubscribers.size) {
         return;
       }
-      const count = await this.apiCount(this.defaultFilter);
+      const count = await this.apiCount(this.defaultCondition);
       if (this.countState !== count) {
         this.countState = count;
         this.runCount();
@@ -266,11 +286,11 @@ export class EntityRepository<
       for (const filteredCountSubscriber of Object.values(
         this.filteredCountSubscribers,
       )) {
-        const filterKey = stringifyFilter(filteredCountSubscriber.filter);
-        const count = await this.apiCount(filteredCountSubscriber.filter);
-        if (this.filteredCountState[filterKey] !== count) {
-          this.filteredCountState[filterKey] = count;
-          this.runCountFiltered(filterKey);
+        const conditionKey = stringifyFilter(filteredCountSubscriber.condition);
+        const count = await this.apiCount(filteredCountSubscriber.condition);
+        if (this.filteredCountState[conditionKey] !== count) {
+          this.filteredCountState[conditionKey] = count;
+          this.runCountFiltered(conditionKey);
         }
       }
     };
@@ -430,7 +450,7 @@ export class EntityRepository<
    * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from filtered entity list changes
    */
   subscribeListFiltered(
-    filter: Filter,
+    filter: FilterInterface<Condition, OrderBy>,
     subscriber: EntityRepositoryListSubscriber,
   ): EntityRepositoryUnsubscriber {
     const filterKey = stringifyFilter(filter);
@@ -469,7 +489,9 @@ export class EntityRepository<
   /**
    * Create a reactive store of a filtered entity list.
    */
-  createListFilteredStore(filter: Filter): Readable<Loadable<number[]>> {
+  createListFilteredStore(
+    filter: FilterInterface<Condition, OrderBy>,
+  ): Readable<Loadable<number[]>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeListFiltered(filter, (list) => {
@@ -483,43 +505,43 @@ export class EntityRepository<
    *
    * Always remember to unsubscribe when the subscription is not needed anymore.
    *
-   * @param filter - the list filter
+   * @param condition - the count condition
    * @param subscriber - this function is called on changes to the filtered entity count, with the count as parameter
    *
    * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from filtered entity count changes
    */
   subscribeCountFiltered(
-    filter: Filter,
+    condition: Condition | undefined,
     subscriber: EntityRepositoryCountSubscriber,
   ): EntityRepositoryUnsubscriber {
-    const filterKey = stringifyFilter(filter);
-    void this.countFiltered(filter).then(() => {
-      subscriber(this.filteredCountState[filterKey]);
+    const conditionKey = stringifyFilter(condition);
+    void this.countFiltered(condition).then(() => {
+      subscriber(this.filteredCountState[conditionKey]);
     });
 
-    if (!this.filteredCountSubscribers[filterKey]) {
-      this.filteredCountSubscribers[filterKey] = {
-        filter,
+    if (!this.filteredCountSubscribers[conditionKey]) {
+      this.filteredCountSubscribers[conditionKey] = {
+        condition,
         set: new Set(),
       };
     }
-    this.filteredCountSubscribers[filterKey]?.set.add(subscriber);
+    this.filteredCountSubscribers[conditionKey]?.set.add(subscriber);
 
     return (): void => {
-      const set = this.filteredCountSubscribers[filterKey]?.set;
+      const set = this.filteredCountSubscribers[conditionKey]?.set;
       if (!set) {
         return;
       }
       set.delete(subscriber);
       if (!set.size) {
-        delete this.filteredCountSubscribers[filterKey];
-        if (this.filteredCountStateDeleteTimeouts[filterKey]) {
-          clearTimeout(this.filteredCountStateDeleteTimeouts[filterKey]);
-          delete this.filteredCountStateDeleteTimeouts[filterKey];
+        delete this.filteredCountSubscribers[conditionKey];
+        if (this.filteredCountStateDeleteTimeouts[conditionKey]) {
+          clearTimeout(this.filteredCountStateDeleteTimeouts[conditionKey]);
+          delete this.filteredCountStateDeleteTimeouts[conditionKey];
         }
-        this.filteredCountStateDeleteTimeouts[filterKey] = setTimeout(() => {
-          delete this.filteredCountState[filterKey];
-          delete this.filteredCountStateDeleteTimeouts[filterKey];
+        this.filteredCountStateDeleteTimeouts[conditionKey] = setTimeout(() => {
+          delete this.filteredCountState[conditionKey];
+          delete this.filteredCountStateDeleteTimeouts[conditionKey];
         }, DELETE_DELAY);
       }
     };
@@ -528,10 +550,10 @@ export class EntityRepository<
   /**
    * Create a reactive store of a filtered entity count.
    */
-  createCountFilteredStore(filter: Filter): Readable<Loadable<number>> {
+  createCountFilteredStore(condition?: Condition): Readable<Loadable<number>> {
     return {
       subscribe: (subscriber) =>
-        this.subscribeCountFiltered(filter, (count) => {
+        this.subscribeCountFiltered(condition, (count) => {
           subscriber(count);
         }),
     };
@@ -621,10 +643,10 @@ export class EntityRepository<
    *
    * This method is called after change to the filtered count state with the specified filter.
    */
-  runCountFiltered(filterKey: string): void {
-    const count = this.filteredCountState[filterKey];
+  runCountFiltered(conditionKey: string): void {
+    const count = this.filteredCountState[conditionKey];
     if (count !== undefined) {
-      this.filteredCountSubscribers[filterKey]?.set.forEach((subscriber) =>
+      this.filteredCountSubscribers[conditionKey]?.set.forEach((subscriber) =>
         subscriber(count),
       );
     }
@@ -653,14 +675,16 @@ export class EntityRepository<
    */
   async count(): Promise<void> {
     if (Number.isNaN(this.countState)) {
-      this.countState = await this.apiCount(this.defaultFilter);
+      this.countState = await this.apiCount(this.defaultCondition);
     }
   }
 
   /**
    * Read a filtered entity list and add it to the filtered list state if not already present.
    */
-  async listFiltered(filter: Filter): Promise<void> {
+  async listFiltered(
+    filter: FilterInterface<Condition, OrderBy>,
+  ): Promise<void> {
     const filterKey = stringifyFilter(filter);
     if (this.filteredListStateDeleteTimeouts[filterKey]) {
       clearTimeout(this.filteredListStateDeleteTimeouts[filterKey]);
@@ -674,14 +698,14 @@ export class EntityRepository<
   /**
    * Read a filtered entity count and add it to the filtered count state if not already present.
    */
-  async countFiltered(filter: Filter): Promise<void> {
-    const filterKey = stringifyFilter(filter);
-    if (this.filteredCountStateDeleteTimeouts[filterKey]) {
-      clearTimeout(this.filteredCountStateDeleteTimeouts[filterKey]);
-      delete this.filteredCountStateDeleteTimeouts[filterKey];
+  async countFiltered(condition?: Condition): Promise<void> {
+    const conditionKey = stringifyFilter(condition);
+    if (this.filteredCountStateDeleteTimeouts[conditionKey]) {
+      clearTimeout(this.filteredCountStateDeleteTimeouts[conditionKey]);
+      delete this.filteredCountStateDeleteTimeouts[conditionKey];
     }
-    if (!this.filteredCountState[filterKey]) {
-      this.filteredCountState[filterKey] = await this.apiCount(filter);
+    if (!this.filteredCountState[conditionKey]) {
+      this.filteredCountState[conditionKey] = await this.apiCount(condition);
     }
   }
 }

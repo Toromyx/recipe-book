@@ -33,16 +33,38 @@ import type {
   UnitNameInterface,
   UnitNameUpdateInterface,
 } from "../../types/entity/unit-name-interface.js";
-import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
-import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-filter-interface.ts";
-import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
-import type { RecipeIngredientDraftFilterInterface } from "../../types/filter/recipe-ingredient-draft-filter-interface.js";
-import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
-import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
-import type { UnitNameFilterInterface } from "../../types/filter/unit-name-filter-interface.js";
+import type {
+  IngredientCondition,
+  IngredientFilter,
+} from "../../types/filter/ingredient-filter.ts";
+import type {
+  RecipeFileCondition,
+  RecipeFileFilter,
+} from "../../types/filter/recipe-file-filter.ts";
+import type {
+  RecipeCondition,
+  RecipeFilter,
+} from "../../types/filter/recipe-filter.ts";
+import type {
+  RecipeIngredientDraftCondition,
+  RecipeIngredientDraftFilter,
+} from "../../types/filter/recipe-ingredient-draft-filter.js";
+import type {
+  RecipeIngredientCondition,
+  RecipeIngredientFilter,
+} from "../../types/filter/recipe-ingredient-filter.ts";
+import type {
+  RecipeStepCondition,
+  RecipeStepFilter,
+} from "../../types/filter/recipe-step-filter.ts";
+import type {
+  UnitNameCondition,
+  UnitNameFilter,
+} from "../../types/filter/unit-name-filter.js";
 import { stringifyFilter } from "../store/repository/entity-repository.ts";
 import { invoke } from "./client.ts";
 import type { CommandAnswer } from "./command-answer.ts";
+import type { CommandParameter } from "./command-parameter.js";
 import { Command } from "./command.ts";
 
 type CommandEntityRead =
@@ -102,7 +124,7 @@ const entityListPromiseCollector: {
 
 const entityCountPromiseCollector: {
   [T in CommandEntityCount]: {
-    [filterKey: string]: Promise<CommandAnswer<T>>;
+    [conditionKey: string]: Promise<CommandAnswer<T>>;
   };
 } = {
   [Command.ENTITY_COUNT_INGREDIENT]: {},
@@ -135,18 +157,22 @@ function readCollected<T extends CommandEntityRead>(
 /**
  * List entities, returning the already existing promise if they are already being listed.
  */
-function listCollected<Filter extends object>(
-  command: CommandEntityList,
-  filter: Filter,
+function listCollected<Command extends CommandEntityList>(
+  command: Command,
+  filter: CommandParameter<Command>["filter"],
 ): Promise<CommandAnswer<typeof command>> {
   const filterKey = stringifyFilter(filter);
   if (entityListPromiseCollector[command][filterKey] === undefined) {
-    entityListPromiseCollector[command][filterKey] = invoke(command, {
-      filter,
-    }).then((value: CommandAnswer<typeof command>) => {
-      delete entityListPromiseCollector[command][filterKey];
-      return value;
-    });
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    entityListPromiseCollector[command as CommandEntityList][filterKey] =
+      invoke(command, {
+        filter,
+      } as CommandParameter<Command>).then(
+        (value: CommandAnswer<typeof command>) => {
+          delete entityListPromiseCollector[command][filterKey];
+          return value;
+        },
+      );
   }
   return entityListPromiseCollector[command][filterKey];
 }
@@ -154,20 +180,24 @@ function listCollected<Filter extends object>(
 /**
  * Count entities, returning the already existing promise if they are already being counted.
  */
-function countCollected<Filter extends object>(
-  command: CommandEntityCount,
-  filter: Filter,
+function countCollected<Command extends CommandEntityCount>(
+  command: Command,
+  condition: CommandParameter<Command>["condition"],
 ): Promise<CommandAnswer<typeof command>> {
-  const filterKey = stringifyFilter(filter);
-  if (entityCountPromiseCollector[command][filterKey] === undefined) {
-    entityCountPromiseCollector[command][filterKey] = invoke(command, {
-      filter,
-    }).then((value: CommandAnswer<typeof command>) => {
-      delete entityCountPromiseCollector[command][filterKey];
-      return value;
-    });
+  const conditionKey = stringifyFilter(condition);
+  if (entityCountPromiseCollector[command][conditionKey] === undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    entityCountPromiseCollector[command as CommandEntityCount][conditionKey] =
+      invoke(command, {
+        condition,
+      } as CommandParameter<Command>).then(
+        (value: CommandAnswer<typeof command>) => {
+          delete entityCountPromiseCollector[command][conditionKey];
+          return value;
+        },
+      );
   }
-  return entityCountPromiseCollector[command][filterKey];
+  return entityCountPromiseCollector[command][conditionKey];
 }
 
 export function createIngredient(
@@ -190,16 +220,14 @@ export function deleteIngredient(id: number): Promise<void> {
   return invoke(Command.ENTITY_DELETE_INGREDIENT, { id });
 }
 
-export function listIngredient(
-  filter: IngredientFilterInterface,
-): Promise<number[]> {
+export function listIngredient(filter: IngredientFilter): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_INGREDIENT, filter);
 }
 
 export function countIngredient(
-  filter: IngredientFilterInterface,
+  condition?: IngredientCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_INGREDIENT, filter);
+  return countCollected(Command.ENTITY_COUNT_INGREDIENT, condition);
 }
 
 export function createRecipe(create: RecipeCreateInterface): Promise<number> {
@@ -218,12 +246,12 @@ export function deleteRecipe(id: number): Promise<void> {
   return invoke(Command.ENTITY_DELETE_RECIPE, { id });
 }
 
-export function listRecipe(filter: RecipeFilterInterface): Promise<number[]> {
+export function listRecipe(filter: RecipeFilter): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_RECIPE, filter);
 }
 
-export function countRecipe(filter: RecipeFilterInterface): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE, filter);
+export function countRecipe(condition?: RecipeCondition): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_RECIPE, condition);
 }
 
 export function createRecipeFile(
@@ -246,16 +274,14 @@ export function deleteRecipeFile(id: number): Promise<void> {
   return invoke(Command.ENTITY_DELETE_RECIPE_FILE, { id });
 }
 
-export function listRecipeFile(
-  filter: RecipeFileFilterInterface,
-): Promise<number[]> {
+export function listRecipeFile(filter: RecipeFileFilter): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_RECIPE_FILE, filter);
 }
 
 export function countRecipeFile(
-  filter: RecipeFileFilterInterface,
+  condition?: RecipeFileCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, filter);
+  return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, condition);
 }
 
 export function createRecipeIngredient(
@@ -281,15 +307,15 @@ export function deleteRecipeIngredient(id: number): Promise<void> {
 }
 
 export function listRecipeIngredient(
-  filter: RecipeIngredientFilterInterface,
+  filter: RecipeIngredientFilter,
 ): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT, filter);
 }
 
 export function countRecipeIngredient(
-  filter: RecipeIngredientFilterInterface,
+  condition?: RecipeIngredientCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, filter);
+  return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, condition);
 }
 
 export function createRecipeIngredientDraft(
@@ -315,15 +341,18 @@ export function deleteRecipeIngredientDraft(id: number): Promise<void> {
 }
 
 export function listRecipeIngredientDraft(
-  filter: RecipeIngredientDraftFilterInterface,
+  filter: RecipeIngredientDraftFilter,
 ): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT, filter);
 }
 
 export function countRecipeIngredientDraft(
-  filter: RecipeIngredientDraftFilterInterface,
+  condition?: RecipeIngredientDraftCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT, filter);
+  return countCollected(
+    Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT,
+    condition,
+  );
 }
 
 export function createRecipeStep(
@@ -346,16 +375,14 @@ export function deleteRecipeStep(id: number): Promise<void> {
   return invoke(Command.ENTITY_DELETE_RECIPE_STEP, { id });
 }
 
-export function listRecipeStep(
-  filter: RecipeStepFilterInterface,
-): Promise<number[]> {
+export function listRecipeStep(filter: RecipeStepFilter): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_RECIPE_STEP, filter);
 }
 
 export function countRecipeStep(
-  filter: RecipeStepFilterInterface,
+  condition?: RecipeStepCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE_STEP, filter);
+  return countCollected(Command.ENTITY_COUNT_RECIPE_STEP, condition);
 }
 
 export function createUnitName(
@@ -376,14 +403,10 @@ export function deleteUnitName(id: number): Promise<void> {
   return invoke(Command.ENTITY_DELETE_UNIT_NAME, { id });
 }
 
-export function listUnitName(
-  filter: UnitNameFilterInterface,
-): Promise<number[]> {
+export function listUnitName(filter: UnitNameFilter): Promise<number[]> {
   return listCollected(Command.ENTITY_LIST_UNIT_NAME, filter);
 }
 
-export function countUnitName(
-  filter: UnitNameFilterInterface,
-): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_UNIT_NAME, filter);
+export function countUnitName(condition?: UnitNameCondition): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_UNIT_NAME, condition);
 }

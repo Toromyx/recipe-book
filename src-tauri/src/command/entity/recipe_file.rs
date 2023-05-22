@@ -2,7 +2,10 @@ use crate::{
     command::error::{CommandError, CommandError::NotFound},
     entity::recipe_file::Model,
     entity_crud::{
-        recipe_file::{RecipeFileCreate, RecipeFileCrud, RecipeFileFilter, RecipeFileUpdate},
+        recipe_file::{
+            RecipeFileCondition, RecipeFileCreate, RecipeFileCrud, RecipeFileFilter,
+            RecipeFileUpdate,
+        },
         EntityCrudTrait,
     },
 };
@@ -39,7 +42,9 @@ pub async fn entity_list_recipe_file(filter: RecipeFileFilter) -> Result<Vec<i64
 }
 
 #[tauri::command]
-pub async fn entity_count_recipe_file(filter: RecipeFileFilter) -> Result<i64, CommandError> {
-    let count = RecipeFileCrud::count(filter).await?;
+pub async fn entity_count_recipe_file(
+    condition: Option<RecipeFileCondition>,
+) -> Result<i64, CommandError> {
+    let count = RecipeFileCrud::count(condition).await?;
     Ok(count)
 }

@@ -51,7 +51,7 @@ It also displays displays the ingredients recipes drafts.
     condition: { recipeStepId },
     orderBy: [
       {
-        column: "order",
+        order: "asc",
       },
     ],
   });
@@ -71,7 +71,7 @@ It also displays displays the ingredients recipes drafts.
     condition: { recipeStepId },
     orderBy: [
       {
-        column: "order",
+        order: "asc",
       },
     ],
   });

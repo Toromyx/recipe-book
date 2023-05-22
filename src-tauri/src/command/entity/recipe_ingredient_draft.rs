@@ -3,8 +3,8 @@ use crate::{
     entity::recipe_ingredient_draft::Model,
     entity_crud::{
         recipe_ingredient_draft::{
-            RecipeIngredientDraftCreate, RecipeIngredientDraftCrud, RecipeIngredientDraftFilter,
-            RecipeIngredientDraftUpdate,
+            RecipeIngredientDraftCondition, RecipeIngredientDraftCreate, RecipeIngredientDraftCrud,
+            RecipeIngredientDraftFilter, RecipeIngredientDraftUpdate,
         },
         EntityCrudTrait,
     },
@@ -49,8 +49,8 @@ pub async fn entity_list_recipe_ingredient_draft(
 
 #[tauri::command]
 pub async fn entity_count_recipe_ingredient_draft(
-    filter: RecipeIngredientDraftFilter,
+    condition: Option<RecipeIngredientDraftCondition>,
 ) -> Result<i64, CommandError> {
-    let count = RecipeIngredientDraftCrud::count(filter).await?;
+    let count = RecipeIngredientDraftCrud::count(condition).await?;
     Ok(count)
 }

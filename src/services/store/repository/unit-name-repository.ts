@@ -3,7 +3,10 @@ import type {
   UnitNameInterface,
   UnitNameUpdateInterface,
 } from "../../../types/entity/unit-name-interface.ts";
-import type { UnitNameFilterInterface } from "../../../types/filter/unit-name-filter-interface.ts";
+import type {
+  UnitNameCondition,
+  UnitNameOrderBy,
+} from "../../../types/filter/unit-name-filter.ts";
 import {
   countUnitName,
   createUnitName,
@@ -20,15 +23,17 @@ export const unitNameRepository: EntityRepository<
   UnitNameInterface,
   UnitNameCreateInterface,
   UnitNameUpdateInterface,
-  UnitNameFilterInterface
+  UnitNameCondition,
+  UnitNameOrderBy
 > = new EntityRepository(
   (entityCreate) => createUnitName(entityCreate),
   (identifier) => readUnitName(identifier),
   (entityUpdate) => updateUnitName(entityUpdate),
   (identifier) => deleteUnitName(identifier),
   (filter) => listUnitName(filter),
-  (filter) => countUnitName(filter),
-  {},
+  (condition) => countUnitName(condition),
+  undefined,
+  undefined,
   (reactFunction) => {
     void listen(EventChannel.ENTITY_ACTION_UPDATED_UNIT_NAME, (event) => {
       reactFunction(event.payload);

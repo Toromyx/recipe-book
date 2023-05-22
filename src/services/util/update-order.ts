@@ -14,6 +14,7 @@ export function updateOrder(
     never,
     never,
     IdentifiableInterface & SortableUpdateInterface,
+    never,
     never
   >,
   idList: Loadable<number[]>,

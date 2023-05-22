@@ -3,7 +3,10 @@ import type {
   RecipeIngredientDraftInterface,
   RecipeIngredientDraftUpdateInterface,
 } from "../../../types/entity/recipe-ingredient-draft-interface.ts";
-import type { RecipeIngredientDraftFilterInterface } from "../../../types/filter/recipe-ingredient-draft-filter-interface.ts";
+import type {
+  RecipeIngredientDraftCondition,
+  RecipeIngredientDraftOrderBy,
+} from "../../../types/filter/recipe-ingredient-draft-filter.ts";
 import {
   countRecipeIngredientDraft,
   createRecipeIngredientDraft,
@@ -20,15 +23,17 @@ export const recipeIngredientDraftRepository: EntityRepository<
   RecipeIngredientDraftInterface,
   RecipeIngredientDraftCreateInterface,
   RecipeIngredientDraftUpdateInterface,
-  RecipeIngredientDraftFilterInterface
+  RecipeIngredientDraftCondition,
+  RecipeIngredientDraftOrderBy
 > = new EntityRepository(
   (entityCreate) => createRecipeIngredientDraft(entityCreate),
   (identifier) => readRecipeIngredientDraft(identifier),
   (entityUpdate) => updateRecipeIngredientDraft(entityUpdate),
   (identifier) => deleteRecipeIngredientDraft(identifier),
   (filter) => listRecipeIngredientDraft(filter),
-  (filter) => countRecipeIngredientDraft(filter),
-  {},
+  (condition) => countRecipeIngredientDraft(condition),
+  undefined,
+  undefined,
   (reactFunction) => {
     void listen(
       EventChannel.ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT_DRAFT,

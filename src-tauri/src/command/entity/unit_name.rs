@@ -2,7 +2,9 @@ use crate::{
     command::error::{CommandError, CommandError::NotFound},
     entity::unit_name::Model,
     entity_crud::{
-        unit_name::{UnitNameCreate, UnitNameCrud, UnitNameFilter, UnitNameUpdate},
+        unit_name::{
+            UnitNameCondition, UnitNameCreate, UnitNameCrud, UnitNameFilter, UnitNameUpdate,
+        },
         EntityCrudTrait,
     },
 };
@@ -39,7 +41,9 @@ pub async fn entity_list_unit_name(filter: UnitNameFilter) -> Result<Vec<i64>, C
 }
 
 #[tauri::command]
-pub async fn entity_count_unit_name(filter: UnitNameFilter) -> Result<i64, CommandError> {
-    let count = UnitNameCrud::count(filter).await?;
+pub async fn entity_count_unit_name(
+    condition: Option<UnitNameCondition>,
+) -> Result<i64, CommandError> {
+    let count = UnitNameCrud::count(condition).await?;
     Ok(count)
 }

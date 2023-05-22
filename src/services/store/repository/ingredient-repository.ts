@@ -3,7 +3,10 @@ import type {
   IngredientInterface,
   IngredientUpdateInterface,
 } from "../../../types/entity/ingredient-interface.ts";
-import type { IngredientFilterInterface } from "../../../types/filter/ingredient-filter-interface.ts";
+import type {
+  IngredientCondition,
+  IngredientOrderBy,
+} from "../../../types/filter/ingredient-filter.ts";
 import {
   countIngredient,
   createIngredient,
@@ -20,15 +23,17 @@ export const ingredientRepository: EntityRepository<
   IngredientInterface,
   IngredientCreateInterface,
   IngredientUpdateInterface,
-  IngredientFilterInterface
+  IngredientCondition,
+  IngredientOrderBy
 > = new EntityRepository(
   (entityCreate) => createIngredient(entityCreate),
   (identifier) => readIngredient(identifier),
   (entityUpdate) => updateIngredient(entityUpdate),
   (identifier) => deleteIngredient(identifier),
   (filter) => listIngredient(filter),
-  (filter) => countIngredient(filter),
-  {},
+  (condition) => countIngredient(condition),
+  undefined,
+  undefined,
   (reactFunction) => {
     void listen(EventChannel.ENTITY_ACTION_UPDATED_INGREDIENT, (event) => {
       reactFunction(event.payload);

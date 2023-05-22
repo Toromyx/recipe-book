@@ -3,13 +3,13 @@
 use sea_orm::{
     sea_query::IntoCondition,
     ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel,
+    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel, QueryOrder, Select,
 };
 use serde::Deserialize;
 
 use crate::{
     entity::recipe::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-    entity_crud::{EntityCrudTrait, Filter},
+    entity_crud::{EntityCrudTrait, Filter, Order, OrderBy},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE, ENTITY_ACTION_DELETED_RECIPE, ENTITY_ACTION_UPDATED_RECIPE,
     },
@@ -60,13 +60,15 @@ impl IntoCondition for RecipeCondition {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum RecipeOrderBy {
-    Name,
+    Name(Order),
 }
 
-impl From<RecipeOrderBy> for Column {
-    fn from(value: RecipeOrderBy) -> Self {
-        match value {
-            RecipeOrderBy::Name => Column::Name,
+impl OrderBy for RecipeOrderBy {
+    type Entity = Entity;
+
+    fn add(self, select: Select<Self::Entity>) -> Select<Self::Entity> {
+        match self {
+            RecipeOrderBy::Name(order) => select.order_by(Column::Name, order.into()),
         }
     }
 }

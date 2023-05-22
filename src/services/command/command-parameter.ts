@@ -27,13 +27,34 @@ import type {
   UnitNameCreateInterface,
   UnitNameUpdateInterface,
 } from "../../types/entity/unit-name-interface.ts";
-import type { IngredientFilterInterface } from "../../types/filter/ingredient-filter-interface.ts";
-import type { RecipeFileFilterInterface } from "../../types/filter/recipe-file-filter-interface.ts";
-import type { RecipeFilterInterface } from "../../types/filter/recipe-filter-interface.ts";
-import type { RecipeIngredientDraftFilterInterface } from "../../types/filter/recipe-ingredient-draft-filter-interface.ts";
-import type { RecipeIngredientFilterInterface } from "../../types/filter/recipe-ingredient-filter-interface.ts";
-import type { RecipeStepFilterInterface } from "../../types/filter/recipe-step-filter-interface.ts";
-import type { UnitNameFilterInterface } from "../../types/filter/unit-name-filter-interface.ts";
+import type {
+  IngredientCondition,
+  IngredientFilter,
+} from "../../types/filter/ingredient-filter.ts";
+import type {
+  RecipeFileCondition,
+  RecipeFileFilter,
+} from "../../types/filter/recipe-file-filter.ts";
+import type {
+  RecipeCondition,
+  RecipeFilter,
+} from "../../types/filter/recipe-filter.ts";
+import type {
+  RecipeIngredientDraftCondition,
+  RecipeIngredientDraftFilter,
+} from "../../types/filter/recipe-ingredient-draft-filter.ts";
+import type {
+  RecipeIngredientCondition,
+  RecipeIngredientFilter,
+} from "../../types/filter/recipe-ingredient-filter.ts";
+import type {
+  RecipeStepCondition,
+  RecipeStepFilter,
+} from "../../types/filter/recipe-step-filter.ts";
+import type {
+  UnitNameCondition,
+  UnitNameFilter,
+} from "../../types/filter/unit-name-filter.ts";
 import type { Command } from "./command.ts";
 
 type CommandParameterMap = {
@@ -41,15 +62,15 @@ type CommandParameterMap = {
   [Command.ENTITY_READ_INGREDIENT]: { id: number };
   [Command.ENTITY_UPDATE_INGREDIENT]: { update: IngredientUpdateInterface };
   [Command.ENTITY_DELETE_INGREDIENT]: { id: number };
-  [Command.ENTITY_LIST_INGREDIENT]: { filter: IngredientFilterInterface };
-  [Command.ENTITY_COUNT_INGREDIENT]: { filter: IngredientFilterInterface };
+  [Command.ENTITY_LIST_INGREDIENT]: { filter: IngredientFilter };
+  [Command.ENTITY_COUNT_INGREDIENT]: { condition?: IngredientCondition };
 
   [Command.ENTITY_CREATE_RECIPE]: { create: RecipeCreateInterface };
   [Command.ENTITY_READ_RECIPE]: { id: number };
   [Command.ENTITY_UPDATE_RECIPE]: { update: RecipeUpdateInterface };
   [Command.ENTITY_DELETE_RECIPE]: { id: number };
-  [Command.ENTITY_LIST_RECIPE]: { filter: RecipeFilterInterface };
-  [Command.ENTITY_COUNT_RECIPE]: { filter: RecipeFilterInterface };
+  [Command.ENTITY_LIST_RECIPE]: { filter: RecipeFilter };
+  [Command.ENTITY_COUNT_RECIPE]: { condition?: RecipeCondition };
 
   [Command.ENTITY_CREATE_RECIPE_FILE]: {
     create: RecipeFileCreateInterface;
@@ -60,10 +81,10 @@ type CommandParameterMap = {
   };
   [Command.ENTITY_DELETE_RECIPE_FILE]: { id: number };
   [Command.ENTITY_LIST_RECIPE_FILE]: {
-    filter: RecipeFileFilterInterface;
+    filter: RecipeFileFilter;
   };
   [Command.ENTITY_COUNT_RECIPE_FILE]: {
-    filter: RecipeFileFilterInterface;
+    condition?: RecipeFileCondition;
   };
 
   [Command.ENTITY_CREATE_RECIPE_INGREDIENT]: {
@@ -75,10 +96,10 @@ type CommandParameterMap = {
   };
   [Command.ENTITY_DELETE_RECIPE_INGREDIENT]: { id: number };
   [Command.ENTITY_LIST_RECIPE_INGREDIENT]: {
-    filter: RecipeIngredientFilterInterface;
+    filter: RecipeIngredientFilter;
   };
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: {
-    filter: RecipeIngredientFilterInterface;
+    condition?: RecipeIngredientCondition;
   };
 
   [Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT]: {
@@ -90,25 +111,25 @@ type CommandParameterMap = {
   };
   [Command.ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT]: { id: number };
   [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {
-    filter: RecipeIngredientDraftFilterInterface;
+    filter: RecipeIngredientDraftFilter;
   };
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {
-    filter: RecipeIngredientDraftFilterInterface;
+    condition?: RecipeIngredientDraftCondition;
   };
 
   [Command.ENTITY_CREATE_RECIPE_STEP]: { create: RecipeStepCreateInterface };
   [Command.ENTITY_READ_RECIPE_STEP]: { id: number };
   [Command.ENTITY_UPDATE_RECIPE_STEP]: { update: RecipeStepUpdateInterface };
   [Command.ENTITY_DELETE_RECIPE_STEP]: { id: number };
-  [Command.ENTITY_LIST_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
-  [Command.ENTITY_COUNT_RECIPE_STEP]: { filter: RecipeStepFilterInterface };
+  [Command.ENTITY_LIST_RECIPE_STEP]: { filter: RecipeStepFilter };
+  [Command.ENTITY_COUNT_RECIPE_STEP]: { condition?: RecipeStepCondition };
 
   [Command.ENTITY_CREATE_UNIT_NAME]: { create: UnitNameCreateInterface };
   [Command.ENTITY_READ_UNIT_NAME]: { id: number };
   [Command.ENTITY_UPDATE_UNIT_NAME]: { update: UnitNameUpdateInterface };
   [Command.ENTITY_DELETE_UNIT_NAME]: { id: number };
-  [Command.ENTITY_LIST_UNIT_NAME]: { filter: UnitNameFilterInterface };
-  [Command.ENTITY_COUNT_UNIT_NAME]: { filter: UnitNameFilterInterface };
+  [Command.ENTITY_LIST_UNIT_NAME]: { filter: UnitNameFilter };
+  [Command.ENTITY_COUNT_UNIT_NAME]: { condition?: UnitNameCondition };
 
   [Command.EXTERNAL_RECIPE]: { url: string };
 
