@@ -1,10 +1,11 @@
 {
   "root": true,
-  "plugins": ["@typescript-eslint", "import", "promise", "svelte3"],
+  "plugins": ["@typescript-eslint", "import", "promise"],
   "extends": [
     "eslint:recommended",
-    "plugin:import/recommended",
     "plugin:promise/recommended",
+    "plugin:svelte/recommended",
+    "plugin:svelte/prettier",
     "prettier"
   ],
   "parserOptions": {
@@ -57,9 +58,9 @@
         "project": "./tsconfig.json"
       },
       "settings": {
-        "import/extensions": [".js", ".json"],
-        "import/parsers": {
-          "@typescript-eslint/parser": [".ts", ".d.ts"]
+        "import/resolver": {
+          "typescript": true,
+          "node": true
         }
       },
       "rules": {
@@ -72,7 +73,7 @@
     },
     {
       "files": ["**/*.svelte"],
-      "processor": "svelte3/svelte3",
+      "parser": "svelte-eslint-parser",
       "rules": {}
     }
   ]
