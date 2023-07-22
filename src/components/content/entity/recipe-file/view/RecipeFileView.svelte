@@ -65,6 +65,7 @@ It includes functionality to optically recognize characters in the recipe file.
       bind:this="{iframe}"
       title="hocr"
       style:display="{iframeDisplay}"
-      style:resize="both"></iframe>
+      style:resize="both"
+    ></iframe>
   </output>
 {/if}

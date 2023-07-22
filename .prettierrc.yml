@@ -1,3 +1,5 @@
-trailingComma: all
+plugins:
+  - prettier-plugin-svelte
 
 svelteStrictMode: true
+svelteAllowShorthand: false
