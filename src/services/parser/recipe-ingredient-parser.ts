@@ -25,7 +25,7 @@ type Extracted = {
   suffix: string;
 };
 
-const ingredientSeparators = ["\n", ",", ";"];
+const ingredientSeparators = ["\n", ",", ";", "•"];
 
 const groupingSymbols = {
   open: ["(", "{", "[", "<"],
