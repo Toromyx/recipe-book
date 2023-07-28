@@ -12,7 +12,7 @@ import type {
   RecipeIngredientDraftCreateInterface,
   RecipeIngredientDraftInterface,
   RecipeIngredientDraftUpdateInterface,
-} from "../../types/entity/recipe-ingredient-draft-interface.js";
+} from "../../types/entity/recipe-ingredient-draft-interface.ts";
 import type {
   RecipeIngredientCreateInterface,
   RecipeIngredientInterface,
@@ -32,7 +32,7 @@ import type {
   UnitNameCreateInterface,
   UnitNameInterface,
   UnitNameUpdateInterface,
-} from "../../types/entity/unit-name-interface.js";
+} from "../../types/entity/unit-name-interface.ts";
 import type {
   IngredientCondition,
   IngredientFilter,
@@ -48,7 +48,7 @@ import type {
 import type {
   RecipeIngredientDraftCondition,
   RecipeIngredientDraftFilter,
-} from "../../types/filter/recipe-ingredient-draft-filter.js";
+} from "../../types/filter/recipe-ingredient-draft-filter.ts";
 import type {
   RecipeIngredientCondition,
   RecipeIngredientFilter,
@@ -60,11 +60,11 @@ import type {
 import type {
   UnitNameCondition,
   UnitNameFilter,
-} from "../../types/filter/unit-name-filter.js";
+} from "../../types/filter/unit-name-filter.ts";
 import { stringifyFilter } from "../store/repository/entity-repository.ts";
 import { invoke } from "./client.ts";
 import type { CommandAnswer } from "./command-answer.ts";
-import type { CommandParameter } from "./command-parameter.js";
+import type { CommandParameter } from "./command-parameter.ts";
 import { Command } from "./command.ts";
 
 type CommandEntityRead =

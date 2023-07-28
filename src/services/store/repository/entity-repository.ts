@@ -1,5 +1,5 @@
 import type { Readable } from "svelte/store";
-import type { FilterInterface } from "../../../types/filter-interface.js";
+import type { FilterInterface } from "../../../types/filter-interface.ts";
 import type { IdentifiableInterface } from "../../../types/identifiable-interface.ts";
 import { equalArray } from "../../util/compare.ts";
 import type { Loadable } from "../../util/loadable.ts";

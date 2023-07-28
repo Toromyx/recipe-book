@@ -1,6 +1,6 @@
 import type { IdentifiableInterface } from "../../types/identifiable-interface.ts";
 import type { SortableUpdateInterface } from "../../types/sortable-interface.ts";
-import type { EntityRepository } from "../store/repository/entity-repository.js";
+import type { EntityRepository } from "../store/repository/entity-repository.ts";
 import type { Loadable } from "./loadable.ts";
 import { isLoading } from "./loadable.ts";
 

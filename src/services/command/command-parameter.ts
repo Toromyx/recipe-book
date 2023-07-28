@@ -9,7 +9,7 @@ import type {
 import type {
   RecipeIngredientDraftCreateInterface,
   RecipeIngredientDraftUpdateInterface,
-} from "../../types/entity/recipe-ingredient-draft-interface.js";
+} from "../../types/entity/recipe-ingredient-draft-interface.ts";
 import type {
   RecipeIngredientCreateInterface,
   RecipeIngredientUpdateInterface,
