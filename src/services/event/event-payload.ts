@@ -1,6 +1,6 @@
 import type { EventChannel } from "./event-channel.ts";
 
-type EventAnswerMap = {
+type EventPayloadMap = {
   [EventChannel.ENTITY_ACTION_CREATED_INGREDIENT]: void;
   [EventChannel.ENTITY_ACTION_UPDATED_INGREDIENT]: number;
   [EventChannel.ENTITY_ACTION_DELETED_INGREDIENT]: number;
@@ -22,5 +22,8 @@ type EventAnswerMap = {
   [EventChannel.ENTITY_ACTION_CREATED_UNIT_NAME]: void;
   [EventChannel.ENTITY_ACTION_UPDATED_UNIT_NAME]: number;
   [EventChannel.ENTITY_ACTION_DELETED_UNIT_NAME]: number;
+
+  [EventChannel.SCRAPER_DOM_DROP]: string;
 };
-export type EventAnswer<T extends EventChannel> = EventAnswerMap[T];
+
+export type EventPayload<T extends EventChannel> = EventPayloadMap[T];

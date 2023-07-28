@@ -1,13 +1,17 @@
 //! This module implements [`ExternalRecipeGetterTrait`] for the domain `sallys-blog.de`.
 
-use std::str::FromStr;
+use std::sync::OnceLock;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
 use url::Url;
 
-use crate::external_recipe::{ExternalRecipeData, ExternalRecipeGetterTrait, Instructions};
+use crate::external_recipe::{
+    ExternalRecipeData, ExternalRecipeGetterTrait, Instructions, UrlMatch,
+};
+
+static PATH_REGEX: OnceLock<Regex> = OnceLock::new();
 
 pub struct ExternalRecipeGetter;
 
@@ -24,11 +28,11 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
         })
     }
 
-    fn hosts() -> Vec<&'static str> {
-        vec!["sallys-blog.de"]
-    }
-
-    fn path_regex() -> Result<Regex, regex::Error> {
-        Regex::from_str(r"^/rezepte/.*$")
+    fn url_matches(&self) -> Vec<UrlMatch<'static>> {
+        vec![UrlMatch {
+            schemes: &["http", "https"],
+            domains: &["sallys-blog.de"],
+            path_regex: PATH_REGEX.get_or_init(|| Regex::new(r"^/rezepte/.*$").unwrap()),
+        }]
     }
 }

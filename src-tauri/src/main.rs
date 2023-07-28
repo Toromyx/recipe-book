@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use tauri::AppHandle;
+use tauri::{AppHandle, Wry};
 
 use crate::command::{
     entity::{
@@ -56,6 +56,7 @@ mod migrator;
 mod path;
 mod protocol;
 mod recipe_file_storage;
+mod scraper;
 mod unit_conversion;
 mod window;
 
@@ -80,6 +81,12 @@ pub fn try_get_app_handle() -> Option<&'static AppHandle> {
 
 #[tokio::main]
 async fn main() {
+    setup()
+        .run(tauri::generate_context!())
+        .expect("There was an error while running the application");
+}
+
+fn setup() -> tauri::Builder<Wry> {
     tauri::Builder::default()
         .setup(|app| {
             unsafe {
@@ -140,6 +147,25 @@ async fn main() {
             unit_convert,
             unit_list_get,
         ])
-        .run(tauri::generate_context!())
-        .expect("There was an error while running the application");
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{sync::Once, thread};
+
+    use super::*;
+
+    static RUN_ONCE: Once = Once::new();
+
+    /// Run the tauri app, but only once.
+    pub fn run() {
+        RUN_ONCE.call_once(|| {
+            thread::spawn(|| {
+                setup()
+                    .any_thread()
+                    .run(tauri::generate_context!())
+                    .unwrap();
+            });
+        });
+    }
 }

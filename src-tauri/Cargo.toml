@@ -7,7 +7,7 @@ authors = [
 ]
 repository = "https://github.com/Toromyx/recipe-book"
 edition = "2021"
-rust-version = "1.66"
+rust-version = "1.70"
 
 [build-dependencies.tauri-build]
 version = "^1.2"
@@ -77,6 +77,9 @@ features = ["full"]
 [dependencies.url]
 version = "^2.3"
 
+[dependencies.uuid]
+version = "^1.4"
+features = ["v4", "fast-rng"]
 
 [features]
 # by default Tauri runs in production mode
