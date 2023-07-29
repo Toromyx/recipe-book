@@ -8,6 +8,7 @@ const translationStrings: TranslationStrings = {
       edit: "Edit",
       update: "Update",
       delete: "Delete",
+      deleteSelectedItems: "Delete selected items",
       cancel: "Cancel",
       confirm: "Confirm",
       add: "Add",

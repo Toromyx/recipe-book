@@ -7,6 +7,7 @@ type Translations<T> = {
       edit: T;
       update: T;
       delete: T;
+      deleteSelectedItems: T;
       cancel: T;
       confirm: T;
       add: T;

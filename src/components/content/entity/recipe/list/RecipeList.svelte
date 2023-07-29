@@ -14,6 +14,7 @@ This component lists all recipes with a form to create a new recipe.
   import { recipeStepRepository } from "../../../../../services/store/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
+  import ActionableList from "../../../../element/ActionableList.svelte";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteProgress from "../../../../element/SvelteProgress.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
@@ -79,18 +80,25 @@ This component lists all recipes with a form to create a new recipe.
 </script>
 
 {#if isLoaded($list)}
-  <ul>
-    {#each $list as id (id)}
-      <li>
-        <a href="{recipeRoute(id)}" use:link><RecipeViewName id="{id}" /></a
-        ><SvelteButton
-          on:click="{() => recipeRepository.delete(id)}"
-          confirmation="{true}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
-        >
-      </li>
-    {/each}
-  </ul>
+  <ActionableList
+    list="{$list}"
+    actions="{[
+      {
+        callback: (ids) => {
+          for (const id of ids) {
+            void recipeRepository.delete(id);
+          }
+        },
+        label: messages.labels.actions.delete.format(),
+        labelAll: messages.labels.actions.deleteSelectedItems.format(),
+        confirmation: true,
+      },
+    ]}"
+    ><svelte:fragment let:item
+      ><a href="{recipeRoute(item)}" use:link><RecipeViewName id="{item}" /></a
+      ></svelte:fragment
+    ></ActionableList
+  >
   <SvelteForm on:submit="{onSubmit}">
     <SvelteInput
       bind:this="{input}"
