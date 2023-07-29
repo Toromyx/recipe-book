@@ -13,7 +13,6 @@ entity "Recipe Step" as recipe_step {
   --
   order: INTEGER
   description: TEXT
-  image: TEXT
 }
 recipe_step }o--|| "recipe_id" recipe
 
