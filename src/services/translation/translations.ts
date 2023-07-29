@@ -39,6 +39,9 @@ type Translations<T> = {
     };
     descriptions: {
       ocrOutput: T;
+      progress: {
+        loadingExternalRecipe: T;
+      };
     };
     factor: T;
   };

@@ -40,6 +40,9 @@ const translationStrings: TranslationStrings = {
     },
     descriptions: {
       ocrOutput: "OCR output",
+      progress: {
+        loadingExternalRecipe: "Loading external recipe",
+      },
     },
     factor: "Factor",
   },

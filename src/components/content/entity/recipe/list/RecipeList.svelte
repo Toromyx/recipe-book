@@ -15,12 +15,15 @@ This component lists all recipes with a form to create a new recipe.
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
+  import SvelteProgress from "../../../../element/SvelteProgress.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
   import RecipeViewName from "../view/RecipeViewName.svelte";
 
   let input;
   let list = recipeRepository.createListStore();
+  /** @type {boolean} */
+  let loadingExternalRecipe = false;
 
   async function onSubmit({ detail: { values } }) {
     let url;
@@ -33,6 +36,7 @@ This component lists all recipes with a form to create a new recipe.
       return;
     }
     let externalRecipeData;
+    loadingExternalRecipe = true;
     try {
       externalRecipeData = await invoke(Command.EXTERNAL_RECIPE, {
         url,
@@ -45,6 +49,8 @@ This component lists all recipes with a form to create a new recipe.
         return;
       }
       throw reason;
+    } finally {
+      loadingExternalRecipe = false;
     }
     const externalRecipe = await getExternalRecipe(externalRecipeData);
     const recipeId = await recipeRepository.create({
@@ -92,8 +98,12 @@ This component lists all recipes with a form to create a new recipe.
       required="{true}"
       label="{messages.labels.entityFields.recipe.name.format()}"
     />
-    <SvelteButton type="submit"
-      >{messages.labels.actions.create.format()}</SvelteButton
+    <SvelteButton type="submit" disabled="{loadingExternalRecipe}"
+      ><span aria-live="polite"
+        >{#if loadingExternalRecipe}<SvelteProgress
+            label="{messages.labels.descriptions.progress.loadingExternalRecipe.format()}"
+          />{:else}{messages.labels.actions.create.format()}{/if}</span
+      ></SvelteButton
     >
   </SvelteForm>
 {/if}
