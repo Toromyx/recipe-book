@@ -64,7 +64,7 @@ The event `done` is emitted either on creation or cancellation. This can be used
 >
   <SvelteFieldset name="ingredients" isList="{true}">
     <ol>
-      {#each parsedRecipeIngredients as parsedRecipeIngredient, i}
+      {#each parsedRecipeIngredients as parsedRecipeIngredient, i (parsedRecipeIngredient)}
         <li>
           <FieldListItem index="{i}">
             <RecipeIngredientEdit

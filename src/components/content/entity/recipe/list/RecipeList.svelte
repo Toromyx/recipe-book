@@ -80,7 +80,7 @@ This component lists all recipes with a form to create a new recipe.
 
 {#if isLoaded($list)}
   <ul>
-    {#each $list as id}
+    {#each $list as id (id)}
       <li>
         <a href="{recipeRoute(id)}" use:link><RecipeViewName id="{id}" /></a
         ><SvelteButton

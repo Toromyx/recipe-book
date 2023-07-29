@@ -100,7 +100,7 @@ It also displays displays the ingredients recipes drafts.
     {/if}
   {/await}
   <ol>
-    {#each $list as id}
+    {#each $list as id (id)}
       <li>
         <RecipeIngredientView id="{id}" factor="{factor}" /><SvelteButton
           on:click="{async () => {

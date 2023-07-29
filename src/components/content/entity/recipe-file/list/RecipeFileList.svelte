@@ -36,7 +36,7 @@ This component display an ordered list of all recipe files of a recipe step.
 
 {#if isLoaded($list)}
   <ol>
-    {#each $list as id}
+    {#each $list as id (id)}
       <li>
         <RecipeFileView id="{id}" /><SvelteButton
           on:click="{async () => {

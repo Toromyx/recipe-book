@@ -35,7 +35,7 @@ This component displays an ordered list of recipe steps of a recipe.
 </script>
 
 {#if isLoaded($list)}
-  {#each $list as id}
+  {#each $list as id (id)}
     <RecipeStepView id="{id}" factor="{factor}" /><SvelteButton
       on:click="{async () => {
         await recipeStepRepository.delete(id);
