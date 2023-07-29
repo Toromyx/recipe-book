@@ -43,6 +43,10 @@ const translationStrings: TranslationStrings = {
       progress: {
         loadingExternalRecipe: "Loading external recipe",
       },
+      bulkActions: {
+        selectItem: "Select this item for bulk actions",
+        selectAllItems: "Select all items for bulk actions",
+      },
     },
     factor: "Factor",
   },

@@ -42,6 +42,10 @@ type Translations<T> = {
       progress: {
         loadingExternalRecipe: T;
       };
+      bulkActions: {
+        selectItem: T;
+        selectAllItems: T;
+      };
     };
     factor: T;
   };
