@@ -103,7 +103,9 @@ The event `done` is emitted either on creation or cancellation. This can be used
               parsedRecipeIngredients = parsedRecipeIngredients;
             }}"
             confirmation="{true}"
-            >{messages.labels.actions.remove.format()}</SvelteButton
+            >{messages.labels.actions.remove
+              .resolveMessage()
+              .toString()}</SvelteButton
           >
         </li>
       {/each}
@@ -111,13 +113,14 @@ The event `done` is emitted either on creation or cancellation. This can be used
     <SvelteButton
       on:click="{() => {
         parsedRecipeIngredients = [...parsedRecipeIngredients, { name: '' }];
-      }}">{messages.labels.actions.add.format()}</SvelteButton
+      }}"
+      >{messages.labels.actions.add.resolveMessage().toString()}</SvelteButton
     >
   </SvelteFieldset>
   <SvelteButton type="submit"
-    >{messages.labels.actions.create.format()}</SvelteButton
+    >{messages.labels.actions.create.resolveMessage().toString()}</SvelteButton
   >
   <SvelteButton on:click="{() => dispatch('done')}"
-    >{messages.labels.actions.cancel.format()}</SvelteButton
+    >{messages.labels.actions.cancel.resolveMessage().toString()}</SvelteButton
   >
 </SvelteForm>

@@ -29,9 +29,10 @@ The `input` or `change` events are fired when the user selects an option.
    * the form element placeholder
    * @type {string}
    */
-  export let placeholder = messages.imperatives.selectPlaceholder.format({
-    label,
-  });
+  export let placeholder =
+    messages.imperatives.selectPlaceholder.resolveMessage({
+      label,
+    });
   /**
    * whether the form element is required or not
    * @type {boolean}

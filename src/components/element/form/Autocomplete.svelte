@@ -146,16 +146,22 @@ The `select` event is fired when a value is selected or deselected. Its detail i
         ...[
           (value) =>
             value.length < min
-              ? messages.validity.autocomplete.min.format({ min })
+              ? messages.validity.autocomplete.min
+                  .resolveMessage({ min })
+                  .toString()
               : undefined,
           (value) =>
             value.length > max
-              ? messages.validity.autocomplete.max.format({ max })
+              ? messages.validity.autocomplete.max
+                  .resolveMessage({ max })
+                  .toString()
               : undefined,
           (value) => {
             for (const item of value) {
               if (excludedValues.includes(item)) {
-                return messages.validity.autocomplete.includesExcluded.format();
+                return messages.validity.autocomplete.includesExcluded
+                  .resolveMessage()
+                  .toString();
               }
             }
           },
@@ -190,7 +196,9 @@ The `select` event is fired when a value is selected or deselected. Its detail i
   <span
     >{#each innerValue as item}<span
         ><slot item="{item}" /><SvelteButton on:click="{() => deselect(item)}"
-          >{messages.labels.actions.delete.format()}</SvelteButton
+          >{messages.labels.actions.delete
+            .resolveMessage()
+            .toString()}</SvelteButton
         ></span
       >{/each}</span
   >
@@ -227,7 +235,9 @@ The `select` event is fired when a value is selected or deselected. Its detail i
         <SvelteButton
           on:click="{() => createAndSelect()}"
           disabled="{innerValue.length >= max}"
-          >{messages.labels.actions.create.format()}</SvelteButton
+          >{messages.labels.actions.create
+            .resolveMessage()
+            .toString()}</SvelteButton
         >
       </li>
     {/if}

@@ -17,6 +17,8 @@ This component implements form fields to edit a recipe step.
 <SvelteTextarea
   name="description"
   value="{description}"
-  label="{messages.labels.entityFields.recipeStep.description.format()}"
+  label="{messages.labels.entityFields.recipeStep.description
+    .resolveMessage()
+    .toString()}"
   required="{true}"
 />

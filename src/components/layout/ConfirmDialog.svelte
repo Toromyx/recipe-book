@@ -20,17 +20,23 @@ These events are not fired when the dialog is closed programmatically.
    * The question to ask the user
    * @type {string}
    */
-  export let question = messages.questions.confirmation.format();
+  export let question = messages.questions.confirmation
+    .resolveMessage()
+    .toString();
   /**
    * The cancellation text to show to the user
    * @type {string}
    */
-  export let cancel = messages.labels.actions.cancel.format();
+  export let cancel = messages.labels.actions.cancel
+    .resolveMessage()
+    .toString();
   /**
    * The confirmation text to show to the user
    * @type {string}
    */
-  export let confirm = messages.labels.actions.confirm.format();
+  export let confirm = messages.labels.actions.confirm
+    .resolveMessage()
+    .toString();
 
   /** @type {HTMLDialogElement|undefined} */
   let dialog;

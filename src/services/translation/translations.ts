@@ -1,4 +1,4 @@
-import { IntlMessageFormat } from "intl-messageformat";
+import type { MessageFormat } from "messageformat";
 
 type Translations<T> = {
   labels: {
@@ -90,7 +90,7 @@ export type TranslationStrings = Translations<string>;
 /**
  * This type describes the created message format objects of the language-specific messages to be formatted.
  */
-export type TranslationFormats = Translations<IntlMessageFormat>;
+export type TranslationFormats = Translations<MessageFormat>;
 
 /**
  * Take in message strings and parse them into message format objects.
@@ -118,9 +118,9 @@ export const constructMessageProxy = (
         ] as unknown;
         switch (typeof targetProperty) {
           case "string":
-            //@ts-expect-error custom cache field
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            this.__cache[getProperty] = new IntlMessageFormat(
+            //@ts-expect-error custom cache field, and polyfill Intl.MessageFormat
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
+            this.__cache[getProperty] = new Intl.MessageFormat(
               targetProperty,
               "en",
             );

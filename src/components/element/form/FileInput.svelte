@@ -100,7 +100,10 @@ The `input` or `change` events are fired when the user sets the value of the fie
       if (selected) {
         onDialogOrFileDrop(selected);
       }
-    }}">{messages.labels.actions.file.open.format()}</SvelteButton
+    }}"
+    >{messages.labels.actions.file.open
+      .resolveMessage()
+      .toString()}</SvelteButton
   >
   <input
     bind:this="{input}"

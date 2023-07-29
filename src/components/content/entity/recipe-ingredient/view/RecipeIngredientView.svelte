@@ -119,17 +119,17 @@ It also takes care of the unit conversion.
   function translateUnit(unit, value) {
     switch (unit) {
       case Unit.MASS_KILOGRAM:
-        return messages.units.kilogram.format({ value });
+        return messages.units.kilogram.resolveMessage({ value }).toString();
       case Unit.MASS_GRAM:
-        return messages.units.gram.format({ value });
+        return messages.units.gram.resolveMessage({ value }).toString();
       case Unit.MASS_POUND:
-        return messages.units.pound.format({ value });
+        return messages.units.pound.resolveMessage({ value }).toString();
       case Unit.VOLUME_LITRE:
-        return messages.units.litre.format({ value });
+        return messages.units.litre.resolveMessage({ value }).toString();
       case Unit.VOLUME_MILLILITRE:
-        return messages.units.millilitre.format({ value });
+        return messages.units.millilitre.resolveMessage({ value }).toString();
       case Unit.VOLUME_US_CUP:
-        return messages.units.usCup.format({ value });
+        return messages.units.usCup.resolveMessage({ value }).toString();
     }
   }
 
