@@ -22,7 +22,46 @@
   let selectAllInput = undefined;
   let checked = {};
 
-  $: allSelected = list.every((item) => checked[item]);
+  $: allSelected = computeAllSelected(list, checked);
+
+  /**
+   * @param {ItemType[]} list
+   * @param {{[ItemType]: boolean}} checked
+   * @return {boolean|undefined} true if all selected, false if none selected, undefined if some selected
+   */
+  function computeAllSelected(list, checked) {
+    let allSelected = undefined;
+    for (const item of list) {
+      if (checked[item]) {
+        if (allSelected === true) {
+          // continue checking if all are selected
+          continue;
+        }
+        if (allSelected === false) {
+          // some are selected
+          return undefined;
+        }
+        if (allSelected === undefined) {
+          // we are at the beginning
+          allSelected = true;
+        }
+      } else {
+        if (allSelected === true) {
+          // some are not selected
+          return undefined;
+        }
+        if (allSelected === false) {
+          // continue checking if none are selected
+          continue;
+        }
+        if (allSelected === undefined) {
+          // we are at the beginning
+          allSelected = false;
+        }
+      }
+    }
+    return allSelected;
+  }
 
   function onInputSelectAll() {
     const selectAllChecked = selectAllInput.checked;
@@ -40,6 +79,7 @@
     .resolveMessage()
     .toString()}"
   checked="{allSelected}"
+  indeterminate="{allSelected === undefined}"
 />
 <ul aria-live="polite">
   {#each list as item (item)}
