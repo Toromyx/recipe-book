@@ -3,25 +3,67 @@
 //! See [`crate::migrator`] for the migrations.
 //! See [`crate::entity`] for the entities.
 
-use std::time::Duration;
+use std::{
+    ops::Deref,
+    sync::{Arc, OnceLock},
+    time::Duration,
+};
 
 use log::LevelFilter;
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
-use tokio::{self, sync::OnceCell};
+use tokio::{
+    self,
+    sync::{OnceCell, OwnedSemaphorePermit, Semaphore},
+};
 
 use crate::{fs::touch, migrator::Migrator, path::app_data_dir};
 
 /// The static database connection (pool), implemented as an [`OnceCell`]
 static DATABASE_CONNECTION: OnceCell<DatabaseConnection> = OnceCell::const_new();
 
+static WRITER_SEMAPHORE: OnceLock<Arc<Semaphore>> = OnceLock::new();
+
 /// Get the static database connection (pool).
 ///
-/// Migrations are run once on initialization, see [`get_connection_and_migrate`].
+/// Use [`connect_writing`] if you are doing write operations on the connection!
+///
+/// Migrations are run once on initialization, see [`get_connection_and_init`].
 pub async fn connect() -> &'static DatabaseConnection {
     DATABASE_CONNECTION
-        .get_or_init(get_connection_and_migrate)
+        .get_or_init(get_connection_and_init)
         .await
+}
+
+pub struct WritingDatabaseConnection {
+    pub database_connection: &'static DatabaseConnection,
+    pub writing_permit: OwnedSemaphorePermit,
+}
+
+impl Deref for WritingDatabaseConnection {
+    type Target = DatabaseConnection;
+
+    fn deref(&self) -> &Self::Target {
+        self.database_connection
+    }
+}
+
+fn writer_semaphore() -> &'static Arc<Semaphore> {
+    WRITER_SEMAPHORE.get_or_init(|| Arc::new(Semaphore::new(1)))
+}
+
+/// Get the static database connection (pool) and a writing permit.
+///
+/// Use [`connect`] if you don't do write operations on the connection!
+///
+/// Only [one writer can exist at a time](https://www.sqlite.org/wal.html#concurrency).
+/// The permit needs to be dropped
+pub async fn connect_writing() -> WritingDatabaseConnection {
+    let permit = writer_semaphore().clone().acquire_owned().await.unwrap();
+    WritingDatabaseConnection {
+        database_connection: connect().await,
+        writing_permit: permit,
+    }
 }
 
 /// Get the path to the SQLite database file.
@@ -55,7 +97,7 @@ async fn get_connection() -> DatabaseConnection {
     let path = get_path().await;
     let database_url = String::from("sqlite://") + &path;
     let mut opt = ConnectOptions::new(database_url);
-    opt.max_connections(1)
+    opt.max_connections(256)
         .acquire_timeout(Duration::from_secs(69420))
         .sqlx_logging(true)
         .sqlx_logging_level(LevelFilter::Trace);
@@ -69,18 +111,33 @@ async fn get_connection() -> DatabaseConnection {
     }
 }
 
-/// Run database migrations in [`crate::migrator`].
-async fn migrate(connection: &DatabaseConnection) {
-    if let Err(err) = Migrator::up(connection, None).await {
-        log::error!("Could not migrate database: {err}",);
+/// Set [WAL mode](https://www.sqlite.org/wal.html) for the database.
+async fn set_wal_mode(connection: &DatabaseConnection) {
+    if let Err(err) = connection
+        .execute_unprepared("PRAGMA journal_mode=WAL;")
+        .await
+    {
+        let msg = format!("Could not set WAL mode: {err}");
+        log::error!("{msg}");
+        panic!("{msg}");
     }
 }
 
-/// Get the database connection and run migrations.
+/// Run database migrations in [`crate::migrator`].
+async fn migrate(connection: &DatabaseConnection) {
+    if let Err(err) = Migrator::up(connection, None).await {
+        let msg = format!("Could not migrate database: {err}");
+        log::error!("{msg}");
+        panic!("{msg}");
+    }
+}
+
+/// Get the database connection and initialize.
 ///
 /// Returns the database connection.
-async fn get_connection_and_migrate() -> DatabaseConnection {
+async fn get_connection_and_init() -> DatabaseConnection {
     let connection = get_connection().await;
+    set_wal_mode(&connection).await;
     migrate(&connection).await;
     connection
 }

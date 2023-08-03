@@ -135,7 +135,7 @@ pub trait EntityCrudTrait {
     async fn create(
         create: Self::EntityCreate,
     ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType> {
-        let db = database::connect().await;
+        let db = database::connect_writing().await;
         let txn = db.begin().await?;
         let active_model = Self::pre_create(create, &txn).await?;
         let model = active_model.insert(&txn).await?;
@@ -172,7 +172,7 @@ pub trait EntityCrudTrait {
     /// - when there is any problem with the database
     /// - when the tauri window can't be messaged about the updated entity
     async fn update(update: Self::EntityUpdate) -> Result<Self::Model> {
-        let db = database::connect().await;
+        let db = database::connect_writing().await;
         let txn = db.begin().await?;
         let model = update.into_active_model().update(&txn).await?;
         txn.commit().await?;
@@ -198,7 +198,7 @@ pub trait EntityCrudTrait {
     /// - when the tauri window can't be messaged about the deleted entity
     /// - when there is an error in [`Self::pre_delete`]
     async fn delete(id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType) -> Result<()> {
-        let db = database::connect().await;
+        let db = database::connect_writing().await;
         let txn = db.begin().await?;
         let model_option = Self::Entity::find_by_id(id).one(&txn).await?;
         let Some(model) = model_option else {
