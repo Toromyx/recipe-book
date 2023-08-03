@@ -13,9 +13,11 @@ export interface RecipeFileInterface
   recipeStepId: number;
 }
 
+type RecipeFileCreateUri = { path: string } | { url: string };
+
 export interface RecipeFileCreateInterface extends SortableInterface {
   name: string;
-  path: string;
+  uri: RecipeFileCreateUri;
   recipeStepId: number;
 }
 

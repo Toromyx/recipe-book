@@ -20,6 +20,28 @@ pub mod recipe_ingredient_draft;
 pub mod recipe_step;
 pub mod unit_name;
 
+/// A trait to transform from any type into an [active model](ActiveModelTrait).
+///
+/// This is a async and fallible version of [`IntoActiveModel`].
+#[async_trait]
+pub trait TryIntoActiveModel<A>
+where
+    A: ActiveModelTrait,
+{
+    async fn try_into_active_model(self) -> Result<A>;
+}
+
+#[async_trait]
+impl<A, T> TryIntoActiveModel<A> for T
+where
+    A: ActiveModelTrait,
+    T: IntoActiveModel<A> + Send,
+{
+    async fn try_into_active_model(self) -> Result<A> {
+        Ok(IntoActiveModel::into_active_model(self))
+    }
+}
+
 /// This struct represents just getting the id column of a database table.
 ///
 /// This is needed for listing entity ids.
@@ -103,11 +125,11 @@ pub trait EntityCrudTrait {
     /// the entity's primary key, its value type needs to be `i64`
     type PrimaryKey: PrimaryKeyTrait<ValueType = i64> + PrimaryKeyToColumn<Column = Self::Column>;
 
-    /// the struct with which to create an entity, implementing [`IntoActiveModel<Self::ActiveModel>`]
-    type EntityCreate: IntoActiveModel<Self::ActiveModel> + Send;
+    /// the struct with which to create an entity, implementing [`TryIntoActiveModel<Self::ActiveModel>`]
+    type EntityCreate: TryIntoActiveModel<Self::ActiveModel> + Send;
 
-    /// the struct with which to update an entity, implementing [`IntoActiveModel<Self::ActiveModel>`]
-    type EntityUpdate: IntoActiveModel<Self::ActiveModel> + Send;
+    /// the struct with which to update an entity, implementing [`TryIntoActiveModel<Self::ActiveModel>`]
+    type EntityUpdate: TryIntoActiveModel<Self::ActiveModel> + Send;
 
     /// the struct with which to filter an entity list or count, implementing [`IntoCondition`]
     type EntityCondition: IntoCondition + Send;
@@ -122,7 +144,7 @@ pub trait EntityCrudTrait {
         create: Self::EntityCreate,
         _txn: &DatabaseTransaction,
     ) -> Result<Self::ActiveModel> {
-        Ok(create.into_active_model())
+        create.try_into_active_model().await
     }
 
     /// Create an entity.
@@ -174,7 +196,7 @@ pub trait EntityCrudTrait {
     async fn update(update: Self::EntityUpdate) -> Result<Self::Model> {
         let db = database::connect_writing().await;
         let txn = db.begin().await?;
-        let model = update.into_active_model().update(&txn).await?;
+        let model = update.try_into_active_model().await?.update(&txn).await?;
         txn.commit().await?;
         get_window().emit(
             Self::entity_action_updated_channel(),

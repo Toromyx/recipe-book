@@ -56,7 +56,7 @@ This component display an ordered list of all recipe files of a recipe step.
       await recipeFileRepository.create({
         name: values.name,
         order: $list.length + 1,
-        path: values.path,
+        uri: { path: values.path },
         recipeStepId,
       });
       context.reset();

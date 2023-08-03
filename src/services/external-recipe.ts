@@ -10,5 +10,6 @@ export type ExternalRecipe = {
   steps: Array<{
     ingredients: string[];
     description: string;
+    files: string[];
   }>;
 };

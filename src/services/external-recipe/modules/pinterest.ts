@@ -17,6 +17,7 @@ function get(data: string): ExternalRecipe {
     ).map((stepElement) => ({
       description: readContent(stepElement),
       ingredients: [],
+      files: [],
     })),
   };
 }
