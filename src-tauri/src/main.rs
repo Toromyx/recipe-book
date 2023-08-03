@@ -151,7 +151,10 @@ fn setup() -> tauri::Builder<Wry> {
 
 #[cfg(test)]
 mod tests {
-    use std::{sync::Once, thread};
+    use std::{
+        sync::{mpsc::channel, Once},
+        thread,
+    };
 
     use super::*;
 
@@ -160,12 +163,17 @@ mod tests {
     /// Run the tauri app, but only once.
     pub fn run() {
         RUN_ONCE.call_once(|| {
-            thread::spawn(|| {
+            let (sender, receiver) = channel();
+            thread::spawn(move || {
                 setup()
                     .any_thread()
-                    .run(tauri::generate_context!())
-                    .unwrap();
+                    .build(tauri::generate_context!())
+                    .unwrap()
+                    .run(move |_, _| {
+                        sender.send(()).ok();
+                    });
             });
+            receiver.recv().ok();
         });
     }
 }
