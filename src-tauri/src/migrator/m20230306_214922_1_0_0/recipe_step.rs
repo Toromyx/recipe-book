@@ -18,11 +18,6 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
                 )
                 .col(ColumnDef::new(RecipeStep::Order).integer().not_null())
                 .col(ColumnDef::new(RecipeStep::Description).text().not_null())
-                .col(
-                    ColumnDef::new(RecipeStep::Image)
-                        .blob(BlobSize::Long)
-                        .null(),
-                )
                 .col(ColumnDef::new(RecipeStep::RecipeId).integer().not_null())
                 .foreign_key(
                     ForeignKey::create()
@@ -66,6 +61,5 @@ pub enum RecipeStep {
     Id,
     Order,
     Description,
-    Image,
     RecipeId,
 }
