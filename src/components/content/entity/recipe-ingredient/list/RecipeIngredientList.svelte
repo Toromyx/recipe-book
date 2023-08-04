@@ -148,7 +148,7 @@ It also displays displays the ingredients recipes drafts.
           );
           return;
         }
-        const text = e.clipboardData.getData('text/text');
+        const text = e.clipboardData.getData('text/plain');
         pastedParsedRecipeIngredients = parseText(
           text,
           whenLoadingDefault($unitList, []),
