@@ -127,6 +127,8 @@ export function parseText(
       .map((part) => part.trim())
       .filter(Boolean),
   );
+  // add original text as non-split option
+  splitTextsBySeparator.push([text.trim()]);
   /**
    * Get a ratio between the number of parts in the split text and the mean lengths of those parts.
    *
