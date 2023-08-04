@@ -45,7 +45,7 @@ It includes functionality to optically recognize characters in the recipe file.
   {#if mimeType === "image"}
     <img src="{src}" alt="{$recipeFile.name}" />
   {:else if mimeType === "video"}
-    <video muted>
+    <video muted controls>
       <source src="{src}" type="{$recipeFile.mime}" />
     </video>
   {:else if mimeType === "audio"}
