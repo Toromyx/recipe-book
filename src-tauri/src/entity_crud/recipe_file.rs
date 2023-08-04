@@ -60,9 +60,8 @@ impl TryIntoActiveModel<ActiveModel> for RecipeFileCreate {
                 let mime = response
                     .headers()
                     .get(header::CONTENT_TYPE)
-                    .map(|content_type| content_type.to_str().ok())
-                    .flatten()
-                    .map(|str| String::from(str))
+                    .and_then(|content_type| content_type.to_str().ok())
+                    .map(String::from)
                     .unwrap_or(mime::APPLICATION_OCTET_STREAM.to_string());
                 let bytes = response.bytes().await?;
                 let named_temp_file = NamedTempFile::new()?;

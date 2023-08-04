@@ -50,10 +50,7 @@ pub struct RecipeCondition {
 
 impl IntoCondition for RecipeCondition {
     fn into_condition(self) -> Condition {
-        Condition::all().add_option(
-            self.name
-                .map(|name| Column::Name.like(&format!("%{name}%"))),
-        )
+        Condition::all().add_option(self.name.map(|name| Column::Name.like(format!("%{name}%"))))
     }
 }
 

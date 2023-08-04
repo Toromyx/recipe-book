@@ -58,10 +58,7 @@ pub struct IngredientCondition {
 impl IntoCondition for IngredientCondition {
     fn into_condition(self) -> Condition {
         Condition::all()
-            .add_option(
-                self.name
-                    .map(|name| Column::Name.like(&format!("%{name}%"))),
-            )
+            .add_option(self.name.map(|name| Column::Name.like(format!("%{name}%"))))
             .add_option(self.name_exact.map(|name| Column::Name.eq(name)))
             .add_option(self.recipe_step_id.map(|recipe_step_id| {
                 Column::Id.in_subquery(
