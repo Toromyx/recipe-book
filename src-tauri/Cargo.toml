@@ -17,10 +17,10 @@ features = []
 version = "^1.0"
 
 [dependencies.async-trait]
-version = "^0.1"
+version = "^0.1.72"
 
 [dependencies.log]
-version = "^0.4"
+version = "^0.4.19"
 
 [dependencies.log4rs]
 version = "^1.2"
@@ -30,7 +30,7 @@ version = "^2.0"
 default-features = false
 
 [dependencies.mime2ext]
-version = "^0.1"
+version = "^0.1.52"
 
 [dependencies.percent-encoding]
 version = "^2.2"
@@ -39,17 +39,17 @@ version = "^2.2"
 version = "^1.7"
 
 [dependencies.reqwest]
-version = "^0.11"
+version = "^0.11.18"
 
 [dependencies.sea-orm]
-version = "^0.11"
+version = "^0.12.1"
 features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"]
 
 [dependencies.sea-orm-migration]
-version = "^0.11"
+version = "^0.12.1"
 
 [dependencies.sea-query]
-version = "^0.28"
+version = "^0.30.0"
 
 [dependencies.serde]
 version = "^1.0"
@@ -68,7 +68,7 @@ features = [ "dialog-open", "protocol-all"]
 version = "^3.7"
 
 [dependencies.tesseract]
-version = "^0.14"
+version = "^0.15.0"
 
 [dependencies.thiserror]
 version = "^1.0"
