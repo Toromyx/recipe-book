@@ -23,7 +23,7 @@ pub mod error;
 /// - [`RecipeFileStorageError::Io`] when there is an I/O error while writing the file
 /// - [`RecipeFileStorageError::Db`] when [`file`] errors
 pub async fn create(recipe_file: &Model) -> Result<PathBuf, RecipeFileStorageError> {
-    let target = file(recipe_file).await?;
+    let target = get_file(recipe_file).await?;
     let source = PathBuf::from(&recipe_file.path);
     fs::create_dir_all(&target.parent().unwrap()).await?;
     fs::copy(&source, &target).await?;
@@ -43,7 +43,7 @@ pub async fn delete(recipe_file: &Model) -> Result<(), RecipeFileStorageError> {
 }
 
 /// Get the recipe file storage root directory.
-fn dir() -> PathBuf {
+fn get_dir() -> PathBuf {
     let mut dir = app_data_dir();
     dir.push("recipe_files");
     dir
@@ -51,7 +51,7 @@ fn dir() -> PathBuf {
 
 /// Get the path segments of the canonical file path relative to the recipe file storage root.
 ///
-/// See [`dir`] for getting the recipe file storage root directory.
+/// See [`get_dir`] for getting the recipe file storage root directory.
 ///
 /// # Errors
 ///
@@ -78,8 +78,8 @@ async fn path_segments(recipe_file: &Model) -> Result<Vec<String>, DbErr> {
 /// # Errors
 ///
 /// - when [`path_segments`] returns an error variant
-async fn file(recipe_file: &Model) -> Result<PathBuf, DbErr> {
-    let mut file = dir();
+async fn get_file(recipe_file: &Model) -> Result<PathBuf, DbErr> {
+    let mut file = get_dir();
     for path_segment in path_segments(recipe_file).await? {
         file.push(path_segment);
     }
