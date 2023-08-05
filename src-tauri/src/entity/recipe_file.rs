@@ -2,7 +2,9 @@
 //!
 //! See [`Model`] for more information.
 
-use sea_orm::entity::prelude::*;
+use async_trait::async_trait;
+use log;
+use sea_orm::{entity::prelude::*, TryIntoModel};
 use serde::Serialize;
 
 /// This struct represents a recipe file.
@@ -39,4 +41,19 @@ impl Related<super::recipe_step::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}
+#[async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_delete<C>(self, _db: &C) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        let model = self.clone().try_into_model()?;
+        if let Err(err) = crate::recipe_file_storage::delete(&model).await {
+            log::warn!(
+                "Could not delete recipe file from storage while deleting entity: {}",
+                err
+            );
+        };
+        Ok(self)
+    }
+}

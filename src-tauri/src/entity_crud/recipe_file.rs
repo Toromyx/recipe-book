@@ -4,7 +4,6 @@ use std::{fs, str::FromStr};
 
 use anyhow::Result;
 use async_trait::async_trait;
-use log;
 use mime_guess::mime;
 use reqwest::header;
 use sea_orm::{
@@ -162,13 +161,6 @@ impl EntityCrudTrait for RecipeFileCrud {
         let mut active_model = model.into_active_model();
         active_model.path = Set(path.to_string_lossy().to_string());
         let model = active_model.update(txn).await?;
-        Ok(model)
-    }
-
-    async fn pre_delete(model: Model, _txn: &DatabaseTransaction) -> Result<Model> {
-        if let Err(err) = recipe_file_storage::delete(&model).await {
-            log::warn!("Could not delete recipe file from storage: {}", err);
-        }
         Ok(model)
     }
 

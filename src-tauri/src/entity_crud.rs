@@ -205,13 +205,6 @@ pub trait EntityCrudTrait {
         Ok(model)
     }
 
-    /// Implement this to run code before deleting the entity.
-    ///
-    /// see [`Self::delete`]
-    async fn pre_delete(model: Self::Model, _txn: &DatabaseTransaction) -> Result<Self::Model> {
-        Ok(model)
-    }
-
     /// Delete an entity.
     ///
     /// # Errors
@@ -226,7 +219,6 @@ pub trait EntityCrudTrait {
         let Some(model) = model_option else {
             return Ok(());
         };
-        let model = Self::pre_delete(model, &txn).await?;
         model.delete(&txn).await?;
         txn.commit().await?;
         get_window().emit(Self::entity_action_deleted_channel(), id)?;
