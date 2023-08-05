@@ -18,7 +18,13 @@ function get(data: string): ExternalRecipe {
           recipeDocument,
           ".flex.items-start.justify-start.mb-1.space-x-3.text-lg.sm\\:text-base",
         ).map((ingredientElement) => readContent(ingredientElement).trim()),
-        files: [],
+        files: selectMultipleInParentNode(
+          selectInParentNode(recipeDocument, ".images-wrap"),
+          "img",
+        ).map(
+          (imgElement) =>
+            `https://sallys-blog.de${imgElement.getAttribute("src")}`,
+        ),
       }),
     ),
   };
