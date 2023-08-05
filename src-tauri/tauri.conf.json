@@ -16,7 +16,7 @@
         "open": true
       },
       "protocol": {
-        "all": true
+        "asset": true
       }
     },
     "bundle": {

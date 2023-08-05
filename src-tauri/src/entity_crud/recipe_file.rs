@@ -158,11 +158,9 @@ impl EntityCrudTrait for RecipeFileCrud {
     type EntityOrderBy = RecipeFileOrderBy;
 
     async fn post_create(model: Model, txn: &DatabaseTransaction) -> Result<Model> {
-        recipe_file_storage::create(&model).await?;
-        let path_segments = recipe_file_storage::path_segments(&model).await?;
-        let path = path_segments.join("/");
+        let path = recipe_file_storage::create(&model).await?;
         let mut active_model = model.into_active_model();
-        active_model.path = Set(path);
+        active_model.path = Set(path.to_string_lossy().to_string());
         let model = active_model.update(txn).await?;
         Ok(model)
     }

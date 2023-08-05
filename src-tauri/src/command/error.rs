@@ -34,6 +34,12 @@ pub enum CommandError {
         tesseract::plumbing::TessBaseApiGetHocrTextError,
     ),
     #[error(transparent)]
+    Tauri(
+        #[serde_as(as = "DisplayFromStr")]
+        #[from]
+        tauri::Error,
+    ),
+    #[error(transparent)]
     Anyhow(
         #[serde_as(as = "DisplayFromStr")]
         #[from]

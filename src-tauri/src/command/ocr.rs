@@ -1,8 +1,9 @@
+use std::path::PathBuf;
+
 use tesseract::Tesseract;
 
 use crate::{
     command::error::CommandError, entity_crud, entity_crud::EntityCrudTrait, get_app_handle,
-    recipe_file_storage,
 };
 
 /// Get the optically recognized characters from the specified recipe file.
@@ -12,7 +13,7 @@ pub async fn ocr(recipe_file_id: i64) -> Result<String, CommandError> {
     let Some(model) = model_option else {
         return Err(CommandError::NotFound);
     };
-    let file = recipe_file_storage::file(&model).await?;
+    let file = PathBuf::from(&model.path);
     let tessdata = get_app_handle()
         .path_resolver()
         .resolve_resource("tessdata")

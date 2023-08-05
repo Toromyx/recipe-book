@@ -37,13 +37,13 @@ pub async fn create(recipe_file: &Model) -> Result<PathBuf, RecipeFileStorageErr
 /// - [`RecipeFileStorageError::Io`] when there is an I/O error while deleting the file
 /// - [`RecipeFileStorageError::Db`] when [`file`] errors
 pub async fn delete(recipe_file: &Model) -> Result<(), RecipeFileStorageError> {
-    let file = file(recipe_file).await?;
+    let file = PathBuf::from(&recipe_file.path);
     fs::remove_file(file).await?;
     Ok(())
 }
 
 /// Get the recipe file storage root directory.
-pub fn dir() -> PathBuf {
+fn dir() -> PathBuf {
     let mut dir = app_data_dir();
     dir.push("recipe_files");
     dir
@@ -56,7 +56,7 @@ pub fn dir() -> PathBuf {
 /// # Errors
 ///
 /// - when the recipe step corresponding to the recipe file can not be found in the database
-pub async fn path_segments(recipe_file: &Model) -> Result<Vec<String>, DbErr> {
+async fn path_segments(recipe_file: &Model) -> Result<Vec<String>, DbErr> {
     let db = database::connect().await;
     let recipe_step = recipe_step::Entity::find_by_id(recipe_file.recipe_step_id)
         .one(db)
@@ -78,7 +78,7 @@ pub async fn path_segments(recipe_file: &Model) -> Result<Vec<String>, DbErr> {
 /// # Errors
 ///
 /// - when [`path_segments`] returns an error variant
-pub async fn file(recipe_file: &Model) -> Result<PathBuf, DbErr> {
+async fn file(recipe_file: &Model) -> Result<PathBuf, DbErr> {
     let mut file = dir();
     for path_segment in path_segments(recipe_file).await? {
         file.push(path_segment);

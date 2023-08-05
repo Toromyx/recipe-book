@@ -62,7 +62,7 @@ version = "^3.0"
 
 [dependencies.tauri]
 version = "^1.2"
-features = [ "dialog-open", "protocol-all"]
+features = [ "protocol-asset", "dialog-open"]
 
 [dependencies.tempfile]
 version = "^3.7"

@@ -8,7 +8,6 @@ It includes functionality to optically recognize characters in the recipe file.
   import { convertFileSrc } from "@tauri-apps/api/tauri";
   import { invoke } from "../../../../../services/command/client.ts";
   import { Command } from "../../../../../services/command/command.ts";
-  import { RECIPE_FILE_URI_SCHEME } from "../../../../../services/protocol.ts";
   import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { createId } from "../../../../../services/util/create-id.ts";
@@ -32,7 +31,7 @@ It includes functionality to optically recognize characters in the recipe file.
 
   $: recipeFile = recipeFileRepository.createStore(id);
   $: mimeType = $recipeFile?.mime.split("/")[0];
-  $: src = convertFileSrc($recipeFile?.path, RECIPE_FILE_URI_SCHEME);
+  $: src = convertFileSrc($recipeFile?.path);
   $: {
     if (iframe) {
       iframe.srcdoc = `<!DOCTYPE html>${output}`;

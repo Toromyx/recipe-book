@@ -1,3 +1,5 @@
+use tauri::Manager;
+
 use crate::{
     command::error::{CommandError, CommandError::NotFound},
     entity::recipe_file::Model,
@@ -17,9 +19,13 @@ pub async fn entity_create_recipe_file(create: RecipeFileCreate) -> Result<i64, 
 }
 
 #[tauri::command]
-pub async fn entity_read_recipe_file(id: i64) -> Result<Model, CommandError> {
+pub async fn entity_read_recipe_file(
+    id: i64,
+    window: tauri::Window,
+) -> Result<Model, CommandError> {
     let model_option = RecipeFileCrud::read(id).await?;
     let model = model_option.ok_or(NotFound)?;
+    window.asset_protocol_scope().allow_file(&model.path)?;
     Ok(model)
 }
 

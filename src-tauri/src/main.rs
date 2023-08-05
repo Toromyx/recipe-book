@@ -54,7 +54,6 @@ mod fs;
 mod log;
 mod migrator;
 mod path;
-mod protocol;
 mod recipe_file_storage;
 mod scraper;
 mod unit_conversion;
@@ -94,10 +93,6 @@ fn setup() -> tauri::Builder<Wry> {
             }
             log::init();
             Ok(())
-        })
-        .register_uri_scheme_protocol(protocol::recipe_file::URI_SCHEME, |app_handle, request| {
-            let response = protocol::recipe_file::protocol(app_handle, request)?;
-            Ok(response)
         })
         .invoke_handler(tauri::generate_handler![
             entity_create_ingredient,
