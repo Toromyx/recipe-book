@@ -32,13 +32,22 @@ pub async fn create(recipe_file: &Model) -> Result<PathBuf, RecipeFileStorageErr
 
 /// Deletes the stored recipe file associated with an recipe file entity.
 ///
+/// Also delete all empty parent directories up to and including [`get_dir`].
+///
 /// # Errors
 ///
 /// - [`RecipeFileStorageError::Io`] when there is an I/O error while deleting the file
 /// - [`RecipeFileStorageError::Db`] when [`file`] errors
 pub async fn delete(recipe_file: &Model) -> Result<(), RecipeFileStorageError> {
     let file = PathBuf::from(&recipe_file.path);
-    fs::remove_file(file).await?;
+    fs::remove_file(file.clone()).await?;
+    let mut dir_option = file.parent();
+    while let Some(dir) = dir_option {
+        if !dir.starts_with(get_dir()) || fs::remove_dir(dir).await.is_err() {
+            break;
+        }
+        dir_option = dir.parent();
+    }
     Ok(())
 }
 
