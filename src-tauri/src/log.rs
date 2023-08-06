@@ -24,7 +24,7 @@ pub fn init() {
     let mut root_builder = Root::builder();
 
     // console
-    #[cfg(debug_assertions)]
+    #[cfg(all(debug_assertions, not(test)))]
     {
         use log4rs::append::console::ConsoleAppender;
 
