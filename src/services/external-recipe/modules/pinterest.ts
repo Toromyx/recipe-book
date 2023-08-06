@@ -114,8 +114,7 @@ function externalRecipeFromRelayResponse(
           relayResponse.response.data.v3GetPinQuery.data.storyPinData.metadata.basics.listBlocks
             .map(
               (listBlock) =>
-                `${listBlock.heading}\n
-                ${listBlock.blocks
+                `${listBlock.heading}\n${listBlock.blocks
                   .map((itemBlock) => itemBlock.text)
                   .join("\n")}`,
             )
