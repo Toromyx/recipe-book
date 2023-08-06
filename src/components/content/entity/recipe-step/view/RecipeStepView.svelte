@@ -45,7 +45,7 @@ This component displays the content of a recipe step.
     }}"
   >
     <svelte:fragment slot="display">
-      <p style="white-space: pre">{$recipeStep.description}</p>
+      <p style="white-space: pre-wrap">{$recipeStep.description}</p>
     </svelte:fragment>
     <RecipeStepEdit slot="edit" description="{$recipeStep.description}" />
   </Editable>
