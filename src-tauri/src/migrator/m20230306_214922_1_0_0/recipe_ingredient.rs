@@ -110,3 +110,48 @@ pub enum RecipeIngredient {
     RecipeStepId,
     IngredientId,
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::DatabaseConnection;
+
+    use crate::database::tests::{get_table_indices, get_table_schema};
+
+    pub async fn test_recipe_ingredient_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_ingredient", db).await;
+        assert_eq!(
+            table_schema,
+            "CREATE TABLE \"recipe_ingredient\" ( \
+            \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
+            \"order\" integer NOT NULL, \
+            \"quantity\" real NULL, \
+            \"unit\" text NULL, \
+            \"quality\" text NULL, \
+            \"recipe_step_id\" integer NOT NULL, \
+            \"ingredient_id\" integer NOT NULL, \
+            UNIQUE (\"order\", \"recipe_step_id\"), \
+            UNIQUE (\"recipe_step_id\", \"ingredient_id\"), \
+            FOREIGN KEY (\"recipe_step_id\") REFERENCES \"recipe_step\" (\"id\") ON DELETE CASCADE, \
+            FOREIGN KEY (\"ingredient_id\") REFERENCES \"ingredient\" (\"id\") ON DELETE RESTRICT \
+            )"
+        );
+    }
+
+    pub async fn test_recipe_ingredient_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_ingredient", db).await;
+        assert_eq!(
+            indices,
+            vec![
+                String::from(
+                    "CREATE INDEX \"idx-recipe_ingredient-order\" ON \"recipe_ingredient\" (\"order\")"
+                ),
+                String::from(
+                    "CREATE INDEX \"idx-recipe_ingredient-recipe_step_id\" ON \"recipe_ingredient\" (\"recipe_step_id\")"
+                ),
+                String::from(
+                    "CREATE INDEX \"idx-recipe_ingredient-ingredient_id\" ON \"recipe_ingredient\" (\"ingredient_id\")"
+                ),
+            ]
+        )
+    }
+}

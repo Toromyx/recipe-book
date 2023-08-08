@@ -38,3 +38,31 @@ pub enum Ingredient {
     Id,
     Name,
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::DatabaseConnection;
+
+    use crate::database::tests::{get_table_indices, get_table_schema};
+
+    pub async fn test_ingredient_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("ingredient", db).await;
+        assert_eq!(
+            table_schema,
+            "CREATE TABLE \"ingredient\" ( \
+        \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
+        \"name\" text NOT NULL \
+        )"
+        );
+    }
+
+    pub async fn test_ingredient_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("ingredient", db).await;
+        assert_eq!(
+            indices,
+            vec![String::from(
+                "CREATE INDEX \"idx-ingredient-name\" ON \"ingredient\" (\"name\")"
+            ),]
+        )
+    }
+}

@@ -71,3 +71,42 @@ enum RecipeFile {
     Path,
     RecipeStepId,
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::DatabaseConnection;
+
+    use crate::database::tests::{get_table_indices, get_table_schema};
+
+    pub async fn test_recipe_file_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_file", db).await;
+        assert_eq!(
+            table_schema,
+            "CREATE TABLE \"recipe_file\" ( \
+        \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
+        \"name\" text NOT NULL, \
+        \"order\" integer NOT NULL, \
+        \"mime\" text NOT NULL, \
+        \"path\" text NOT NULL, \
+        \"recipe_step_id\" integer NOT NULL, \
+        UNIQUE (\"order\", \"recipe_step_id\"), \
+        FOREIGN KEY (\"recipe_step_id\") REFERENCES \"recipe_step\" (\"id\") ON DELETE CASCADE \
+        )"
+        );
+    }
+
+    pub async fn test_recipe_file_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_file", db).await;
+        assert_eq!(
+            indices,
+            vec![
+                String::from(
+                    "CREATE INDEX \"idx-recipe_file-order\" ON \"recipe_file\" (\"order\")"
+                ),
+                String::from(
+                    "CREATE INDEX \"idx-recipe_file-recipe_step_id\" ON \"recipe_file\" (\"recipe_step_id\")"
+                ),
+            ]
+        )
+    }
+}

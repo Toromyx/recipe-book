@@ -63,3 +63,40 @@ pub enum RecipeStep {
     Description,
     RecipeId,
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::DatabaseConnection;
+
+    use crate::database::tests::{get_table_indices, get_table_schema};
+
+    pub async fn test_recipe_step_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_step", db).await;
+        assert_eq!(
+            table_schema,
+            "CREATE TABLE \"recipe_step\" ( \
+            \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
+            \"order\" integer NOT NULL, \
+            \"description\" text NOT NULL, \
+            \"recipe_id\" integer NOT NULL, \
+            UNIQUE (\"order\", \"recipe_id\"), \
+            FOREIGN KEY (\"recipe_id\") REFERENCES \"recipe\" (\"id\") ON DELETE CASCADE \
+            )"
+        );
+    }
+
+    pub async fn test_recipe_step_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_step", db).await;
+        assert_eq!(
+            indices,
+            vec![
+                String::from(
+                    "CREATE INDEX \"idx-recipe_step-order\" ON \"recipe_step\" (\"order\")"
+                ),
+                String::from(
+                    "CREATE INDEX \"idx-recipe_step-recipe_id\" ON \"recipe_step\" (\"recipe_id\")"
+                ),
+            ]
+        )
+    }
+}

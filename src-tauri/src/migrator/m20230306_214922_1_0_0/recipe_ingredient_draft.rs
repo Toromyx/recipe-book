@@ -84,3 +84,40 @@ pub enum RecipeIngredientDraft {
     Text,
     RecipeStepId,
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::DatabaseConnection;
+
+    use crate::database::tests::{get_table_indices, get_table_schema};
+
+    pub async fn test_recipe_ingredient_draft_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_ingredient_draft", db).await;
+        assert_eq!(
+            table_schema,
+            "CREATE TABLE \"recipe_ingredient_draft\" ( \
+            \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
+            \"order\" integer NOT NULL, \
+            \"text\" text NOT NULL, \
+            \"recipe_step_id\" integer NOT NULL, \
+            UNIQUE (\"order\", \"recipe_step_id\"), \
+            FOREIGN KEY (\"recipe_step_id\") REFERENCES \"recipe_step\" (\"id\") ON DELETE CASCADE \
+            )"
+        );
+    }
+
+    pub async fn test_recipe_ingredient_draft_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_ingredient_draft", db).await;
+        assert_eq!(
+            indices,
+            vec![
+                String::from(
+                    "CREATE INDEX \"idx-recipe_ingredient_draft-order\" ON \"recipe_ingredient_draft\" (\"order\")"
+                ),
+                String::from(
+                    "CREATE INDEX \"idx-recipe_ingredient_draft-recipe_step_id\" ON \"recipe_ingredient_draft\" (\"recipe_step_id\")"
+                ),
+            ]
+        )
+    }
+}

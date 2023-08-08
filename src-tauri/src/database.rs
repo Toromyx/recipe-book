@@ -141,3 +141,39 @@ async fn get_connection_and_init() -> DatabaseConnection {
     migrate(&connection).await;
     connection
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
+    use sea_query::Value;
+
+    pub async fn get_memory_database() -> DatabaseConnection {
+        Database::connect("sqlite::memory:").await.unwrap()
+    }
+
+    pub async fn get_table_schema(table: &str, db: &DatabaseConnection) -> String {
+        let query_result = db
+            .query_one(Statement::from_sql_and_values(
+                db.get_database_backend(),
+                "SELECT `sql` FROM `sqlite_schema` WHERE `tbl_name` = ?;",
+                vec![Value::from(table)],
+            ))
+            .await
+            .unwrap()
+            .unwrap();
+        query_result.try_get("", "sql").unwrap()
+    }
+
+    pub async fn get_table_indices(table: &str, db: &DatabaseConnection) -> Vec<String> {
+        db.query_all(Statement::from_sql_and_values(
+            db.get_database_backend(),
+            "SELECT `sql` FROM `sqlite_master` WHERE `tbl_name` = ? AND `type` = \"index\" AND NOT `sql` IS NULL;",
+            vec![Value::from(table)],
+        ))
+        .await
+        .unwrap()
+        .iter()
+        .map(|query_result| query_result.try_get("", "sql").unwrap())
+        .collect()
+    }
+}
