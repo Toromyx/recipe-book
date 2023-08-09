@@ -31,7 +31,20 @@ impl MigrationTrait for Migration {
 
 #[cfg(test)]
 mod tests {
+    use ingredient::tests::{assert_ingredient_indices, assert_ingredient_schema};
+    use recipe::tests::{assert_recipe_indices, assert_recipe_schema};
+    use recipe_file::tests::{assert_recipe_file_indices, assert_recipe_file_schema};
+    use recipe_ingredient::tests::{
+        assert_recipe_ingredient_indices, assert_recipe_ingredient_schema,
+    };
+    use recipe_ingredient_draft::tests::{
+        assert_recipe_ingredient_draft_indices, assert_recipe_ingredient_draft_schema,
+    };
+    use recipe_step::tests::{assert_recipe_step_indices, assert_recipe_step_schema};
     use sea_orm_migration::SchemaManager;
+    use unit_name::tests::{
+        assert_unit_name_content, assert_unit_name_indices, assert_unit_name_schema,
+    };
 
     use super::*;
     use crate::database::tests::get_memory_database;
@@ -42,20 +55,20 @@ mod tests {
         let schema_manager = SchemaManager::new(&db);
         let migration = Migration {};
         migration.up(&schema_manager).await.unwrap();
-        ingredient::tests::test_ingredient_schema(&db).await;
-        ingredient::tests::test_ingredient_indices(&db).await;
-        recipe::tests::test_recipe_schema(&db).await;
-        recipe::tests::test_recipe_indices(&db).await;
-        recipe_step::tests::test_recipe_step_schema(&db).await;
-        recipe_step::tests::test_recipe_step_indices(&db).await;
-        recipe_file::tests::test_recipe_file_schema(&db).await;
-        recipe_file::tests::test_recipe_file_indices(&db).await;
-        recipe_ingredient::tests::test_recipe_ingredient_schema(&db).await;
-        recipe_ingredient::tests::test_recipe_ingredient_indices(&db).await;
-        recipe_ingredient_draft::tests::test_recipe_ingredient_draft_schema(&db).await;
-        recipe_ingredient_draft::tests::test_recipe_ingredient_draft_indices(&db).await;
-        unit_name::tests::test_unit_name_schema(&db).await;
-        unit_name::tests::test_unit_name_indices(&db).await;
-        unit_name::tests::test_unit_name_content(&db).await;
+        assert_ingredient_schema(&db).await;
+        assert_ingredient_indices(&db).await;
+        assert_recipe_schema(&db).await;
+        assert_recipe_indices(&db).await;
+        assert_recipe_step_schema(&db).await;
+        assert_recipe_step_indices(&db).await;
+        assert_recipe_file_schema(&db).await;
+        assert_recipe_file_indices(&db).await;
+        assert_recipe_ingredient_schema(&db).await;
+        assert_recipe_ingredient_indices(&db).await;
+        assert_recipe_ingredient_draft_schema(&db).await;
+        assert_recipe_ingredient_draft_indices(&db).await;
+        assert_unit_name_schema(&db).await;
+        assert_unit_name_indices(&db).await;
+        assert_unit_name_content(&db).await;
     }
 }

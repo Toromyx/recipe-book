@@ -75,12 +75,12 @@ pub mod tests {
 
     use crate::database::tests::{get_table_indices, get_table_schema};
 
-    pub async fn test_unit_name_schema(db: &DatabaseConnection) {
+    pub async fn assert_unit_name_schema(db: &DatabaseConnection) {
         let table_schema = get_table_schema("unit_name", db).await;
         assert_eq!(table_schema, "CREATE TABLE \"unit_name\" ( \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"name\" text NOT NULL, \"unit\" text NOT NULL, UNIQUE (\"name\") )");
     }
 
-    pub async fn test_unit_name_indices(db: &DatabaseConnection) {
+    pub async fn assert_unit_name_indices(db: &DatabaseConnection) {
         let indices = get_table_indices("unit_name", db).await;
         assert_eq!(
             indices,
@@ -90,7 +90,7 @@ pub mod tests {
         )
     }
 
-    pub async fn test_unit_name_content(db: &DatabaseConnection) {
+    pub async fn assert_unit_name_content(db: &DatabaseConnection) {
         let query_results = db
             .query_all(Statement::from_string(
                 db.get_database_backend(),

@@ -45,7 +45,7 @@ pub mod tests {
 
     use crate::database::tests::{get_table_indices, get_table_schema};
 
-    pub async fn test_recipe_schema(db: &DatabaseConnection) {
+    pub async fn assert_recipe_schema(db: &DatabaseConnection) {
         let table_schema = get_table_schema("recipe", db).await;
         assert_eq!(
             table_schema,
@@ -56,7 +56,7 @@ pub mod tests {
         );
     }
 
-    pub async fn test_recipe_indices(db: &DatabaseConnection) {
+    pub async fn assert_recipe_indices(db: &DatabaseConnection) {
         let indices = get_table_indices("recipe", db).await;
         assert_eq!(
             indices,
