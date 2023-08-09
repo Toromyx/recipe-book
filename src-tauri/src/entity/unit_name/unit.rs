@@ -61,3 +61,30 @@ impl From<Unit> for unit_conversion::Unit {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use sea_orm::Iterable;
+
+    use super::*;
+
+    #[test]
+    fn test_unit_string_value() {
+        for unit in Unit::iter() {
+            assert_eq!(
+                format!("\"{}\"", unit.to_value()),
+                serde_json::to_string(&unit).unwrap(),
+            )
+        }
+    }
+
+    #[test]
+    fn test_unit_from() {
+        for unit in Unit::iter() {
+            assert_eq!(
+                unit.clone(),
+                Unit::from(unit_conversion::Unit::from(unit.clone())),
+            )
+        }
+    }
+}
