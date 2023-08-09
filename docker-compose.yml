@@ -1,0 +1,9 @@
+services:
+  dev:
+    build:
+      context: .
+      target: base
+    working_dir: /opt/project
+    tty: true
+    volumes:
+      - .:/opt/project
