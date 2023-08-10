@@ -37,3 +37,4 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y \
   webkit2gtk-driver \
   xvfb
+RUN cargo install tauri-driver
