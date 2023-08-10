@@ -5,9 +5,10 @@ This component lists all recipes with a form to create a new recipe.
 
 <script>
   import { link, push } from "svelte-spa-router";
-  import { invoke } from "../../../../../services/command/client.ts";
-  import { Command } from "../../../../../services/command/command.ts";
-  import { getExternalRecipe } from "../../../../../services/external-recipe/getter.ts";
+  import {
+    ExternalRecipeUrlNotSupportedError,
+    getExternalRecipe,
+  } from "../../../../../services/external-recipe/getter.ts";
   import { recipeRoute } from "../../../../../services/router.ts";
   import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
   import { recipeIngredientDraftRepository } from "../../../../../services/store/repository/recipe-ingredient-draft-repository.ts";
@@ -37,14 +38,12 @@ This component lists all recipes with a form to create a new recipe.
       await push(recipeRoute(recipeId));
       return;
     }
-    let externalRecipeData;
+    let externalRecipe;
     loadingExternalRecipe = true;
     try {
-      externalRecipeData = await invoke(Command.EXTERNAL_RECIPE, {
-        url,
-      });
+      externalRecipe = await getExternalRecipe(String(url));
     } catch (reason) {
-      if (reason.ExternalRecipeUrlNotSupported) {
+      if (reason instanceof ExternalRecipeUrlNotSupportedError) {
         input.setAndReportCustomValidity(
           messages.validity.externalRecipeUrlNotSupported
             .resolveMessage()
@@ -56,7 +55,6 @@ This component lists all recipes with a form to create a new recipe.
     } finally {
       loadingExternalRecipe = false;
     }
-    const externalRecipe = await getExternalRecipe(externalRecipeData);
     const recipeId = await recipeRepository.create({
       name: externalRecipe.name,
     });

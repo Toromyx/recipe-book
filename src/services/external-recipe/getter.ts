@@ -1,4 +1,7 @@
-import type { ExternalRecipe, ExternalRecipeData } from "../external-recipe.ts";
+import { invoke } from "../command/client.ts";
+import type { CommandError } from "../command/command-error.ts";
+import { Command } from "../command/command.ts";
+import type { ExternalRecipe } from "../external-recipe.ts";
 
 export type ExternalRecipeModule = {
   get: (data: string) => ExternalRecipe;
@@ -14,9 +17,20 @@ const getModulePath = (name: string) => `./modules/${name}.ts`;
 const getModule = (name: string): Promise<ExternalRecipeModule> =>
   modules[getModulePath(name)]();
 
-export async function getExternalRecipe(
-  externalRecipeData: ExternalRecipeData,
-): Promise<ExternalRecipe> {
+export class ExternalRecipeUrlNotSupportedError extends Error {}
+
+export async function getExternalRecipe(url: string) {
+  let externalRecipeData;
+  try {
+    externalRecipeData = await invoke(Command.EXTERNAL_RECIPE, {
+      url,
+    });
+  } catch (reason) {
+    if ("ExternalRecipeUrlNotSupported" in (reason as CommandError)) {
+      throw new ExternalRecipeUrlNotSupportedError();
+    }
+    throw reason;
+  }
   if ("jsModule" in externalRecipeData.instructions) {
     const module = await getModule(
       externalRecipeData.instructions.jsModule.name,
