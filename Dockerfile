@@ -1,5 +1,10 @@
 FROM rust:1.70-bookworm AS base
 
+# rust setup
+RUN rustup toolchain install nightly
+RUN rustup component add rust-analyzer
+RUN rustup component add clippy
+
 # cargo utilities
 RUN cargo install cargo-watch
 RUN cargo install cargo-outdated
