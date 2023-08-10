@@ -3,18 +3,14 @@
 //! See [`crate::migrator`] for the migrations.
 //! See [`crate::entity`] for the entities.
 
-use std::{
-    ops::Deref,
-    sync::{Arc, OnceLock},
-    time::Duration,
-};
+use std::time::Duration;
 
 use log::LevelFilter;
 use sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
 use tokio::{
     self,
-    sync::{OnceCell, OwnedSemaphorePermit, Semaphore},
+    sync::{Mutex, MutexGuard, OnceCell},
 };
 
 use crate::{fs::touch, migrator::Migrator, path::app_data_dir};
@@ -22,7 +18,8 @@ use crate::{fs::touch, migrator::Migrator, path::app_data_dir};
 /// The static database connection (pool), implemented as an [`OnceCell`]
 static DATABASE_CONNECTION: OnceCell<DatabaseConnection> = OnceCell::const_new();
 
-static WRITER_SEMAPHORE: OnceLock<Arc<Semaphore>> = OnceLock::new();
+static WRITING_DATABASE_CONNECTION: OnceCell<Mutex<&'static DatabaseConnection>> =
+    OnceCell::const_new();
 
 /// Get the static database connection (pool).
 ///
@@ -35,35 +32,19 @@ pub async fn connect() -> &'static DatabaseConnection {
         .await
 }
 
-pub struct WritingDatabaseConnection {
-    pub database_connection: &'static DatabaseConnection,
-    pub writing_permit: OwnedSemaphorePermit,
-}
-
-impl Deref for WritingDatabaseConnection {
-    type Target = DatabaseConnection;
-
-    fn deref(&self) -> &Self::Target {
-        self.database_connection
-    }
-}
-
-fn writer_semaphore() -> &'static Arc<Semaphore> {
-    WRITER_SEMAPHORE.get_or_init(|| Arc::new(Semaphore::new(1)))
-}
-
-/// Get the static database connection (pool) and a writing permit.
+/// Get the static database connection (pool) inside a [`MutexGuard`].
 ///
 /// Use [`connect`] if you don't do write operations on the connection!
 ///
 /// Only [one writer can exist at a time](https://www.sqlite.org/wal.html#concurrency).
-/// The permit needs to be dropped
-pub async fn connect_writing() -> WritingDatabaseConnection {
-    let permit = writer_semaphore().clone().acquire_owned().await.unwrap();
-    WritingDatabaseConnection {
-        database_connection: connect().await,
-        writing_permit: permit,
+pub async fn connect_writing() -> MutexGuard<'static, &'static DatabaseConnection> {
+    async fn init() -> Mutex<&'static DatabaseConnection> {
+        let db = connect().await;
+        Mutex::new(db)
     }
+
+    let mutex = WRITING_DATABASE_CONNECTION.get_or_init(init).await;
+    mutex.lock().await
 }
 
 /// Get the path to the SQLite database file.
