@@ -21,12 +21,16 @@ static DATABASE_CONNECTION: OnceCell<DatabaseConnection> = OnceCell::const_new()
 static WRITING_DATABASE_CONNECTION: OnceCell<Mutex<&'static DatabaseConnection>> =
     OnceCell::const_new();
 
+type ReadingDatabaseConnection = &'static DatabaseConnection;
+
+type WritingDatabaseConnection = MutexGuard<'static, ReadingDatabaseConnection>;
+
 /// Get the static database connection (pool).
 ///
 /// Use [`connect_writing`] if you are doing write operations on the connection!
 ///
 /// Migrations are run once on initialization, see [`get_connection_and_init`].
-pub async fn connect() -> &'static DatabaseConnection {
+pub async fn connect() -> ReadingDatabaseConnection {
     DATABASE_CONNECTION
         .get_or_init(get_connection_and_init)
         .await
@@ -37,8 +41,8 @@ pub async fn connect() -> &'static DatabaseConnection {
 /// Use [`connect`] if you don't do write operations on the connection!
 ///
 /// Only [one writer can exist at a time](https://www.sqlite.org/wal.html#concurrency).
-pub async fn connect_writing() -> MutexGuard<'static, &'static DatabaseConnection> {
-    async fn init() -> Mutex<&'static DatabaseConnection> {
+pub async fn connect_writing() -> WritingDatabaseConnection {
+    async fn init() -> Mutex<ReadingDatabaseConnection> {
         let db = connect().await;
         Mutex::new(db)
     }
