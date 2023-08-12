@@ -13,30 +13,30 @@ RUN cargo install cargo-audit
 
 # node
 RUN apt-get update && apt-get install -y \
-  nodejs \
-  npm
+nodejs \
+npm
 
 # tauri build dependencies
 RUN apt-get update && apt-get install -y \
-  libwebkit2gtk-4.0-dev \
-  build-essential \
-  curl \
-  wget \
-  file \
-  libssl-dev \
-  libgtk-3-dev \
-  libayatana-appindicator3-dev \
-  librsvg2-dev
+libwebkit2gtk-4.0-dev \
+build-essential \
+curl \
+wget \
+file \
+libssl-dev \
+libgtk-3-dev \
+libayatana-appindicator3-dev \
+librsvg2-dev
 
 # tesseract
 RUN apt-get update && apt-get install -y \
-  clang
+clang
 RUN apt-get update && apt-get install -y \
-  libleptonica-dev \
-  libtesseract-dev
+libleptonica-dev \
+libtesseract-dev
 
 # test dependencies
 RUN apt-get update && apt-get install -y \
-  webkit2gtk-driver \
-  xvfb
+webkit2gtk-driver \
+xvfb
 RUN cargo install tauri-driver
