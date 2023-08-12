@@ -7,7 +7,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/toromyx/recipe-book:${{ github.ref }}
+      image: ghcr.io/toromyx/recipe-book:github-actions-test
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
