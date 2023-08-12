@@ -1,9 +1,10 @@
 FROM rust:1.70-bookworm AS base
 
 # rust setup
-RUN rustup toolchain install nightly
 RUN rustup component add rust-analyzer
 RUN rustup component add clippy
+RUN rustup toolchain install nightly
+RUN rustup component add rustfmt --toolchain nightly
 
 # cargo utilities
 RUN cargo install cargo-watch
