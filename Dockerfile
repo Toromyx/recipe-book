@@ -1,7 +1,5 @@
 FROM rust:1.70-bookworm AS base
 
-# this is a test
-
 # rust setup
 RUN rustup component add rust-analyzer
 RUN rustup component add clippy
