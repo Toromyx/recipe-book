@@ -9,6 +9,7 @@ RUN rustup component add rustfmt --toolchain nightly
 # cargo utilities
 RUN cargo install cargo-watch
 RUN cargo install cargo-outdated
+RUN cargo install cargo-audit
 
 # node
 RUN apt-get update && apt-get install -y \
