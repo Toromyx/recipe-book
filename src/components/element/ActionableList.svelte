@@ -99,5 +99,6 @@
 </ul>
 {#each actions as action}<SvelteButton
     on:click="{() => action.callback(list.filter((item) => checked[item]))}"
+    disabled="{allSelected === false}"
     confirmation="{action.confirmation}">{action.labelAll}</SvelteButton
   >{/each}
