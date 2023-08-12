@@ -4,8 +4,6 @@ name: Build and Publish Container
 
 on:
   push:
-    branches:
-      - main
     paths:
       - Dockerfile
 
