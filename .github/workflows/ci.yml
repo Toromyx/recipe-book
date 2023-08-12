@@ -1,0 +1,25 @@
+name: CI
+
+on: [push]
+
+jobs:
+
+  audit:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/toromyx/recipe-book:${{ github.ref }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - run: npm run audit
+
+  check:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/toromyx/recipe-book:${{ github.ref }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - run: npm run check
