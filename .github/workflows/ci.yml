@@ -12,14 +12,18 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
       - run: npm run audit
 
   check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/toromyx/recipe-book:${{ github.ref }}
+      image: ghcr.io/toromyx/recipe-book:github-actions-test
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
       - run: npm run check
