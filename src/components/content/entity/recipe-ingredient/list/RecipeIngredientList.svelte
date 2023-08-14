@@ -7,10 +7,7 @@ It also displays displays the ingredients recipes drafts.
 -->
 
 <script>
-  import {
-    listRecipeIngredientDraft,
-    readRecipeIngredientDraft,
-  } from "../../../../../services/command/entity.ts";
+  import { readRecipeIngredientDraft } from "../../../../../services/command/entity.ts";
   import {
     parseHtml,
     parseText,
@@ -44,28 +41,12 @@ It also displays displays the ingredients recipes drafts.
   let list;
   /** @type {Readable<Loadable<number[]>>} */
   let usedIngredientsList;
+  /** @type {Readable<Loadable<number[]>>} */
+  let draftList;
   /** @type {(ParsedRecipeIngredient & {id?: number})[]} */
   let pastedParsedRecipeIngredients = [];
-
-  let recipeIngredientDraftIdsPromise = listRecipeIngredientDraft({
-    condition: { recipeStepId },
-    orderBy: [
-      {
-        order: "asc",
-      },
-    ],
-  });
-  let draftedParsedRecipeIngredientsPromise =
-    recipeIngredientDraftIdsPromise.then((recipeIngredientDraftIds) =>
-      Promise.all(
-        recipeIngredientDraftIds.map(async (recipeIngredientDraftId) => {
-          const recipeIngredientDraft = await readRecipeIngredientDraft(
-            recipeIngredientDraftId,
-          );
-          return parseString(recipeIngredientDraft.text, $unitList);
-        }),
-      ),
-    );
+  /** @type {Promise<Array<ParsedRecipeIngredient|null>>} */
+  let draftedParsedRecipeIngredientsPromise = Promise.reject();
 
   $: list = recipeIngredientRepository.createListFilteredStore({
     condition: { recipeStepId },
@@ -78,6 +59,20 @@ It also displays displays the ingredients recipes drafts.
   $: usedIngredientsList = ingredientRepository.createListFilteredStore({
     condition: { recipeStepId },
   });
+  $: draftList = recipeIngredientDraftRepository.createListFilteredStore({
+    condition: { recipeStepId },
+    orderBy: [{ order: "asc" }],
+  });
+  $: draftedParsedRecipeIngredientsPromise = $draftList
+    ? Promise.all(
+        $draftList.map(async (recipeIngredientDraftId) => {
+          const recipeIngredientDraft = await readRecipeIngredientDraft(
+            recipeIngredientDraftId,
+          );
+          return parseString(recipeIngredientDraft.text, $unitList);
+        }),
+      )
+    : Promise.reject();
 </script>
 
 {#if isLoaded($list)}
@@ -85,7 +80,7 @@ It also displays displays the ingredients recipes drafts.
     {#if draftedParsedRecipeIngredients.length}
       <AdditionalIngredientsForm
         on:done="{async () => {
-          for (const recipeIngredientDraftId of await recipeIngredientDraftIdsPromise) {
+          for (const recipeIngredientDraftId of $draftList) {
             void recipeIngredientDraftRepository.delete(
               recipeIngredientDraftId,
             );
@@ -95,7 +90,9 @@ It also displays displays the ingredients recipes drafts.
         numIngredients="{$list.length}"
         recipeStepId="{recipeStepId}"
         usedIngredientIds="{$usedIngredientsList}"
-        parsedRecipeIngredients="{draftedParsedRecipeIngredients}"
+        parsedRecipeIngredients="{draftedParsedRecipeIngredients.filter(
+          Boolean,
+        )}"
       />
     {/if}
   {/await}
