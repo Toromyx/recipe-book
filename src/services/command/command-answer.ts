@@ -6,7 +6,6 @@ import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
 import type { RecipeStepInterface } from "../../types/entity/recipe-step-interface.ts";
 import type { UnitNameInterface } from "../../types/entity/unit-name-interface.ts";
 import type { UnitConversion } from "../../types/unit-conversion.ts";
-import type { ExternalRecipeData } from "../external-recipe.ts";
 import type { Command } from "./command.ts";
 
 type CommandAnswerMap = {
@@ -59,7 +58,7 @@ type CommandAnswerMap = {
   [Command.ENTITY_LIST_UNIT_NAME]: number[];
   [Command.ENTITY_COUNT_UNIT_NAME]: number;
 
-  [Command.EXTERNAL_RECIPE]: ExternalRecipeData;
+  [Command.EXTERNAL_RECIPE]: number;
 
   [Command.OCR]: string;
 

@@ -24,6 +24,7 @@ type EventPayloadMap = {
   [EventChannel.ENTITY_ACTION_DELETED_UNIT_NAME]: number;
 
   [EventChannel.SCRAPER_DOM_DROP]: string;
+  [EventChannel.SCRAPER_ELEMENT_DROP]: string;
 };
 
 export type EventPayload<T extends EventChannel> = EventPayloadMap[T];

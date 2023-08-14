@@ -12,8 +12,14 @@ pub mod answer_channel;
 pub mod channel;
 pub mod question_channel;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IdPayload<T> {
+#[derive(Debug, Clone, Serialize)]
+struct IdQuestionPayload<T> {
+    pub id: String,
+    pub data: T,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct IdAnswerPayload<T> {
     pub id: String,
     pub data: T,
 }
@@ -37,15 +43,15 @@ pub async fn ask<QuestionData, AnswerData>(
     question_data: QuestionData,
 ) -> anyhow::Result<AnswerData>
 where
-    QuestionData: Debug + Clone + Serialize + for<'de> Deserialize<'de>,
-    AnswerData: Debug + Clone + Send + Serialize + for<'de> Deserialize<'de> + 'static,
+    QuestionData: Debug + Clone + Serialize,
+    AnswerData: Debug + Clone + Send + for<'de> Deserialize<'de> + 'static,
 {
     let id = Uuid::new_v4().to_string();
     let (tx, rx) = oneshot::channel();
     let id_2 = id.clone();
     let tx_mutex = Mutex::new(Some(tx));
     let event_handler = get_window().listen(answer_channel, move |event| {
-        let id_payload: IdPayload<AnswerData> =
+        let id_payload: IdAnswerPayload<AnswerData> =
             serde_json::from_str(event.payload().unwrap()).unwrap();
         if id_payload.id != id_2 {
             return;
@@ -56,7 +62,7 @@ where
     });
     get_window().emit(
         question_channel,
-        IdPayload {
+        IdQuestionPayload {
             id: id.clone(),
             data: question_data,
         },

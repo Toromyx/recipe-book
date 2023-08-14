@@ -5,7 +5,6 @@ use std::str::FromStr;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
-use serde::Serialize;
 use url::Url;
 
 use crate::external_recipe::error::ExternalRecipeError;
@@ -14,22 +13,21 @@ pub mod error;
 pub mod pinterest;
 pub mod sallys_welt;
 
-#[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalRecipeData {
-    data: String,
-    instructions: Instructions,
+#[derive(Debug, Clone)]
+pub struct ExternalRecipe {
+    pub name: String,
+    pub steps: Vec<ExternalRecipeStep>,
 }
 
-#[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Instructions {
-    /// A named JavaScript module inside `src/services/external-recipe/modules` handles the external recipe logic, being provided with the data
-    JsModule { name: String },
+#[derive(Debug, Clone)]
+pub struct ExternalRecipeStep {
+    pub ingredients: Vec<String>,
+    pub description: String,
+    pub files: Vec<String>,
 }
 
 /// Get an external recipe from an URL.
-pub async fn get(url_string: String) -> Result<ExternalRecipeData, ExternalRecipeError> {
+pub async fn get(url_string: String) -> Result<ExternalRecipe, ExternalRecipeError> {
     let url = Url::from_str(&url_string).map_err(anyhow::Error::from)?;
     let external_recipe_getter_option = external_recipe_getters()
         .into_iter()
@@ -115,7 +113,7 @@ pub trait ExternalRecipeGetterTrait: Send + Sync {
     }
 
     /// Get the external recipe from the URL.
-    async fn get(&self, url: Url) -> Result<ExternalRecipeData>;
+    async fn get(&self, url: Url) -> Result<ExternalRecipe>;
 
     /// Get the [`Vec`] of [`UrlMatch`]es of this implementor.
     fn url_matches(&self) -> Vec<UrlMatch<'static>>;
