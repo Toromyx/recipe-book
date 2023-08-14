@@ -8,12 +8,9 @@ This component lists all recipes with a form to create a new recipe.
   import {
     ExternalRecipeUrlNotSupportedError,
     getExternalRecipe,
-  } from "../../../../../services/external-recipe/getter.ts";
+  } from "../../../../../services/external-recipe.ts";
   import { recipeRoute } from "../../../../../services/router.ts";
-  import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
-  import { recipeIngredientDraftRepository } from "../../../../../services/store/repository/recipe-ingredient-draft-repository.ts";
   import { recipeRepository } from "../../../../../services/store/repository/recipe-repository.ts";
-  import { recipeStepRepository } from "../../../../../services/store/repository/recipe-step-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import ActionableList from "../../../../element/ActionableList.svelte";
@@ -38,10 +35,10 @@ This component lists all recipes with a form to create a new recipe.
       await push(recipeRoute(recipeId));
       return;
     }
-    let externalRecipe;
+    let recipeId;
     loadingExternalRecipe = true;
     try {
-      externalRecipe = await getExternalRecipe(String(url));
+      recipeId = await getExternalRecipe(String(url));
     } catch (reason) {
       if (reason instanceof ExternalRecipeUrlNotSupportedError) {
         input.setAndReportCustomValidity(
@@ -55,35 +52,6 @@ This component lists all recipes with a form to create a new recipe.
     } finally {
       loadingExternalRecipe = false;
     }
-    const recipeId = await recipeRepository.create({
-      name: externalRecipe.name,
-    });
-    await Promise.all(
-      externalRecipe.steps.map(async (step, i) => {
-        const recipeStepId = await recipeStepRepository.create({
-          recipeId,
-          description: step.description,
-          order: i + 1,
-        });
-        await Promise.all([
-          ...step.ingredients.map(async (ingredient, i) => {
-            await recipeIngredientDraftRepository.create({
-              recipeStepId,
-              order: i + 1,
-              text: ingredient,
-            });
-          }),
-          ...step.files.map(async (file, i) => {
-            await recipeFileRepository.create({
-              recipeStepId,
-              order: i + 1,
-              name: file,
-              uri: { url: file },
-            });
-          }),
-        ]);
-      }),
-    );
     await push(recipeRoute(recipeId));
   }
 </script>
