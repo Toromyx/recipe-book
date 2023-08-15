@@ -53,7 +53,6 @@ pub enum CommandError {
 
 impl From<ExternalRecipeError> for CommandError {
     fn from(value: ExternalRecipeError) -> Self {
-        let x = 0;
         match value {
             ExternalRecipeError::Anyhow(anyhow) => Self::Anyhow(anyhow),
             ExternalRecipeError::UrlNotSupported() => Self::ExternalRecipeUrlNotSupported(value),
