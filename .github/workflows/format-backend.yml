@@ -15,7 +15,20 @@ jobs:
           node-version: 18
       - uses: actions-rs/toolchain@v1
         with:
+          toolchain: stable
+      - uses: actions-rs/toolchain@v1
+        with:
           toolchain: nightly
           components: rustfmt
+      - run: >-
+          sudo apt-get update &&
+          sudo apt-get install -y
+          libgtk-3-dev
+          libayatana-appindicator3-dev
+          libwebkit2gtk-4.0-dev
+          libleptonica-dev
+          libtesseract-dev
       - run: npm ci
+      - run: npm run build
+      - run: npm run tauri icon
       - run: npm run format:backend
