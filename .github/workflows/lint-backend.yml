@@ -3,8 +3,6 @@ name: Lint Backend
 on:
   push:
     paths:
-      # TODO remove this
-      - ".github/workflows/lint-backend.yml"
       - "src-tauri/**"
 
 jobs:

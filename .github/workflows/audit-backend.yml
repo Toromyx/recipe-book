@@ -5,8 +5,6 @@ on:
     - cron: "4 2 * * 0"
   push:
     paths:
-      # TODO remove this
-      - ".github/workflows/audit-backend.yml"
       - "src-tauri/Cargo.lock"
 
 jobs:
