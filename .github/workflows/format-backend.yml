@@ -3,6 +3,8 @@ name: Format Backend
 on:
   push:
     paths:
+      # TODO remove this
+      - ".github/workflows/format-backend.yml"
       - "src-tauri/**"
 
 jobs:
