@@ -80,7 +80,6 @@ pub fn try_get_app_handle() -> Option<&'static AppHandle> {
 
 #[tokio::main]
 async fn main() {
-    let x = 0;
     setup()
         .run(tauri::generate_context!())
         .expect("There was an error while running the application");
