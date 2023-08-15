@@ -24,9 +24,6 @@ jobs:
           libtesseract-dev
           webkit2gtk-driver
           xvfb
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: tauri-driver
       - run: npm ci
       - run: npm run build
       - run: npm run tauri icon
