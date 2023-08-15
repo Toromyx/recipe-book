@@ -5,6 +5,8 @@ on:
     - cron: "4 2 * * 0"
   push:
     paths:
+      # TODO remove this
+      - ".github/workflows/audit-backend.yml"
       - "src-tauri/Cargo.lock"
 
 jobs:
@@ -12,6 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/audit-check@v1
+      - uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: 18
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-audit
+      - run: npm run audit:backend
