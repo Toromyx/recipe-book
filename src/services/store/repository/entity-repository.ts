@@ -30,6 +30,8 @@ type EntityRepositoryUnsubscriber = () => void;
 
 const DELETE_DELAY = 100_000;
 
+console.log(test);
+
 /**
  * Stringify a filter object in JSON.
  *
