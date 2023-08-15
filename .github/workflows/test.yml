@@ -1,6 +1,14 @@
 name: Test
 
-on: push
+on:
+  push:
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "app-icon.png"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "vite.config.js"
 
 jobs:
   test:
