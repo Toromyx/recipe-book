@@ -1,0 +1,19 @@
+name: Audit Frontend
+
+on:
+  schedule:
+    - cron: "4 2 * * 0"
+  push:
+    paths:
+      - "package-lock.json"
+
+jobs:
+  audit_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+      - run: npm run audit:frontend

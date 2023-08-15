@@ -1,0 +1,36 @@
+name: Test
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: >-
+          sudo apt-get update &&
+          sudo apt-get install -y
+          libgtk-3-dev
+          libayatana-appindicator3-dev
+          libwebkit2gtk-4.0-dev
+          libleptonica-dev
+          libtesseract-dev
+          webkit2gtk-driver
+          xvfb
+      - run: npm ci
+      - run: npm run build
+      - run: npm run tauri icon
+      - uses: actions/cache@v3
+        with:
+          key: test-${{ hashFiles('src-tauri/Cargo.lock') }}
+          path: |
+            src-tauri/target
+            ~/.cargo
+      - run: xvfb-run npm run test
