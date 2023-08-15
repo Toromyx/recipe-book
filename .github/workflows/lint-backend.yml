@@ -33,5 +33,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: lint-backend-${{ hashFiles('src-tauri/**') }}
-          path: src-tauri/target
+          path: |
+            src-tauri/target
+            ~/.cargo
       - run: npm run lint:backend
