@@ -149,23 +149,46 @@ mod tests {
 
     use super::*;
 
-    const PIN_IT_URL: &str = "https://pin.it/3qVfEYG";
+    #[derive(Debug, Clone)]
+    struct ExpectedGet {
+        input: String,
+        output: ExternalRecipe,
+    }
 
-    const PINTEREST_URL: &str = "https://www.pinterest.de/pin/568227678004669298/";
+    fn expected_roasted_pepper_pasta_sauce() -> ExternalRecipe {
+        ExternalRecipe {
+            name: String::from("Roasted Pepper Pasta Soße"),
+            steps: vec![ExternalRecipeStep {
+                ingredients: vec![],
+                description: String::from("Zutaten:\n\n- 3-4 Rote Paprika\n- 1 Zwiebel\n- 1 Knoblauchknolle\n- Olivenöl\n- 500g Pasta der Wahl\n- Handvoll Parmesan\n\nZubereitung:\n\n1. Um Zeit zu sparen schonmal vorab den Ofen auf 220 Grad Ober/Unter vorheizen\n2. Paprika waschen und Stiel entfernen. Anschliessend die Paprika, die geviertelte Zwiebel und die queer halbierte Knoblauchzehe in einer Auflaufform verteilen. Sparsam etwas Olivenöl verteilen und das Gemüse im Backofen für ca. 30-40 Minuten backen. (Solange bis sie aussehen wie im Video)\n3. Den Inhalt der Auflaufform etwas abkühlen lassen und dann in einen Mixbehälter geben und zusammen mit einer Handvoll Parmesan und etwas Olivenöl zu einer Creme mixen\n4. Pasta in sehr gut gesalzenem Wasser kochen (in der Sauce ist kein Salz)\n5. Sosse, in einer Pfanne kurz anbraten und zusammen mit 1-2 Kellen Pastawasser mit den gekochten Pasta zu einer Creme vermischen\n\nAm besten zusammen mit noch mehr Parmesan servieren.\n"),
+                files: vec![String::from("https://v1.pinimg.com/videos/mc/expMp4/a9/a2/66/a9a266243020587a931e459fa4fd9853_t1.mp4")],
+            }],
+        }
+    }
 
-    #[tokio::test]
-    async fn test_pin_it() {
-        crate::tests::run();
-        let getter = ExternalRecipeGetter;
-        let result = getter.get(Url::from_str(PIN_IT_URL).unwrap()).await;
-        assert!(result.is_ok());
+    fn expected_gets() -> Vec<ExpectedGet> {
+        vec![
+            ExpectedGet {
+                input: String::from("https://pin.it/3qVfEYG"),
+                output: expected_roasted_pepper_pasta_sauce(),
+            },
+            ExpectedGet {
+                input: String::from("https://www.pinterest.de/pin/568227678004669298/"),
+                output: expected_roasted_pepper_pasta_sauce(),
+            },
+        ]
     }
 
     #[tokio::test]
-    async fn test_pinterest() {
+    async fn test_get() {
         crate::tests::run();
         let getter = ExternalRecipeGetter;
-        let result = getter.get(Url::from_str(PINTEREST_URL).unwrap()).await;
-        assert!(result.is_ok());
+        for expected_get in expected_gets() {
+            let actual = getter
+                .get(Url::from_str(&expected_get.input).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(actual, expected_get.output);
+        }
     }
 }

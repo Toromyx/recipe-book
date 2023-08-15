@@ -14,12 +14,14 @@ pub mod pinterest;
 pub mod sallys_welt;
 
 #[derive(Debug, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
 pub struct ExternalRecipe {
     pub name: String,
     pub steps: Vec<ExternalRecipeStep>,
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
 pub struct ExternalRecipeStep {
     pub ingredients: Vec<String>,
     pub description: String,
