@@ -1,6 +1,9 @@
 # ignore every file
 *.*
 
+# but not these folders
+!.github
+
 # except these file types
 !*.json
 !*.yml
