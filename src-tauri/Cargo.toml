@@ -85,6 +85,9 @@ version = "^2.3"
 version = "^1.4"
 features = ["v4", "fast-rng"]
 
+[dev-dependencies.pretty_assertions]
+version = "^1.4"
+
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs, it is executed with `cargo run --no-default-features` if `devPath` is an URL

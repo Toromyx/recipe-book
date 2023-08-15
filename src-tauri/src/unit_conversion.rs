@@ -59,6 +59,8 @@ impl Convert for VolumeUnit {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use crate::unit_conversion::{Convert, MassUnit, VolumeUnit};
 
     #[test]

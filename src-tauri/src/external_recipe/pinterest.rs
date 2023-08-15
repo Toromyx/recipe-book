@@ -147,6 +147,8 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
 mod tests {
     use std::str::FromStr;
 
+    use pretty_assertions::assert_eq;
+
     use super::*;
 
     #[derive(Debug, Clone)]

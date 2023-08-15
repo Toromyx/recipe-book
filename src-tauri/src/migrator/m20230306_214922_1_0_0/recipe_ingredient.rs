@@ -113,13 +113,14 @@ pub enum RecipeIngredient {
 
 #[cfg(test)]
 pub mod tests {
+    use pretty_assertions::{assert_eq, assert_str_eq};
     use sea_orm::DatabaseConnection;
 
     use crate::database::tests::{get_table_indices, get_table_schema};
 
     pub async fn assert_recipe_ingredient_schema(db: &DatabaseConnection) {
         let table_schema = get_table_schema("recipe_ingredient", db).await;
-        assert_eq!(
+        assert_str_eq!(
             table_schema,
             "CREATE TABLE \"recipe_ingredient\" ( \
             \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \

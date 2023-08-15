@@ -125,6 +125,7 @@ pub trait ExternalRecipeGetterTrait: Send + Sync {
 mod tests {
     use std::str::FromStr;
 
+    use pretty_assertions::assert_eq;
     use url::Url;
 
     use super::*;

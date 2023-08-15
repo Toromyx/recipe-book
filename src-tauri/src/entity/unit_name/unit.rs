@@ -64,6 +64,7 @@ impl From<Unit> for unit_conversion::Unit {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::{assert_eq, assert_str_eq};
     use sea_orm::Iterable;
 
     use super::*;
@@ -71,7 +72,7 @@ mod tests {
     #[test]
     fn test_unit_string_value() {
         for unit in Unit::iter() {
-            assert_eq!(
+            assert_str_eq!(
                 format!("\"{}\"", unit.to_value()),
                 serde_json::to_string(&unit).unwrap(),
             )
