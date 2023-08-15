@@ -1,0 +1,17 @@
+name: Audit Backend
+
+on:
+  schedule:
+    - cron: "4 2 * * 0"
+  push:
+    paths:
+      - "src-tauri/Cargo.lock"
+
+jobs:
+  audit_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
