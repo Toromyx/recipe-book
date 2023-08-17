@@ -54,67 +54,6 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
             name: dom.select("h1").await?.text_content().await?,
             steps,
         })
-        /*
-              return {
-          name: readContent(selectInParentNode(recipeDocument, "h1")),
-          steps: selectMultipleInParentNode(recipeDocument, ".recipe").map(
-            (stepElement) => ({
-              description: readContent(stepElement),
-              ingredients: selectMultipleInParentNode(
-                recipeDocument,
-                ".flex.items-start.justify-start.mb-1.space-x-3.text-lg.sm\\:text-base",
-              ).map((ingredientElement) => readContent(ingredientElement).trim()),
-              files: selectMultipleInParentNode(
-                selectInParentNode(recipeDocument, ".images-wrap"),
-                "img",
-              ).map(
-                (imgElement) =>
-                  `https://sallys-blog.de${imgElement.getAttribute("src")}`,
-              ),
-            }),
-          ),
-        };
-              */
-        /*
-                /**
-         * Select a single element in the parent node.
-         * @throws {Error} when the element is not found.
-         */
-        export function selectInParentNode(
-          parentNode: ParentNode,
-          selector: string,
-        ): HTMLElement {
-          const element = parentNode.querySelector(selector);
-          if (!element) {
-            throw new Error(
-              `Could not select an element in a node with selector "${selector}".`,
-            );
-          }
-
-          return element as HTMLElement;
-        }
-
-        /**
-         * Select multiple elements in the parent node.
-         */
-        export function selectMultipleInParentNode(
-          parentNode: ParentNode,
-          selector: string,
-        ): HTMLElement[] {
-          const elements = parentNode.querySelectorAll(selector);
-          return [...elements] as HTMLElement[];
-        }
-
-        export function readContent(element: HTMLElement): string {
-          return element.innerText;
-        }
-                */
-        /*Ok(ExternalRecipeData {
-            data: text,
-            instructions: Instructions::JsModule {
-                name: String::from("sallys-welt"),
-            },
-        })*/
     }
 
     fn url_matches(&self) -> Vec<UrlMatch<'static>> {
