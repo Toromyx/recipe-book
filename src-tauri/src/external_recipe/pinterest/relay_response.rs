@@ -1,4 +1,10 @@
-use serde::Deserialize;
+use std::{fmt, fmt::Formatter};
+
+use serde::{
+    de::Visitor,
+    Deserialize, Deserializer,
+    __private::de::{ContentDeserializer, TaggedContentVisitor},
+};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct PinterestRelayRequestParameters {
@@ -72,12 +78,79 @@ pub struct PinterestRelayStoryData {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-pub struct PinterestRelayPinQueryData {
+pub struct PinterestRelayPinQueryDataUploaded {
     pub title: String,
-    #[serde(rename = "imageSpec_orig")]
-    pub image_spec_orig: PinterestRelayImageSpec,
     #[serde(rename = "storyPinData")]
     pub story_pin_data: PinterestRelayStoryData,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct PinterestRelayPinQueryDataExternal {
+    pub link: String,
+}
+
+#[derive(Debug, Clone)]
+pub enum PinterestRelayPinQueryData {
+    Uploaded(PinterestRelayPinQueryDataUploaded),
+    External(PinterestRelayPinQueryDataExternal),
+}
+
+impl<'de> Deserialize<'de> for PinterestRelayPinQueryData {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[doc(hidden)]
+        enum Field {
+            Uploaded,
+            External,
+        }
+        #[doc(hidden)]
+        struct FieldVisitor;
+        impl<'de> Visitor<'de> for FieldVisitor {
+            type Value = Field;
+            fn expecting(&self, formatter: &mut Formatter) -> fmt::Result {
+                Formatter::write_str(formatter, "a string")
+            }
+            fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                match value {
+                    "Uploaded by user" => Ok(Field::Uploaded),
+                    _ => Ok(Field::External),
+                }
+            }
+        }
+        impl<'de> Deserialize<'de> for Field {
+            #[inline]
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                Deserializer::deserialize_identifier(deserializer, FieldVisitor)
+            }
+        }
+
+        let (tag, content) = Deserializer::deserialize_any(
+            deserializer,
+            TaggedContentVisitor::<Field>::new(
+                "domain",
+                "enum PinterestRelayPinQueryData specified by field \"domain\"",
+            ),
+        )?;
+        let deserializer = ContentDeserializer::<D::Error>::new(content);
+        match tag {
+            Field::Uploaded => Result::map(
+                <PinterestRelayPinQueryDataUploaded as Deserialize>::deserialize(deserializer),
+                PinterestRelayPinQueryData::Uploaded,
+            ),
+            Field::External => Result::map(
+                <PinterestRelayPinQueryDataExternal as Deserialize>::deserialize(deserializer),
+                PinterestRelayPinQueryData::External,
+            ),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize)]

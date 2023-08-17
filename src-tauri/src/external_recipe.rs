@@ -35,7 +35,7 @@ pub async fn get(url_string: String) -> Result<ExternalRecipe, ExternalRecipeErr
         .into_iter()
         .find(|external_recipe_getter| external_recipe_getter.can_get(&url));
     let Some(external_recipe_getter) = external_recipe_getter_option else {
-        return Err(ExternalRecipeError::UrlNotSupported());
+        return Err(ExternalRecipeError::UrlNotSupported(url_string));
     };
     let external_recipe = external_recipe_getter.get(url).await?;
     Ok(external_recipe)
@@ -115,7 +115,7 @@ pub trait ExternalRecipeGetterTrait: Send + Sync {
     }
 
     /// Get the external recipe from the URL.
-    async fn get(&self, url: Url) -> Result<ExternalRecipe>;
+    async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError>;
 
     /// Get the [`Vec`] of [`UrlMatch`]es of this implementor.
     fn url_matches(&self) -> Vec<UrlMatch<'static>>;

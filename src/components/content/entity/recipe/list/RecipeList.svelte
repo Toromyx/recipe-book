@@ -43,7 +43,7 @@ This component lists all recipes with a form to create a new recipe.
       if (reason instanceof ExternalRecipeUrlNotSupportedError) {
         input.setAndReportCustomValidity(
           messages.validity.externalRecipeUrlNotSupported
-            .resolveMessage()
+            .resolveMessage({ url: reason.url })
             .toString(),
         );
         return;

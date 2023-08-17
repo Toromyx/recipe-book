@@ -8,7 +8,10 @@ use regex::Regex;
 use url::Url;
 
 use crate::{
-    external_recipe::{ExternalRecipe, ExternalRecipeGetterTrait, ExternalRecipeStep, UrlMatch},
+    external_recipe::{
+        error::ExternalRecipeError, ExternalRecipe, ExternalRecipeGetterTrait, ExternalRecipeStep,
+        UrlMatch,
+    },
     scraper::{Dom, ParentNode},
 };
 
@@ -18,7 +21,7 @@ pub struct ExternalRecipeGetter;
 
 #[async_trait]
 impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
-    async fn get(&self, url: Url) -> Result<ExternalRecipe> {
+    async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError> {
         let response = reqwest::get(url).await?;
         let text = response.text().await?;
         let dom = Arc::new(Dom::create(text).await?);

@@ -34,6 +34,12 @@ pub enum CommandError {
         tesseract::plumbing::TessBaseApiGetHocrTextError,
     ),
     #[error(transparent)]
+    Reqwest(
+        #[serde_as(as = "DisplayFromStr")]
+        #[from]
+        reqwest::Error,
+    ),
+    #[error(transparent)]
     Tauri(
         #[serde_as(as = "DisplayFromStr")]
         #[from]
@@ -45,8 +51,10 @@ pub enum CommandError {
         #[from]
         anyhow::Error,
     ),
+    #[error("The external recipe url \"{0}\" is not supported.")]
+    ExternalRecipeUrlNotSupported(String),
     #[error(transparent)]
-    ExternalRecipeUrlNotSupported(#[serde_as(as = "DisplayFromStr")] ExternalRecipeError),
+    ExternalRecipeParseError(#[serde_as(as = "DisplayFromStr")] ExternalRecipeError),
     #[error("Entity was not found.")]
     NotFound,
 }
@@ -54,8 +62,10 @@ pub enum CommandError {
 impl From<ExternalRecipeError> for CommandError {
     fn from(value: ExternalRecipeError) -> Self {
         match value {
+            ExternalRecipeError::Reqwest(reqwest) => Self::Reqwest(reqwest),
             ExternalRecipeError::Anyhow(anyhow) => Self::Anyhow(anyhow),
-            ExternalRecipeError::UrlNotSupported() => Self::ExternalRecipeUrlNotSupported(value),
+            ExternalRecipeError::UrlNotSupported(url) => Self::ExternalRecipeUrlNotSupported(url),
+            ExternalRecipeError::ParseError(_) => Self::ExternalRecipeParseError(value),
         }
     }
 }

@@ -2,7 +2,7 @@
 
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
 use scraper::Dom;
@@ -14,7 +14,10 @@ static PINTEREST_PATH_REGEX: OnceLock<Regex> = OnceLock::new();
 
 use crate::{
     external_recipe::{
-        pinterest::relay_response::{PinterestRelay, PinterestRelayResponse},
+        error::ExternalRecipeError,
+        pinterest::relay_response::{
+            PinterestRelay, PinterestRelayPinQueryData, PinterestRelayResponse,
+        },
         ExternalRecipe, ExternalRecipeGetterTrait, ExternalRecipeStep, UrlMatch,
     },
     scraper,
@@ -70,7 +73,7 @@ pub struct ExternalRecipeGetter;
 #[async_trait]
 impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
     /// For `pin.it` URLs, we first need to find the canonical URL before trying to parse the HTML for the recipe data.
-    async fn get(&self, url: Url) -> Result<ExternalRecipe> {
+    async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError> {
         let response = reqwest::get(url.clone()).await?;
         let mut text = response.text().await?;
         if let Some(prepared_url) = UrlMatch::prepare_url(&url) {
@@ -95,47 +98,49 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
             }
         }
         let Some(relay_response) = relay_response_option else {
-            return Err(anyhow!("HTML does not contain a usable relay response."));
+            return Err(ExternalRecipeError::ParseError(String::from(
+                "HTML does not contain a usable relay response.",
+            )));
         };
-        Ok(ExternalRecipe {
-            name: relay_response.data.pin_query.data.title,
-            steps: vec![ExternalRecipeStep {
-                ingredients: vec![],
-                description: relay_response
-                    .data
-                    .pin_query
-                    .data
-                    .story_pin_data
-                    .metadata
-                    .basics
-                    .list_blocks
-                    .into_iter()
-                    .map(|list_block| {
-                        format!(
-                            "{}\n{}",
-                            list_block.heading,
-                            list_block
-                                .blocks
-                                .into_iter()
-                                .map(|block_item| block_item.text)
-                                .collect::<Vec<String>>()
-                                .join("\n")
-                        )
-                    })
-                    .collect::<Vec<String>>()
-                    .join("\n"),
-                files: relay_response
-                    .data
-                    .pin_query
-                    .data
-                    .story_pin_data
-                    .pages
-                    .into_iter()
-                    .flat_map(|page| page.blocks)
-                    .map(|block| block.video_data.video_list.video.url)
-                    .collect(),
-            }],
-        })
+        match relay_response.data.pin_query.data {
+            PinterestRelayPinQueryData::Uploaded(data) => Ok(ExternalRecipe {
+                name: data.title,
+                steps: vec![ExternalRecipeStep {
+                    ingredients: vec![],
+                    description: data
+                        .story_pin_data
+                        .metadata
+                        .basics
+                        .list_blocks
+                        .into_iter()
+                        .map(|list_block| {
+                            format!(
+                                "{}\n{}",
+                                list_block.heading,
+                                list_block
+                                    .blocks
+                                    .into_iter()
+                                    .map(|block_item| block_item.text)
+                                    .collect::<Vec<String>>()
+                                    .join("\n")
+                            )
+                        })
+                        .collect::<Vec<String>>()
+                        .join("\n"),
+                    files: data
+                        .story_pin_data
+                        .pages
+                        .into_iter()
+                        .flat_map(|page| page.blocks)
+                        .map(|block| block.video_data.video_list.video.url)
+                        .collect(),
+                }],
+            }),
+            PinterestRelayPinQueryData::External(data) => {
+                let external_recipe = crate::external_recipe::get(data.link).await?;
+                Ok(external_recipe)
+            }
+        }
     }
 
     fn url_matches(&self) -> Vec<UrlMatch<'static>> {

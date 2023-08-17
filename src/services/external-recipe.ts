@@ -2,7 +2,14 @@ import { invoke } from "./command/client.ts";
 import type { CommandError } from "./command/command-error.ts";
 import { Command } from "./command/command.ts";
 
-export class ExternalRecipeUrlNotSupportedError extends Error {}
+export class ExternalRecipeUrlNotSupportedError extends Error {
+  url: string;
+
+  constructor(url: string, message?: string) {
+    super(message);
+    this.url = url;
+  }
+}
 
 export async function getExternalRecipe(url: string) {
   let recipeId;
@@ -11,8 +18,11 @@ export async function getExternalRecipe(url: string) {
       url,
     });
   } catch (reason) {
-    if ("ExternalRecipeUrlNotSupported" in (reason as CommandError)) {
-      throw new ExternalRecipeUrlNotSupportedError();
+    const commandError: CommandError = reason as CommandError;
+    if ("ExternalRecipeUrlNotSupported" in commandError) {
+      throw new ExternalRecipeUrlNotSupportedError(
+        commandError.ExternalRecipeUrlNotSupported,
+      );
     }
     throw reason;
   }

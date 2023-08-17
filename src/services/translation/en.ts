@@ -62,7 +62,7 @@ const translationStrings: TranslationStrings = {
       includesExcluded: "{The current selection includes an excluded value.}",
     },
     externalRecipeUrlNotSupported:
-      "{This external recipe URL is not supported.}",
+      '{The external recipe URL "{$url}" is not supported.}',
   },
   questions: {
     confirmation: "{Are you sure?}",
