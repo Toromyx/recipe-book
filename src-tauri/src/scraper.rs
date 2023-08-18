@@ -29,7 +29,7 @@ use crate::{
 
 #[async_trait]
 pub trait ParentNode {
-    async fn select(&self, selector: &str) -> Result<Element>;
+    async fn select(&self, selector: &str) -> Result<Option<Element>>;
 
     async fn select_all(&self, selector: &str) -> Result<Vec<Element>>;
 }
@@ -69,14 +69,14 @@ impl Dom {
 
 #[async_trait]
 impl ParentNode for Dom {
-    async fn select(&self, selector: &str) -> Result<Element> {
-        let element_id = event::ask(
+    async fn select(&self, selector: &str) -> Result<Option<Element>> {
+        let element_id_option: Option<String> = event::ask(
             SCRAPER_DOM_SELECT_QUESTION,
             SCRAPER_DOM_SELECT_ANSWER,
             (&self.id, selector),
         )
         .await?;
-        Ok(Element { id: element_id })
+        Ok(element_id_option.map(|element_id| Element { id: element_id }))
     }
 
     async fn select_all(&self, selector: &str) -> Result<Vec<Element>> {
@@ -139,14 +139,14 @@ impl Element {
 
 #[async_trait]
 impl ParentNode for Element {
-    async fn select(&self, selector: &str) -> Result<Element> {
-        let element_id = event::ask(
+    async fn select(&self, selector: &str) -> Result<Option<Element>> {
+        let element_id_option: Option<String> = event::ask(
             SCRAPER_ELEMENT_SELECT_QUESTION,
             SCRAPER_ELEMENT_SELECT_ANSWER,
             (&self.id, selector),
         )
         .await?;
-        Ok(Element { id: element_id })
+        Ok(element_id_option.map(|element_id| Element { id: element_id }))
     }
 
     async fn select_all(&self, selector: &str) -> Result<Vec<Element>> {

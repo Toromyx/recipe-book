@@ -43,7 +43,7 @@ void answer(
     const document = documents[id];
     const element = document.querySelector<HTMLElement>(selector);
     if (!element) {
-      return "";
+      return null;
     }
     return createElement(element);
   },

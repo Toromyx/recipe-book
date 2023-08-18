@@ -46,7 +46,7 @@ void answer(
     const parentElement = elements[id];
     const element = parentElement.querySelector<HTMLElement>(selector);
     if (!element) {
-      return "";
+      return null;
     }
     return create(element);
   },

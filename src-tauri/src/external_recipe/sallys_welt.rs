@@ -36,7 +36,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
                     ingredient_element.text_content().await?.trim(),
                 ));
             }
-            let images_wrap_element = dom.select(".images-wrap").await?;
+            let images_wrap_element = dom.select(".images-wrap").await?.unwrap();
             let mut files = vec![];
             for img_element in images_wrap_element.select_all("img").await? {
                 files.push(format!(
@@ -51,7 +51,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
             });
         }
         Ok(ExternalRecipe {
-            name: dom.select("h1").await?.text_content().await?,
+            name: dom.select("h1").await?.unwrap().text_content().await?,
             steps,
         })
     }
