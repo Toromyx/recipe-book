@@ -10,6 +10,7 @@ use url::Url;
 use crate::external_recipe::error::ExternalRecipeError;
 
 pub mod error;
+pub mod knusperstuebchen;
 pub mod pinterest;
 pub mod sallys_welt;
 
@@ -45,6 +46,7 @@ fn external_recipe_getters() -> Vec<Box<dyn ExternalRecipeGetterTrait>> {
     vec![
         Box::new(pinterest::ExternalRecipeGetter),
         Box::new(sallys_welt::ExternalRecipeGetter),
+        Box::new(knusperstuebchen::ExternalRecipeGetter),
     ]
 }
 
@@ -129,6 +131,25 @@ mod tests {
     use url::Url;
 
     use super::*;
+
+    #[derive(Debug, Clone)]
+    pub struct ExpectedGet {
+        pub url: String,
+        pub external_recipe: ExternalRecipe,
+    }
+
+    pub async fn assert_expected_gets<Getter: ExternalRecipeGetterTrait>(
+        getter: Getter,
+        expected_gets: Vec<ExpectedGet>,
+    ) {
+        for expected_get in expected_gets {
+            let actual = getter
+                .get(Url::from_str(&expected_get.url).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(actual, expected_get.external_recipe);
+        }
+    }
 
     #[test]
     pub fn test_prepare_url_domains() {
