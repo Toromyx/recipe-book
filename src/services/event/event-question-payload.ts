@@ -6,6 +6,7 @@ type EventQuestionPayloadMap = {
   [EventQuestionChannel.SCRAPER_DOM_SELECT_QUESTION]: [string, string];
   [EventQuestionChannel.SCRAPER_DOM_SELECT_ALL_QUESTION]: [string, string];
   [EventQuestionChannel.SCRAPER_ELEMENT_TEXT_CONTENT_QUESTION]: string;
+  [EventQuestionChannel.SCRAPER_ELEMENT_INNER_TEXT_QUESTION]: string;
   [EventQuestionChannel.SCRAPER_ELEMENT_GET_ATTRIBUTE_QUESTION]: [
     string,
     string,

@@ -4,9 +4,9 @@ import { EventAnswerChannel } from "../event/event-answer-channel.ts";
 import { EventChannel } from "../event/event-channel.ts";
 import { EventQuestionChannel } from "../event/event-question-channel.ts";
 
-const elements: Record<string, Element> = {};
+const elements: Record<string, HTMLElement> = {};
 
-export function create(element: Element): string {
+export function create(element: HTMLElement): string {
   const id = v4();
   elements[id] = element;
   return id;
@@ -18,6 +18,15 @@ void answer(
   (id) => {
     const element = elements[id];
     return element.textContent ?? "";
+  },
+);
+
+void answer(
+  EventQuestionChannel.SCRAPER_ELEMENT_INNER_TEXT_QUESTION,
+  EventAnswerChannel.SCRAPER_ELEMENT_INNER_TEXT_ANSWER,
+  (id) => {
+    const element = elements[id];
+    return element.innerText ?? "";
   },
 );
 
@@ -35,7 +44,7 @@ void answer(
   EventAnswerChannel.SCRAPER_ELEMENT_SELECT_ANSWER,
   ([id, selector]) => {
     const parentElement = elements[id];
-    const element = parentElement.querySelector(selector);
+    const element = parentElement.querySelector<HTMLElement>(selector);
     if (!element) {
       return "";
     }
@@ -48,7 +57,7 @@ void answer(
   EventAnswerChannel.SCRAPER_ELEMENT_SELECT_ALL_ANSWER,
   ([id, selector]) => {
     const parentElement = elements[id];
-    const children = parentElement.querySelectorAll(selector);
+    const children = parentElement.querySelectorAll<HTMLElement>(selector);
     return [...children].map((element) => create(element));
   },
 );

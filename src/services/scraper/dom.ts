@@ -41,7 +41,7 @@ void answer(
   EventAnswerChannel.SCRAPER_DOM_SELECT_ANSWER,
   ([id, selector]) => {
     const document = documents[id];
-    const element = document.querySelector(selector);
+    const element = document.querySelector<HTMLElement>(selector);
     if (!element) {
       return "";
     }
@@ -54,7 +54,7 @@ void answer(
   EventAnswerChannel.SCRAPER_DOM_SELECT_ALL_ANSWER,
   ([id, selector]) => {
     const document = documents[id];
-    const elements = document.querySelectorAll(selector);
+    const elements = document.querySelectorAll<HTMLElement>(selector);
     return [...elements].map((element) => createElement(element));
   },
 );

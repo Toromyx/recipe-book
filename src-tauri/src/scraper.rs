@@ -11,15 +11,17 @@ use crate::{
         answer_channel::{
             SCRAPER_DOM_CANONICAL_LINK_ANSWER, SCRAPER_DOM_CREATE_ANSWER,
             SCRAPER_DOM_SELECT_ALL_ANSWER, SCRAPER_DOM_SELECT_ANSWER,
-            SCRAPER_ELEMENT_GET_ATTRIBUTE_ANSWER, SCRAPER_ELEMENT_SELECT_ALL_ANSWER,
-            SCRAPER_ELEMENT_SELECT_ANSWER, SCRAPER_ELEMENT_TEXT_CONTENT_ANSWER,
+            SCRAPER_ELEMENT_GET_ATTRIBUTE_ANSWER, SCRAPER_ELEMENT_INNER_TEXT_ANSWER,
+            SCRAPER_ELEMENT_SELECT_ALL_ANSWER, SCRAPER_ELEMENT_SELECT_ANSWER,
+            SCRAPER_ELEMENT_TEXT_CONTENT_ANSWER,
         },
         channel::{SCRAPER_DOM_DROP, SCRAPER_ELEMENT_DROP},
         question_channel::{
             SCRAPER_DOM_CANONICAL_LINK_QUESTION, SCRAPER_DOM_CREATE_QUESTION,
             SCRAPER_DOM_SELECT_ALL_QUESTION, SCRAPER_DOM_SELECT_QUESTION,
-            SCRAPER_ELEMENT_GET_ATTRIBUTE_QUESTION, SCRAPER_ELEMENT_SELECT_ALL_QUESTION,
-            SCRAPER_ELEMENT_SELECT_QUESTION, SCRAPER_ELEMENT_TEXT_CONTENT_QUESTION,
+            SCRAPER_ELEMENT_GET_ATTRIBUTE_QUESTION, SCRAPER_ELEMENT_INNER_TEXT_QUESTION,
+            SCRAPER_ELEMENT_SELECT_ALL_QUESTION, SCRAPER_ELEMENT_SELECT_QUESTION,
+            SCRAPER_ELEMENT_TEXT_CONTENT_QUESTION,
         },
     },
     window::get_window,
@@ -113,6 +115,15 @@ impl Element {
         )
         .await?;
         Ok(text_content)
+    }
+    pub async fn inner_text(&self) -> Result<String> {
+        let inner_text = event::ask(
+            SCRAPER_ELEMENT_INNER_TEXT_QUESTION,
+            SCRAPER_ELEMENT_INNER_TEXT_ANSWER,
+            &self.id,
+        )
+        .await?;
+        Ok(inner_text)
     }
 
     pub async fn get_attribute(&self, qualified_name: &str) -> Result<String> {

@@ -6,6 +6,7 @@ type EventAnswerPayloadMap = {
   [EventAnswerChannel.SCRAPER_DOM_SELECT_ANSWER]: string;
   [EventAnswerChannel.SCRAPER_DOM_SELECT_ALL_ANSWER]: string[];
   [EventAnswerChannel.SCRAPER_ELEMENT_TEXT_CONTENT_ANSWER]: string;
+  [EventAnswerChannel.SCRAPER_ELEMENT_INNER_TEXT_ANSWER]: string;
   [EventAnswerChannel.SCRAPER_ELEMENT_GET_ATTRIBUTE_ANSWER]: string;
   [EventAnswerChannel.SCRAPER_ELEMENT_SELECT_ANSWER]: string;
   [EventAnswerChannel.SCRAPER_ELEMENT_SELECT_ALL_ANSWER]: string[];
