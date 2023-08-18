@@ -1,3 +1,5 @@
+//! This module implements [`ExternalRecipeGetterTrait`] for [Knusperstübchen](https://knusperstuebchen.net/).
+
 use std::sync::OnceLock;
 
 use async_trait::async_trait;
