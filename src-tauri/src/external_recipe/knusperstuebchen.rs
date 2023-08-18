@@ -40,7 +40,12 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
                 let ingredients_element = recipe_element.select(".ERSIngredients").await?.unwrap();
                 let mut ingredients = vec![];
                 for ingredient_element in ingredients_element.select_all("li").await? {
-                    ingredients.push(ingredient_element.inner_text().await?);
+                    let inner_text = ingredient_element.inner_text().await?;
+                    let trimmed = inner_text.trim();
+                    if trimmed.is_empty() {
+                        continue;
+                    }
+                    ingredients.push(String::from(trimmed));
                 }
                 let description_element = recipe_element.select(".ERSInstructions").await?.unwrap();
                 let img_element = recipe_element.select("img").await?.unwrap();
@@ -165,7 +170,6 @@ mod tests {
                             String::from("1 TL Paprikapulver"),
                             String::from("Salz und Pfeffer nach Belieben"),
                             String::from("200 g Feta"),
-                            String::from(""),
                         ],
                         description: String::from(
                             "So wird's gemacht\nFür den Lachs Olivenöl, Salt, Pfeffer, Paprikapulver, Chiliflocken, Kräuter und Zwiebel (in Ringe geschnitten) in eine Schale geben und vermengen. Den (angetauten) Lachs mit der Masse marinieren und in eine Ofenform geben. Anstelle von Lachs kann zum Beispiel auch mehr Feta genommen werden und dieser im Ofen gebacken werden mit der gleichen Marinade. Lachs im Backofen bei 180°C (je nach Filetgröße) ca. 15–20 Minuten glasig backen Für den Salat: Den Perlocouscous (alternativ auch einfach Couscous) in doppelt so viel Wasser geben und aufkochen lassen, kurz köcheln lassen bis er aufquellt und weich wird. Etwa 5 Minuten quellen lassen und abgießen.20 ml Olivenöl und Tomatenmark in den Couscous geben und verrühren. Gerne etwas salzen und pfeffern. In eine große Salatschüssel gehackte Tomaten, gehackte Gutken, gehackte Frühlingszwiebel und fein gehackter Knoblauch geben. Basilikum, Petersilie, Zitrone 20 ml Olivenöl mischen und in die Masse geben.Perlcouscous hinzugeben und gut vermengen. Blaubeeren, Rucola hinzugeben und zum Schluss den Feta über den Salat bröseln. Salat in Schüsseln anrichten und den Lachs warm aus dem Ofen dazu servieren.",
