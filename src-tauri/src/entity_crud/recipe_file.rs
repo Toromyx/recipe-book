@@ -136,7 +136,7 @@ impl OrderBy for RecipeFileOrderBy {
 
     fn add(self, select: Select<Self::Entity>) -> Select<Self::Entity> {
         match self {
-            RecipeFileOrderBy::Order(order) => select.order_by(Column::Name, order.into()),
+            RecipeFileOrderBy::Order(order) => select.order_by(Column::Order, order.into()),
         }
     }
 }
