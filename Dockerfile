@@ -1,4 +1,4 @@
-FROM rust:1.70-bookworm AS base
+FROM rust:1.70 AS base
 
 # rust setup
 RUN cargo install cargo-binstall
