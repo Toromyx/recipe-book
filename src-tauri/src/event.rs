@@ -48,6 +48,7 @@ where
 {
     await_dom_content_loaded();
     let id = Uuid::new_v4().to_string();
+    log::debug!("Asking frontend question on {} ({}).", question_channel, id);
     let (tx, rx) = oneshot::channel();
     let id_2 = id.clone();
     let tx_mutex = Mutex::new(Some(tx));
@@ -70,5 +71,6 @@ where
     )?;
     let answer_data = rx.await.unwrap();
     get_window().unlisten(event_handler);
+    log::debug!("Received frontend answer on {} ({}).", answer_channel, id);
     Ok(answer_data)
 }
