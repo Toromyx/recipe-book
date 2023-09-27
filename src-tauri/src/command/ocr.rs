@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use tesseract::Tesseract;
 
 use crate::{
-    command::error::CommandError, entity_crud, entity_crud::EntityCrudTrait, get_app_handle,
+    app_handle::get_app_handle, command::error::CommandError, entity_crud,
+    entity_crud::EntityCrudTrait,
 };
 
 /// Get the optically recognized characters from the specified recipe file.

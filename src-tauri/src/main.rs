@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use tauri::{AppHandle, Wry};
+use tauri::Wry;
 
 use crate::command::{
     entity::{
@@ -44,6 +44,7 @@ use crate::command::{
     unit_list::unit_list_get,
 };
 
+mod app_handle;
 mod command;
 mod database;
 mod dom_content_loaded;
@@ -60,25 +61,6 @@ mod scraper;
 mod unit_conversion;
 mod window;
 
-/// This static variable holds the app handle once the tauri app has started.
-static mut APP_HANDLE: Option<AppHandle> = None;
-
-/// Get and unwrap the static app handle [`APP_HANDLE`].
-///
-/// See [`try_get_app_handle`] for a non-panicing version.
-///
-/// # Panics
-///
-/// This function panics when [`APP_HANDLE`] is [`None`]. this is the case when the tauri app is un-initialized.
-pub fn get_app_handle() -> &'static AppHandle {
-    try_get_app_handle().expect("Could not get the app handle.")
-}
-
-/// Get the static app handle [`APP_HANDLE`].
-pub fn try_get_app_handle() -> Option<&'static AppHandle> {
-    unsafe { APP_HANDLE.as_ref() }
-}
-
 #[tokio::main]
 async fn main() {
     setup()
@@ -89,9 +71,7 @@ async fn main() {
 fn setup() -> tauri::Builder<Wry> {
     tauri::Builder::default()
         .setup(|app| {
-            unsafe {
-                APP_HANDLE = Some(app.handle());
-            }
+            app_handle::setup(app);
             log::init();
             dom_content_loaded::setup(app);
             Ok(())

@@ -2,16 +2,13 @@
 
 use tauri::{Manager, Window};
 
-use crate::try_get_app_handle;
+use crate::app_handle::get_app_handle;
 
 /// Try to get the main window.
 ///
-/// Returns [`None`] when the [`try_get_app_handle`] returns [`None`].
+/// Returns [`None`] when the window with label `main` does not exist.
 pub fn try_get_window() -> Option<Window> {
-    match try_get_app_handle() {
-        Some(app_handle) => app_handle.get_window("main"),
-        _ => None,
-    }
+    get_app_handle().get_window("main")
 }
 
 /// Get the main window.

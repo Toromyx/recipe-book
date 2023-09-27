@@ -2,7 +2,7 @@
 
 use std::{fs::create_dir_all, path::PathBuf};
 
-use crate::get_app_handle;
+use crate::app_handle::get_app_handle;
 
 macro_rules! mutable_or_immutable {
     ($var_name:ident, $var_value:expr) => {
