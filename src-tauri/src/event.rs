@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::oneshot;
 use uuid::Uuid;
 
-use crate::window::get_window;
+use crate::{dom_content_loaded::await_dom_content_loaded, window::get_window};
 
 pub mod answer_channel;
 pub mod channel;
@@ -46,6 +46,7 @@ where
     QuestionData: Debug + Clone + Serialize,
     AnswerData: Debug + Clone + Send + for<'de> Deserialize<'de> + 'static,
 {
+    await_dom_content_loaded();
     let id = Uuid::new_v4().to_string();
     let (tx, rx) = oneshot::channel();
     let id_2 = id.clone();

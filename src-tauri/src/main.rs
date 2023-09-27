@@ -46,6 +46,7 @@ use crate::command::{
 
 mod command;
 mod database;
+mod dom_content_loaded;
 mod entity;
 mod entity_crud;
 mod event;
@@ -92,6 +93,7 @@ fn setup() -> tauri::Builder<Wry> {
                 APP_HANDLE = Some(app.handle());
             }
             log::init();
+            dom_content_loaded::setup(app);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -146,10 +148,7 @@ fn setup() -> tauri::Builder<Wry> {
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        sync::{mpsc::channel, Once},
-        thread,
-    };
+    use std::{sync::Once, thread};
 
     use super::*;
 
@@ -158,17 +157,12 @@ mod tests {
     /// Run the tauri app, but only once.
     pub fn run() {
         RUN_ONCE.call_once(|| {
-            let (sender, receiver) = channel();
             thread::spawn(move || {
                 setup()
                     .any_thread()
-                    .build(tauri::generate_context!())
-                    .unwrap()
-                    .run(move |_, _| {
-                        sender.send(()).ok();
-                    });
+                    .run(tauri::generate_context!())
+                    .unwrap();
             });
-            receiver.recv().ok();
         });
     }
 }
