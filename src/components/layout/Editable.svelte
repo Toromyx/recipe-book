@@ -28,9 +28,7 @@ The `edit` event is fired on submitting this form. The detail of this event is t
   >
     <slot name="edit" />
     <SvelteButton type="submit"
-      >{messages.labels.actions.update
-        .resolveMessage()
-        .toString()}</SvelteButton
+      >{messages.labels.actions.update.format()}</SvelteButton
     >
   </SvelteForm>
 {:else}
@@ -38,6 +36,6 @@ The `edit` event is fired on submitting this form. The detail of this event is t
 {/if}
 <SvelteButton on:click="{() => (edit = !edit)}"
   >{edit
-    ? messages.labels.actions.cancel.resolveMessage().toString()
-    : messages.labels.actions.edit.resolveMessage().toString()}</SvelteButton
+    ? messages.labels.actions.cancel.format()
+    : messages.labels.actions.edit.format()}</SvelteButton
 >

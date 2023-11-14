@@ -16,17 +16,13 @@ This component implements form fields for editing a recipe file.
 </script>
 
 <SvelteInput
-  label="{messages.labels.entityFields.recipeFile.name
-    .resolveMessage()
-    .toString()}"
+  label="{messages.labels.entityFields.recipeFile.name.format()}"
   name="name"
   value="{name}"
   required="{true}"
 />
 <FileInput
-  label="{messages.labels.entityFields.recipeFile.path
-    .resolveMessage()
-    .toString()}"
+  label="{messages.labels.entityFields.recipeFile.path.format()}"
   name="path"
   required="{true}"
 />

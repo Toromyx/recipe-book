@@ -42,9 +42,9 @@ This component lists all recipes with a form to create a new recipe.
     } catch (reason) {
       if (reason instanceof ExternalRecipeUrlNotSupportedError) {
         input.setAndReportCustomValidity(
-          messages.validity.externalRecipeUrlNotSupported
-            .resolveMessage({ url: reason.url })
-            .toString(),
+          messages.validity.externalRecipeUrlNotSupported.format({
+            url: reason.url,
+          }),
         );
         return;
       }
@@ -66,10 +66,8 @@ This component lists all recipes with a form to create a new recipe.
             void recipeRepository.delete(id);
           }
         },
-        label: messages.labels.actions.delete.resolveMessage().toString(),
-        labelAll: messages.labels.actions.deleteSelectedItems
-          .resolveMessage()
-          .toString(),
+        label: messages.labels.actions.delete.format(),
+        labelAll: messages.labels.actions.deleteSelectedItems.format(),
         confirmation: true,
       },
     ]}"
@@ -83,19 +81,13 @@ This component lists all recipes with a form to create a new recipe.
       bind:this="{input}"
       name="name"
       required="{true}"
-      label="{messages.labels.entityFields.recipe.name
-        .resolveMessage()
-        .toString()}"
+      label="{messages.labels.entityFields.recipe.name.format()}"
     />
     <SvelteButton type="submit" disabled="{loadingExternalRecipe}"
       ><span aria-live="polite"
         >{#if loadingExternalRecipe}<SvelteProgress
-            label="{messages.labels.descriptions.progress.loadingExternalRecipe
-              .resolveMessage()
-              .toString()}"
-          />{:else}{messages.labels.actions.create
-            .resolveMessage()
-            .toString()}{/if}</span
+            label="{messages.labels.descriptions.progress.loadingExternalRecipe.format()}"
+          />{:else}{messages.labels.actions.create.format()}{/if}</span
       ></SvelteButton
     >
   </SvelteForm>

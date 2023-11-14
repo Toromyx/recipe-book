@@ -57,8 +57,7 @@ It includes functionality to optically recognize characters in the recipe file.
     on:click="{() =>
       void invoke(Command.OCR, { recipeFileId: id }).then((result) => {
         output = result;
-      })}"
-    >{messages.labels.actions.ocr.resolveMessage().toString()}</SvelteButton
+      })}">{messages.labels.actions.ocr.format()}</SvelteButton
   >
   <output for="{buttonId}">
     <iframe

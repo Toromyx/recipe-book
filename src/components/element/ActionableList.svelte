@@ -75,9 +75,7 @@
   bind:this="{selectAllInput}"
   on:input="{onInputSelectAll}"
   type="checkbox"
-  aria-label="{messages.labels.descriptions.bulkActions.selectAllItems
-    .resolveMessage()
-    .toString()}"
+  aria-label="{messages.labels.descriptions.bulkActions.selectAllItems.format()}"
   checked="{allSelected}"
   indeterminate="{allSelected === undefined}"
 />
@@ -86,9 +84,7 @@
     <li>
       <input
         type="checkbox"
-        aria-label="{messages.labels.descriptions.bulkActions.selectItem
-          .resolveMessage()
-          .toString()}"
+        aria-label="{messages.labels.descriptions.bulkActions.selectItem.format()}"
         bind:checked="{checked[item]}"
       /><slot item="{item}" />{#each actions as action}<SvelteButton
           on:click="{() => action.callback([item])}"

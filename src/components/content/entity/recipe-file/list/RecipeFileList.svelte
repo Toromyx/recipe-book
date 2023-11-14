@@ -44,9 +44,7 @@ This component display an ordered list of all recipe files of a recipe step.
             updateOrder(recipeFileRepository, $list, id);
           }}"
           confirmation="{true}"
-          >{messages.labels.actions.delete
-            .resolveMessage()
-            .toString()}</SvelteButton
+          >{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>
     {/each}
@@ -64,9 +62,7 @@ This component display an ordered list of all recipe files of a recipe step.
   >
     <RecipeFileEdit />
     <SvelteButton type="submit"
-      >{messages.labels.actions.create
-        .resolveMessage()
-        .toString()}</SvelteButton
+      >{messages.labels.actions.create.format()}</SvelteButton
     >
   </SvelteForm>
 {/if}

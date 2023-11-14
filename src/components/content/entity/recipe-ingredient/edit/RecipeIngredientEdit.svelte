@@ -123,9 +123,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   name="quantity"
   type="number"
   value="{innerQuantity}"
-  label="{messages.labels.entityFields.recipeIngredient.quantity
-    .resolveMessage()
-    .toString()}"
+  label="{messages.labels.entityFields.recipeIngredient.quantity.format()}"
   min="0"
 />
 <SvelteInput
@@ -134,9 +132,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   on:paste
   name="unit"
   value="{innerUnit}"
-  label="{messages.labels.entityFields.recipeIngredient.unit
-    .resolveMessage()
-    .toString()}"
+  label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
   list="{UNIT_LIST_ID}"
 />
 <Autocomplete
@@ -150,9 +146,7 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   value="{innerIngredientId ? [innerIngredientId] : []}"
   userInput="{innerIngredientName}"
   excludedValues="{usedIngredientIds}"
-  label="{messages.labels.entityFields.recipeIngredient.ingredient
-    .resolveMessage()
-    .toString()}"
+  label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
   callback="{async (userInput) => (ingredientIdUserInput = userInput)}"
   results="{whenLoadingDefault($ingredientIdResults, [])}"
   createCallback="{(userInput) =>
@@ -167,7 +161,5 @@ The event `edit` is fired when the user makes yn change to any field. The event 
   on:paste
   name="quality"
   value="{innerQuality}"
-  label="{messages.labels.entityFields.recipeIngredient.quality
-    .resolveMessage()
-    .toString()}"
+  label="{messages.labels.entityFields.recipeIngredient.quality.format()}"
 />

@@ -42,9 +42,7 @@ This component displays an ordered list of recipe steps of a recipe.
         updateOrder(recipeStepRepository, $list, id);
       }}"
       confirmation="{true}"
-      >{messages.labels.actions.delete
-        .resolveMessage()
-        .toString()}</SvelteButton
+      >{messages.labels.actions.delete.format()}</SvelteButton
     >
   {/each}
   <SvelteForm
@@ -58,15 +56,13 @@ This component displays an ordered list of recipe steps of a recipe.
     }}"
   >
     <h2>
-      {messages.headings.recipeStep.resolveMessage({
+      {messages.headings.recipeStep.format({
         number: $list.length + 1,
       })}
     </h2>
     <RecipeStepEdit />
     <SvelteButton type="submit"
-      >{messages.labels.actions.create
-        .resolveMessage()
-        .toString()}</SvelteButton
+      >{messages.labels.actions.create.format()}</SvelteButton
     >
   </SvelteForm>
 {/if}

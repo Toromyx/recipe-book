@@ -31,7 +31,7 @@ This component displays the content of a recipe.
       on:input="{({ detail }) => (factor = detail)}"
       name="factor"
       type="number"
-      label="{messages.labels.factor.resolveMessage().toString()}"
+      label="{messages.labels.factor.format()}"
       value="{factor}"
       min="{0}"
     />

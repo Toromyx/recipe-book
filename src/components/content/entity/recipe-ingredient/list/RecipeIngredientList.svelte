@@ -105,9 +105,7 @@ It also displays displays the ingredients recipes drafts.
             updateOrder(recipeIngredientRepository, $list, id);
           }}"
           confirmation="{true}"
-          >{messages.labels.actions.delete
-            .resolveMessage()
-            .toString()}</SvelteButton
+          >{messages.labels.actions.delete.format()}</SvelteButton
         >
       </li>
     {/each}
@@ -154,9 +152,7 @@ It also displays displays the ingredients recipes drafts.
       usedIngredientIds="{whenLoadingDefault($usedIngredientsList, [])}"
     />
     <SvelteButton type="submit"
-      >{messages.labels.actions.create
-        .resolveMessage()
-        .toString()}</SvelteButton
+      >{messages.labels.actions.create.format()}</SvelteButton
     >
   </SvelteForm>
 {/if}

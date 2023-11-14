@@ -28,13 +28,11 @@ This component displays the content of a recipe step.
 
 {#if isLoaded($recipeStep)}
   <h2>
-    {messages.headings.recipeStep
-      .resolveMessage({ number: $recipeStep.order })
-      .toString()}
+    {messages.headings.recipeStep.format({ number: $recipeStep.order })}
   </h2>
-  <h3>{messages.headings.ingredients.resolveMessage().toString()}</h3>
+  <h3>{messages.headings.ingredients.format()}</h3>
   <RecipeIngredientList recipeStepId="{id}" factor="{factor}" />
-  <h3>{messages.headings.description.resolveMessage().toString()}</h3>
+  <h3>{messages.headings.description.format()}</h3>
   <Editable
     on:edit="{async ({ detail: { values, changed } }) => {
       const update = { id };
@@ -49,6 +47,6 @@ This component displays the content of a recipe step.
     </svelte:fragment>
     <RecipeStepEdit slot="edit" description="{$recipeStep.description}" />
   </Editable>
-  <h3>{messages.headings.files.resolveMessage().toString()}</h3>
+  <h3>{messages.headings.files.format()}</h3>
   <RecipeFileList recipeStepId="{id}" />
 {/if}
