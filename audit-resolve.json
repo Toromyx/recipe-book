@@ -1,0 +1,10 @@
+{
+  "decisions": {
+    "1094730|@tauri-apps/cli": {
+      "decision": "ignore",
+      "madeAt": 1700075216026
+    }
+  },
+  "rules": {},
+  "version": 1
+}
