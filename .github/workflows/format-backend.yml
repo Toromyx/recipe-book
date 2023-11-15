@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "src-tauri/**"
+      - ".github/workflows/format-backend.yml"
 
 jobs:
   format_backend:

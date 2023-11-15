@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - "src-tauri/Cargo.lock"
+      - ".github/workflows/audit-backend.yml"
 
 jobs:
   audit_backend:

@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "src-tauri/**"
+      - ".github/workflows/lint-backend.yml"
 
 jobs:
   lint_backend:
