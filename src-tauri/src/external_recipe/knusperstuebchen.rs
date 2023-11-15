@@ -89,20 +89,24 @@ mod tests {
     fn expected_gets() -> Vec<ExpectedGet> {
         vec![
             ExpectedGet {
-                url: String::from("https://knusperstuebchen.net/2014/09/26/apfelkuchenzeit-schoenste-zeit-apfel-mazarin-kuchen/"),
+                url: String::from(
+                    "https://knusperstuebchen.net/2014/09/26/apfelkuchenzeit-schoenste-zeit-apfel-mazarin-kuchen/",
+                ),
                 external_recipe: ExternalRecipe {
                     name: String::from("Apfel-Mazarin-Kuchen"),
                     steps: vec![ExternalRecipeStep {
                         ingredients: vec![],
                         description: String::from(""),
-                        files: vec![
-                            String::from("https://knusperstuebchen.net/wp-content/uploads/2014/09/Apfel-Mazarin-Kuchen.pdf"),
-                        ],
+                        files: vec![String::from(
+                            "https://knusperstuebchen.net/wp-content/uploads/2014/09/Apfel-Mazarin-Kuchen.pdf",
+                        )],
                     }],
                 },
             },
             ExpectedGet {
-                url: String::from("https://knusperstuebchen.net/2013/11/08/freitag-ist-pizzatag-auf-ins-wochenende/"),
+                url: String::from(
+                    "https://knusperstuebchen.net/2013/11/08/freitag-ist-pizzatag-auf-ins-wochenende/",
+                ),
                 external_recipe: ExternalRecipe {
                     name: String::from("Pizza Grundrezept - knusprig"),
                     steps: vec![ExternalRecipeStep {
@@ -119,7 +123,9 @@ mod tests {
                             String::from("6 Knoblauchzehen"),
                             String::from("200ml Passata"),
                             String::from("100g Tomatenmark"),
-                            String::from("nach Belieben 200g frische Tomaten oder gehackte Tomaten"),
+                            String::from(
+                                "nach Belieben 200g frische Tomaten oder gehackte Tomaten",
+                            ),
                             String::from("175ml Rotwein"),
                             String::from("Prise Zucker"),
                             String::from("Prise Zimt"),
@@ -133,17 +139,23 @@ mod tests {
                             String::from("Basilikum"),
                         ],
                         description: String::from(
-                            "So wird's gemacht Für den Teig:\nHonig mit der Hefe cremig rühren, lauwarmes Wasser hinzufügen, alles verrühren bis die Hefe vollständig aufgelöst ist, abdecken und 10 Minuten ruhen lassen. Nun zu dem Hefegemisch das Mehl geben, auf das Mehl die restlichen Zutaten geben und zu einem homogenen Teig verkneten. Hände mit 1 TL Olivenöl einreiben und den Teig noch einmal kurz mit den Händen kneten, sodass der gesamte Teig mit Olivenöl bedeckt ist. In der Schüssel abgedeckt für 50 Minuten ruhen lassen.\nFür die Tomatensauce\nDerweil Olivenöl in einem Topf erhitzen, Zwiebeln anschwitzen. Nach 5 Minuten Knoblauch hinzugeben. Nun mit Rotwein ablöschen und kurz köcheln lassen. Passata und Gemüsebrühe hinzugeben, weiter köcheln lassen. Restliche Zutaten hinzugeben, Platte herunterstellen, leicht köcheln lassen, gelegentlich umrühren. Zum Schluss mit Pürierstab auf gewünschte Konsistenz pürieren. Entweder gleich verwenden oder in Gläser füllen und einkochen.\nFertigstellung:\nOfen inkl. Blech auf 220°C vorheizen. Nun Teig in bis zu vier gleich große Teile teilen, kreisförmig dünn ausrollen. Teig auf Backpapier legen. 2-3 EL Tomatensauce verteilen, darauf geriebenen Mozzarella geben. Mit gewünschten Zutaten wie Chorizo, Parma und Tomaten belegen. Zum Schluss mit etwas Parmesan bestreuen. Pizzen auf das heiße Blech geben ca. 15-20 Minuten backen."
+                            "So wird's gemacht Für den Teig:\nHonig mit der Hefe cremig rühren, lauwarmes Wasser hinzufügen, alles verrühren bis die Hefe vollständig aufgelöst ist, abdecken und 10 Minuten ruhen lassen. Nun zu dem Hefegemisch das Mehl geben, auf das Mehl die restlichen Zutaten geben und zu einem homogenen Teig verkneten. Hände mit 1 TL Olivenöl einreiben und den Teig noch einmal kurz mit den Händen kneten, sodass der gesamte Teig mit Olivenöl bedeckt ist. In der Schüssel abgedeckt für 50 Minuten ruhen lassen.\nFür die Tomatensauce\nDerweil Olivenöl in einem Topf erhitzen, Zwiebeln anschwitzen. Nach 5 Minuten Knoblauch hinzugeben. Nun mit Rotwein ablöschen und kurz köcheln lassen. Passata und Gemüsebrühe hinzugeben, weiter köcheln lassen. Restliche Zutaten hinzugeben, Platte herunterstellen, leicht köcheln lassen, gelegentlich umrühren. Zum Schluss mit Pürierstab auf gewünschte Konsistenz pürieren. Entweder gleich verwenden oder in Gläser füllen und einkochen.\nFertigstellung:\nOfen inkl. Blech auf 220°C vorheizen. Nun Teig in bis zu vier gleich große Teile teilen, kreisförmig dünn ausrollen. Teig auf Backpapier legen. 2-3 EL Tomatensauce verteilen, darauf geriebenen Mozzarella geben. Mit gewünschten Zutaten wie Chorizo, Parma und Tomaten belegen. Zum Schluss mit etwas Parmesan bestreuen. Pizzen auf das heiße Blech geben ca. 15-20 Minuten backen.",
                         ),
                         files: vec![
-                            String::from("https://knusperstuebchen.net/wp-content/uploads/2013/11/Knusprige-Lieblingspizza-mit-Chorizo-Pizza-Raclette-477x300.jpg"),
-                            String::from("https://knusperstuebchen.net/wp-content/uploads/2013/11/Knusper-Pizza-Rezept.pdf"),
+                            String::from(
+                                "https://knusperstuebchen.net/wp-content/uploads/2013/11/Knusprige-Lieblingspizza-mit-Chorizo-Pizza-Raclette-477x300.jpg",
+                            ),
+                            String::from(
+                                "https://knusperstuebchen.net/wp-content/uploads/2013/11/Knusper-Pizza-Rezept.pdf",
+                            ),
                         ],
                     }],
                 },
             },
             ExpectedGet {
-                url: String::from("https://knusperstuebchen.net/2023/08/16/perlcouscous-salat-mit-ofenlachs-und-blaubeeren/"),
+                url: String::from(
+                    "https://knusperstuebchen.net/2023/08/16/perlcouscous-salat-mit-ofenlachs-und-blaubeeren/",
+                ),
                 external_recipe: ExternalRecipe {
                     name: String::from("Perlcouscous-Salat mit Ofenlachs und Blaubeeren"),
                     steps: vec![ExternalRecipeStep {
@@ -177,8 +189,12 @@ mod tests {
                             "So wird's gemacht\nFür den Lachs Olivenöl, Salt, Pfeffer, Paprikapulver, Chiliflocken, Kräuter und Zwiebel (in Ringe geschnitten) in eine Schale geben und vermengen. Den (angetauten) Lachs mit der Masse marinieren und in eine Ofenform geben. Anstelle von Lachs kann zum Beispiel auch mehr Feta genommen werden und dieser im Ofen gebacken werden mit der gleichen Marinade. Lachs im Backofen bei 180°C (je nach Filetgröße) ca. 15–20 Minuten glasig backen Für den Salat: Den Perlocouscous (alternativ auch einfach Couscous) in doppelt so viel Wasser geben und aufkochen lassen, kurz köcheln lassen bis er aufquellt und weich wird. Etwa 5 Minuten quellen lassen und abgießen.20 ml Olivenöl und Tomatenmark in den Couscous geben und verrühren. Gerne etwas salzen und pfeffern. In eine große Salatschüssel gehackte Tomaten, gehackte Gutken, gehackte Frühlingszwiebel und fein gehackter Knoblauch geben. Basilikum, Petersilie, Zitrone 20 ml Olivenöl mischen und in die Masse geben.Perlcouscous hinzugeben und gut vermengen. Blaubeeren, Rucola hinzugeben und zum Schluss den Feta über den Salat bröseln. Salat in Schüsseln anrichten und den Lachs warm aus dem Ofen dazu servieren.",
                         ),
                         files: vec![
-                            String::from("https://knusperstuebchen.net/wp-content/uploads/2023/08/Perlcouscous-Salat-mit-Ofenlachs-und-Blaubeeren-10.jpg"),
-                            String::from("https://knusperstuebchen.net/wp-content/uploads/2023/08/Perlcouscous-Salat-mit-Ofenlachs.pdf"),
+                            String::from(
+                                "https://knusperstuebchen.net/wp-content/uploads/2023/08/Perlcouscous-Salat-mit-Ofenlachs-und-Blaubeeren-10.jpg",
+                            ),
+                            String::from(
+                                "https://knusperstuebchen.net/wp-content/uploads/2023/08/Perlcouscous-Salat-mit-Ofenlachs.pdf",
+                            ),
                         ],
                     }],
                 },

@@ -102,11 +102,11 @@ pub trait OrderBy {
 pub trait EntityCrudTrait {
     /// the entity, implementing [`EntityTrait`]
     type Entity: EntityTrait<
-        Model = Self::Model,
-        Column = Self::Column,
-        Relation = Self::Relation,
-        PrimaryKey = Self::PrimaryKey,
-    >;
+            Model = Self::Model,
+            Column = Self::Column,
+            Relation = Self::Relation,
+            PrimaryKey = Self::PrimaryKey,
+        >;
 
     /// the entity's model, implementing [`ModelTrait`]
     type Model: ModelTrait<Entity = Self::Entity>

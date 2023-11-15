@@ -78,7 +78,10 @@ pub mod tests {
 
     pub async fn assert_unit_name_schema(db: &DatabaseConnection) {
         let table_schema = get_table_schema("unit_name", db).await;
-        assert_str_eq!(table_schema, "CREATE TABLE \"unit_name\" ( \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"name\" text NOT NULL, \"unit\" text NOT NULL, UNIQUE (\"name\") )");
+        assert_str_eq!(
+            table_schema,
+            "CREATE TABLE \"unit_name\" ( \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"name\" text NOT NULL, \"unit\" text NOT NULL, UNIQUE (\"name\") )"
+        );
     }
 
     pub async fn assert_unit_name_indices(db: &DatabaseConnection) {
