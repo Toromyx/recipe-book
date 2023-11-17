@@ -38,7 +38,10 @@ jobs:
       - run: npm run tauri icon
       - uses: actions/cache@v3
         with:
-          key: test-${{ hashFiles('src-tauri/Cargo.lock') }}
+          key: test-${{ hashFiles('src-tauri/Cargo.lock') }}-${{ hashFiles('src-tauri/**') }}
+          restore-keys: |
+            test-${{ hashFiles('src-tauri/Cargo.lock') }}-
+            test-
           path: |
             src-tauri/target
             ~/.cargo
