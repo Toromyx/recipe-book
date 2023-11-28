@@ -32,10 +32,11 @@ jobs:
       - run: npm run tauri icon
       - uses: actions/cache@v3
         with:
-          key: lint-backend-${{ hashFiles('src-tauri/Cargo.lock') }}-${{ hashFiles('src-tauri/**') }}
+          key: rust-${{ steps.toolchain.outputs.rustc_hash }}-${{ hashFiles('src-tauri/**', 'app-icon.png') }}-lint
           restore-keys: |
-            lint-backend-${{ hashFiles('src-tauri/Cargo.lock') }}-
-            lint-backend-
+            rust-${{ steps.toolchain.outputs.rustc_hash }}-${{ hashFiles('src-tauri/**', 'app-icon.png') }}-
+            rust-${{ steps.toolchain.outputs.rustc_hash }}-
+            rust-
           path: |
             src-tauri/target
             ~/.cargo
