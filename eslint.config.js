@@ -10,7 +10,6 @@ import parserSvelte from "svelte-eslint-parser";
 
 /** @type {FlatConfig} */
 const baseConfig = {
-  ignores: ["dist/**", "src-tauri/target/**"],
   plugins: {
     import: pluginImport,
     promise: pluginPromise,
@@ -110,6 +109,9 @@ const config = [
       ...pluginSvelte.configs.prettier.rules,
       ...configPrettier.rules,
     },
+  },
+  {
+    ignores: ["dist/**", "src-tauri/target/**"],
   },
 ];
 export default config;
