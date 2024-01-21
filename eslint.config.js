@@ -26,6 +26,7 @@ const baseConfig = {
     ...configJs.configs.recommended.rules,
     ...pluginPromise.configs.recommended.rules,
     ...configPrettier.rules,
+
     eqeqeq: "warn",
     "guard-for-in": "warn",
     "no-console": "warn",
