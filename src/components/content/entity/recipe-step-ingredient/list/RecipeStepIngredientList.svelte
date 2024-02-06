@@ -46,7 +46,7 @@ It also displays displays the ingredients recipes drafts.
   /** @type {(ParsedRecipeIngredient & {id?: number})[]} */
   let pastedParsedRecipeIngredients = [];
   /** @type {Promise<Array<ParsedRecipeIngredient|null>>} */
-  let draftedParsedRecipeIngredientsPromise = Promise.reject();
+  let draftedParsedRecipeIngredientsPromise = new Promise(() => {});
 
   $: list = recipeIngredientRepository.createListFilteredStore({
     condition: { recipeStepId },
@@ -63,7 +63,7 @@ It also displays displays the ingredients recipes drafts.
     condition: { recipeStepId },
     orderBy: [{ order: "asc" }],
   });
-  $: draftedParsedRecipeIngredientsPromise = $draftList
+  $: draftedParsedRecipeIngredientsPromise = isLoaded($draftList)
     ? Promise.all(
         $draftList.map(async (recipeIngredientDraftId) => {
           const recipeIngredientDraft = await readRecipeIngredientDraft(
@@ -72,7 +72,7 @@ It also displays displays the ingredients recipes drafts.
           return parseString(recipeIngredientDraft.text, $unitList);
         }),
       )
-    : Promise.reject();
+    : new Promise(() => {});
 </script>
 
 {#if isLoaded($list)}
