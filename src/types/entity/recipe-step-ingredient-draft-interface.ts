@@ -4,20 +4,20 @@ import type {
   SortableUpdateInterface,
 } from "../sortable-interface.ts";
 
-export interface RecipeIngredientDraftInterface
+export interface RecipeStepIngredientDraftInterface
   extends IdentifiableInterface,
     SortableInterface {
   text: string;
   recipeStepId: number;
 }
 
-export interface RecipeIngredientDraftCreateInterface
+export interface RecipeStepIngredientDraftCreateInterface
   extends SortableInterface {
   text: string;
   recipeStepId: number;
 }
 
-export interface RecipeIngredientDraftUpdateInterface
+export interface RecipeStepIngredientDraftUpdateInterface
   extends IdentifiableInterface,
     SortableUpdateInterface {
   order?: number;

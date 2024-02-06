@@ -1,4 +1,4 @@
-//! This module implements the creation of [`crate::entity::recipe_ingredient`].
+//! This module implements the creation of [`crate::entity::recipe_step_ingredient`].
 
 use sea_orm_migration::prelude::*;
 
@@ -11,50 +11,68 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
         .create_table(
             Table::create()
-                .table(RecipeIngredient::Table)
+                .table(RecipeStepIngredient::Table)
                 .col(
-                    ColumnDef::new(RecipeIngredient::Id)
+                    ColumnDef::new(RecipeStepIngredient::Id)
                         .integer()
                         .not_null()
                         .auto_increment()
                         .primary_key(),
                 )
-                .col(ColumnDef::new(RecipeIngredient::Order).integer().not_null())
-                .col(ColumnDef::new(RecipeIngredient::Quantity).double().null())
-                .col(ColumnDef::new(RecipeIngredient::Unit).string().null())
-                .col(ColumnDef::new(RecipeIngredient::Quality).string().null())
                 .col(
-                    ColumnDef::new(RecipeIngredient::RecipeStepId)
+                    ColumnDef::new(RecipeStepIngredient::Order)
                         .integer()
                         .not_null(),
                 )
                 .col(
-                    ColumnDef::new(RecipeIngredient::IngredientId)
+                    ColumnDef::new(RecipeStepIngredient::Quantity)
+                        .double()
+                        .null(),
+                )
+                .col(ColumnDef::new(RecipeStepIngredient::Unit).string().null())
+                .col(
+                    ColumnDef::new(RecipeStepIngredient::Quality)
+                        .string()
+                        .null(),
+                )
+                .col(
+                    ColumnDef::new(RecipeStepIngredient::RecipeStepId)
+                        .integer()
+                        .not_null(),
+                )
+                .col(
+                    ColumnDef::new(RecipeStepIngredient::IngredientId)
                         .integer()
                         .not_null(),
                 )
                 .foreign_key(
                     ForeignKey::create()
-                        .from(RecipeIngredient::Table, RecipeIngredient::RecipeStepId)
+                        .from(
+                            RecipeStepIngredient::Table,
+                            RecipeStepIngredient::RecipeStepId,
+                        )
                         .to(RecipeStep::Table, RecipeStep::Id)
                         .on_delete(ForeignKeyAction::Cascade),
                 )
                 .foreign_key(
                     ForeignKey::create()
-                        .from(RecipeIngredient::Table, RecipeIngredient::IngredientId)
+                        .from(
+                            RecipeStepIngredient::Table,
+                            RecipeStepIngredient::IngredientId,
+                        )
                         .to(Ingredient::Table, Ingredient::Id)
                         .on_delete(ForeignKeyAction::Restrict),
                 )
                 .index(
                     Index::create()
-                        .col(RecipeIngredient::Order)
-                        .col(RecipeIngredient::RecipeStepId)
+                        .col(RecipeStepIngredient::Order)
+                        .col(RecipeStepIngredient::RecipeStepId)
                         .unique(),
                 )
                 .index(
                     Index::create()
-                        .col(RecipeIngredient::RecipeStepId)
-                        .col(RecipeIngredient::IngredientId)
+                        .col(RecipeStepIngredient::RecipeStepId)
+                        .col(RecipeStepIngredient::IngredientId)
                         .unique(),
                 )
                 .to_owned(),
@@ -64,11 +82,11 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
         .create_index(
             Index::create()
                 .name(&index_name(
-                    &RecipeIngredient::Table,
-                    &RecipeIngredient::Order,
+                    &RecipeStepIngredient::Table,
+                    &RecipeStepIngredient::Order,
                 ))
-                .table(RecipeIngredient::Table)
-                .col(RecipeIngredient::Order)
+                .table(RecipeStepIngredient::Table)
+                .col(RecipeStepIngredient::Order)
                 .to_owned(),
         )
         .await?;
@@ -76,11 +94,11 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
         .create_index(
             Index::create()
                 .name(&index_name(
-                    &RecipeIngredient::Table,
-                    &RecipeIngredient::RecipeStepId,
+                    &RecipeStepIngredient::Table,
+                    &RecipeStepIngredient::RecipeStepId,
                 ))
-                .table(RecipeIngredient::Table)
-                .col(RecipeIngredient::RecipeStepId)
+                .table(RecipeStepIngredient::Table)
+                .col(RecipeStepIngredient::RecipeStepId)
                 .to_owned(),
         )
         .await?;
@@ -88,11 +106,11 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
         .create_index(
             Index::create()
                 .name(&index_name(
-                    &RecipeIngredient::Table,
-                    &RecipeIngredient::IngredientId,
+                    &RecipeStepIngredient::Table,
+                    &RecipeStepIngredient::IngredientId,
                 ))
-                .table(RecipeIngredient::Table)
-                .col(RecipeIngredient::IngredientId)
+                .table(RecipeStepIngredient::Table)
+                .col(RecipeStepIngredient::IngredientId)
                 .to_owned(),
         )
         .await?;
@@ -100,7 +118,7 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
 }
 
 #[derive(Iden)]
-pub enum RecipeIngredient {
+pub enum RecipeStepIngredient {
     Table,
     Id,
     Order,
@@ -118,11 +136,11 @@ pub mod tests {
 
     use crate::database::tests::{get_table_indices, get_table_schema};
 
-    pub async fn assert_recipe_ingredient_schema(db: &DatabaseConnection) {
-        let table_schema = get_table_schema("recipe_ingredient", db).await;
+    pub async fn assert_recipe_step_ingredient_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_step_ingredient", db).await;
         assert_str_eq!(
             table_schema,
-            "CREATE TABLE \"recipe_ingredient\" ( \
+            "CREATE TABLE \"recipe_step_ingredient\" ( \
             \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
             \"order\" integer NOT NULL, \
             \"quantity\" real NULL, \
@@ -138,19 +156,19 @@ pub mod tests {
         );
     }
 
-    pub async fn assert_recipe_ingredient_indices(db: &DatabaseConnection) {
-        let indices = get_table_indices("recipe_ingredient", db).await;
+    pub async fn assert_recipe_step_ingredient_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_step_ingredient", db).await;
         assert_eq!(
             indices,
             vec![
                 String::from(
-                    "CREATE INDEX \"idx-recipe_ingredient-order\" ON \"recipe_ingredient\" (\"order\")"
+                    "CREATE INDEX \"idx-recipe_step_ingredient-order\" ON \"recipe_step_ingredient\" (\"order\")"
                 ),
                 String::from(
-                    "CREATE INDEX \"idx-recipe_ingredient-recipe_step_id\" ON \"recipe_ingredient\" (\"recipe_step_id\")"
+                    "CREATE INDEX \"idx-recipe_step_ingredient-recipe_step_id\" ON \"recipe_step_ingredient\" (\"recipe_step_id\")"
                 ),
                 String::from(
-                    "CREATE INDEX \"idx-recipe_ingredient-ingredient_id\" ON \"recipe_ingredient\" (\"ingredient_id\")"
+                    "CREATE INDEX \"idx-recipe_step_ingredient-ingredient_id\" ON \"recipe_step_ingredient\" (\"ingredient_id\")"
                 ),
             ]
         )

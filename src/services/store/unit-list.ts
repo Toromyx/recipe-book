@@ -19,9 +19,9 @@ function createUnitList(): Readable<Loadable<string[]>> {
   setUnitList();
 
   for (const channel of [
-    EventChannel.ENTITY_ACTION_CREATED_RECIPE_INGREDIENT,
-    EventChannel.ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT,
-    EventChannel.ENTITY_ACTION_DELETED_RECIPE_INGREDIENT,
+    EventChannel.ENTITY_ACTION_CREATED_RECIPE_STEP_INGREDIENT,
+    EventChannel.ENTITY_ACTION_UPDATED_RECIPE_STEP_INGREDIENT,
+    EventChannel.ENTITY_ACTION_DELETED_RECIPE_STEP_INGREDIENT,
   ]) {
     void listen(channel, () => {
       setUnitList();

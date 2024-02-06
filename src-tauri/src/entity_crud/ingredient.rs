@@ -11,7 +11,7 @@ use serde::Deserialize;
 use crate::{
     entity::{
         ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-        recipe_ingredient,
+        recipe_step_ingredient,
     },
     entity_crud::{EntityCrudTrait, Filter, Order, OrderBy},
     event::channel::{
@@ -62,10 +62,10 @@ impl IntoCondition for IngredientCondition {
             .add_option(self.name_exact.map(|name| Column::Name.eq(name)))
             .add_option(self.recipe_step_id.map(|recipe_step_id| {
                 Column::Id.in_subquery(
-                    recipe_ingredient::Entity::find()
+                    recipe_step_ingredient::Entity::find()
                         .select_only()
-                        .column(recipe_ingredient::Column::IngredientId)
-                        .filter(recipe_ingredient::Column::RecipeStepId.eq(recipe_step_id))
+                        .column(recipe_step_ingredient::Column::IngredientId)
+                        .filter(recipe_step_ingredient::Column::RecipeStepId.eq(recipe_step_id))
                         .into_query(),
                 )
             }))

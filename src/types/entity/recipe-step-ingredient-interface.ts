@@ -4,7 +4,7 @@ import type {
   SortableUpdateInterface,
 } from "../sortable-interface.ts";
 
-export interface RecipeIngredientInterface
+export interface RecipeStepIngredientInterface
   extends IdentifiableInterface,
     SortableInterface {
   quantity: number | null;
@@ -14,7 +14,7 @@ export interface RecipeIngredientInterface
   ingredientId: number;
 }
 
-export interface RecipeIngredientCreateInterface extends SortableInterface {
+export interface RecipeStepIngredientCreateInterface extends SortableInterface {
   quantity: number | null;
   unit: string | null;
   quality: string | null;
@@ -22,7 +22,7 @@ export interface RecipeIngredientCreateInterface extends SortableInterface {
   ingredientId: number;
 }
 
-export interface RecipeIngredientUpdateInterface
+export interface RecipeStepIngredientUpdateInterface
   extends IdentifiableInterface,
     SortableUpdateInterface {
   order?: number;

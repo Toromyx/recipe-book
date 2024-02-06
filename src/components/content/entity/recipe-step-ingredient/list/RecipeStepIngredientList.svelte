@@ -1,21 +1,21 @@
 <!--
 @component
-This component displays an ordered list of recipe ingredients of a recipe step.
+This component displays an ordered list of recipe step ingredients of a recipe step.
 
-It provides functionality to add a new recipe ingredient and integrates with the recipe ingredient parser.
+It provides functionality to add a new recipe step ingredient and integrates with the recipe ingredient parser.
 It also displays displays the ingredients recipes drafts.
 -->
 
 <script>
-  import { readRecipeIngredientDraft } from "../../../../../services/command/entity.ts";
+  import { readRecipeStepIngredientDraft } from "../../../../../services/command/entity.ts";
   import {
     parseHtml,
     parseText,
     parseString,
   } from "../../../../../services/parser/recipe-ingredient-parser.ts";
   import { ingredientRepository } from "../../../../../services/store/repository/ingredient-repository.ts";
-  import { recipeIngredientDraftRepository } from "../../../../../services/store/repository/recipe-ingredient-draft-repository.ts";
-  import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
+  import { recipeStepIngredientDraftRepository } from "../../../../../services/store/repository/recipe-step-ingredient-draft-repository.ts";
+  import { recipeStepIngredientRepository } from "../../../../../services/store/repository/recipe-step-ingredient-repository.ts";
   import { unitList } from "../../../../../services/store/unit-list.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import {
@@ -25,9 +25,9 @@ It also displays displays the ingredients recipes drafts.
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
-  import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
-  import RecipeIngredientView from "../view/RecipeIngredientView.svelte";
-  import AdditionalIngredientsForm from "./RecipeIngredientList/AdditionalIngredientsForm.svelte";
+  import RecipeStepIngredientEdit from "../edit/RecipeStepIngredientEdit.svelte";
+  import RecipeStepIngredientView from "../view/RecipeStepIngredientView.svelte";
+  import AdditionalIngredientsForm from "./RecipeStepIngredientList/AdditionalIngredientsForm.svelte";
 
   /**
    * the recipe step id
@@ -48,7 +48,7 @@ It also displays displays the ingredients recipes drafts.
   /** @type {Promise<Array<ParsedRecipeIngredient|null>>} */
   let draftedParsedRecipeIngredientsPromise = new Promise(() => {});
 
-  $: list = recipeIngredientRepository.createListFilteredStore({
+  $: list = recipeStepIngredientRepository.createListFilteredStore({
     condition: { recipeStepId },
     orderBy: [
       {
@@ -59,17 +59,17 @@ It also displays displays the ingredients recipes drafts.
   $: usedIngredientsList = ingredientRepository.createListFilteredStore({
     condition: { recipeStepId },
   });
-  $: draftList = recipeIngredientDraftRepository.createListFilteredStore({
+  $: draftList = recipeStepIngredientDraftRepository.createListFilteredStore({
     condition: { recipeStepId },
     orderBy: [{ order: "asc" }],
   });
   $: draftedParsedRecipeIngredientsPromise = isLoaded($draftList)
     ? Promise.all(
-        $draftList.map(async (recipeIngredientDraftId) => {
-          const recipeIngredientDraft = await readRecipeIngredientDraft(
-            recipeIngredientDraftId,
+        $draftList.map(async (recipeStepIngredientDraftId) => {
+          const recipeStepIngredientDraft = await readRecipeStepIngredientDraft(
+            recipeStepIngredientDraftId,
           );
-          return parseString(recipeIngredientDraft.text, $unitList);
+          return parseString(recipeStepIngredientDraft.text, $unitList);
         }),
       )
     : new Promise(() => {});
@@ -80,9 +80,9 @@ It also displays displays the ingredients recipes drafts.
     {#if draftedParsedRecipeIngredients.length}
       <AdditionalIngredientsForm
         on:done="{async () => {
-          for (const recipeIngredientDraftId of $draftList) {
-            void recipeIngredientDraftRepository.delete(
-              recipeIngredientDraftId,
+          for (const recipeStepIngredientDraftId of $draftList) {
+            void recipeStepIngredientDraftRepository.delete(
+              recipeStepIngredientDraftId,
             );
           }
           draftedParsedRecipeIngredients = [];
@@ -99,10 +99,10 @@ It also displays displays the ingredients recipes drafts.
   <ol>
     {#each $list as id (id)}
       <li>
-        <RecipeIngredientView id="{id}" factor="{factor}" /><SvelteButton
+        <RecipeStepIngredientView id="{id}" factor="{factor}" /><SvelteButton
           on:click="{async () => {
-            await recipeIngredientRepository.delete(id);
-            updateOrder(recipeIngredientRepository, $list, id);
+            await recipeStepIngredientRepository.delete(id);
+            updateOrder(recipeStepIngredientRepository, $list, id);
           }}"
           confirmation="{true}"
           >{messages.labels.actions.delete.format()}</SvelteButton
@@ -121,7 +121,7 @@ It also displays displays the ingredients recipes drafts.
   {/if}
   <SvelteForm
     on:submit="{async ({ detail: { values, context } }) => {
-      await recipeIngredientRepository.create({
+      await recipeStepIngredientRepository.create({
         order: $list.length + 1,
         quantity: values.quantity || null,
         unit: values.unit || null,
@@ -132,7 +132,7 @@ It also displays displays the ingredients recipes drafts.
       context.reset();
     }}"
   >
-    <RecipeIngredientEdit
+    <RecipeStepIngredientEdit
       on:paste="{(e) => {
         e.preventDefault();
         const html = e.clipboardData.getData('text/html');

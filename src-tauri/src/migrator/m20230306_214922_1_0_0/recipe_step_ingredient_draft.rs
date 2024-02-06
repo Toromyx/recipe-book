@@ -1,4 +1,4 @@
-//! This module implements the creation of [`crate::entity::recipe_ingredient_draft`].
+//! This module implements the creation of [`crate::entity::recipe_step_ingredient_draft`].
 
 use sea_orm_migration::prelude::*;
 
@@ -8,42 +8,42 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
         .create_table(
             Table::create()
-                .table(RecipeIngredientDraft::Table)
+                .table(RecipeStepIngredientDraft::Table)
                 .col(
-                    ColumnDef::new(RecipeIngredientDraft::Id)
+                    ColumnDef::new(RecipeStepIngredientDraft::Id)
                         .integer()
                         .not_null()
                         .auto_increment()
                         .primary_key(),
                 )
                 .col(
-                    ColumnDef::new(RecipeIngredientDraft::Order)
+                    ColumnDef::new(RecipeStepIngredientDraft::Order)
                         .integer()
                         .not_null(),
                 )
                 .col(
-                    ColumnDef::new(RecipeIngredientDraft::Text)
+                    ColumnDef::new(RecipeStepIngredientDraft::Text)
                         .text()
                         .not_null(),
                 )
                 .col(
-                    ColumnDef::new(RecipeIngredientDraft::RecipeStepId)
+                    ColumnDef::new(RecipeStepIngredientDraft::RecipeStepId)
                         .integer()
                         .not_null(),
                 )
                 .foreign_key(
                     ForeignKey::create()
                         .from(
-                            RecipeIngredientDraft::Table,
-                            RecipeIngredientDraft::RecipeStepId,
+                            RecipeStepIngredientDraft::Table,
+                            RecipeStepIngredientDraft::RecipeStepId,
                         )
                         .to(RecipeStep::Table, RecipeStep::Id)
                         .on_delete(ForeignKeyAction::Cascade),
                 )
                 .index(
                     Index::create()
-                        .col(RecipeIngredientDraft::Order)
-                        .col(RecipeIngredientDraft::RecipeStepId)
+                        .col(RecipeStepIngredientDraft::Order)
+                        .col(RecipeStepIngredientDraft::RecipeStepId)
                         .unique(),
                 )
                 .to_owned(),
@@ -53,11 +53,11 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
         .create_index(
             Index::create()
                 .name(&index_name(
-                    &RecipeIngredientDraft::Table,
-                    &RecipeIngredientDraft::Order,
+                    &RecipeStepIngredientDraft::Table,
+                    &RecipeStepIngredientDraft::Order,
                 ))
-                .table(RecipeIngredientDraft::Table)
-                .col(RecipeIngredientDraft::Order)
+                .table(RecipeStepIngredientDraft::Table)
+                .col(RecipeStepIngredientDraft::Order)
                 .to_owned(),
         )
         .await?;
@@ -65,11 +65,11 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
         .create_index(
             Index::create()
                 .name(&index_name(
-                    &RecipeIngredientDraft::Table,
-                    &RecipeIngredientDraft::RecipeStepId,
+                    &RecipeStepIngredientDraft::Table,
+                    &RecipeStepIngredientDraft::RecipeStepId,
                 ))
-                .table(RecipeIngredientDraft::Table)
-                .col(RecipeIngredientDraft::RecipeStepId)
+                .table(RecipeStepIngredientDraft::Table)
+                .col(RecipeStepIngredientDraft::RecipeStepId)
                 .to_owned(),
         )
         .await?;
@@ -77,7 +77,7 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
 }
 
 #[derive(Iden)]
-pub enum RecipeIngredientDraft {
+pub enum RecipeStepIngredientDraft {
     Table,
     Id,
     Order,
@@ -92,11 +92,11 @@ pub mod tests {
 
     use crate::database::tests::{get_table_indices, get_table_schema};
 
-    pub async fn assert_recipe_ingredient_draft_schema(db: &DatabaseConnection) {
-        let table_schema = get_table_schema("recipe_ingredient_draft", db).await;
+    pub async fn assert_recipe_step_ingredient_draft_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_step_ingredient_draft", db).await;
         assert_str_eq!(
             table_schema,
-            "CREATE TABLE \"recipe_ingredient_draft\" ( \
+            "CREATE TABLE \"recipe_step_ingredient_draft\" ( \
             \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
             \"order\" integer NOT NULL, \
             \"text\" text NOT NULL, \
@@ -107,16 +107,16 @@ pub mod tests {
         );
     }
 
-    pub async fn assert_recipe_ingredient_draft_indices(db: &DatabaseConnection) {
-        let indices = get_table_indices("recipe_ingredient_draft", db).await;
+    pub async fn assert_recipe_step_ingredient_draft_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_step_ingredient_draft", db).await;
         assert_eq!(
             indices,
             vec![
                 String::from(
-                    "CREATE INDEX \"idx-recipe_ingredient_draft-order\" ON \"recipe_ingredient_draft\" (\"order\")"
+                    "CREATE INDEX \"idx-recipe_step_ingredient_draft-order\" ON \"recipe_step_ingredient_draft\" (\"order\")"
                 ),
                 String::from(
-                    "CREATE INDEX \"idx-recipe_ingredient_draft-recipe_step_id\" ON \"recipe_ingredient_draft\" (\"recipe_step_id\")"
+                    "CREATE INDEX \"idx-recipe_step_ingredient_draft-recipe_step_id\" ON \"recipe_step_ingredient_draft\" (\"recipe_step_id\")"
                 ),
             ]
         )

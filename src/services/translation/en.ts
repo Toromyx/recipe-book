@@ -29,14 +29,14 @@ const translationStrings: TranslationStrings = {
         name: "Name",
         path: "File",
       },
-      recipeIngredient: {
+      recipeStep: {
+        description: "Description",
+      },
+      recipeStepIngredient: {
         quantity: "Quantity",
         unit: "Unit",
         ingredient: "Ingredient",
         quality: "Quality",
-      },
-      recipeStep: {
-        description: "Description",
       },
     },
     descriptions: {

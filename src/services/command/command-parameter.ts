@@ -7,17 +7,17 @@ import type {
   RecipeFileUpdateInterface,
 } from "../../types/entity/recipe-file-interface.ts";
 import type {
-  RecipeIngredientDraftCreateInterface,
-  RecipeIngredientDraftUpdateInterface,
-} from "../../types/entity/recipe-ingredient-draft-interface.ts";
-import type {
-  RecipeIngredientCreateInterface,
-  RecipeIngredientUpdateInterface,
-} from "../../types/entity/recipe-ingredient-interface.ts";
-import type {
   RecipeCreateInterface,
   RecipeUpdateInterface,
 } from "../../types/entity/recipe-interface.ts";
+import type {
+  RecipeStepIngredientDraftCreateInterface,
+  RecipeStepIngredientDraftUpdateInterface,
+} from "../../types/entity/recipe-step-ingredient-draft-interface.ts";
+import type {
+  RecipeStepIngredientCreateInterface,
+  RecipeStepIngredientUpdateInterface,
+} from "../../types/entity/recipe-step-ingredient-interface.ts";
 import type {
   RecipeStepCreateInterface,
   RecipeStepUpdateInterface,
@@ -40,17 +40,17 @@ import type {
   RecipeFilter,
 } from "../../types/filter/recipe-filter.ts";
 import type {
-  RecipeIngredientDraftCondition,
-  RecipeIngredientDraftFilter,
-} from "../../types/filter/recipe-ingredient-draft-filter.ts";
-import type {
-  RecipeIngredientCondition,
-  RecipeIngredientFilter,
-} from "../../types/filter/recipe-ingredient-filter.ts";
-import type {
   RecipeStepCondition,
   RecipeStepFilter,
 } from "../../types/filter/recipe-step-filter.ts";
+import type {
+  RecipeStepIngredientDraftCondition,
+  RecipeStepIngredientDraftFilter,
+} from "../../types/filter/recipe-step-ingredient-draft-filter.ts";
+import type {
+  RecipeStepIngredientCondition,
+  RecipeStepIngredientFilter,
+} from "../../types/filter/recipe-step-ingredient-filter.ts";
 import type {
   UnitNameCondition,
   UnitNameFilter,
@@ -87,34 +87,34 @@ type CommandParameterMap = {
     condition?: RecipeFileCondition;
   };
 
-  [Command.ENTITY_CREATE_RECIPE_INGREDIENT]: {
-    create: RecipeIngredientCreateInterface;
+  [Command.ENTITY_CREATE_RECIPE_STEP_INGREDIENT]: {
+    create: RecipeStepIngredientCreateInterface;
   };
-  [Command.ENTITY_READ_RECIPE_INGREDIENT]: { id: number };
-  [Command.ENTITY_UPDATE_RECIPE_INGREDIENT]: {
-    update: RecipeIngredientUpdateInterface;
+  [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT]: { id: number };
+  [Command.ENTITY_UPDATE_RECIPE_STEP_INGREDIENT]: {
+    update: RecipeStepIngredientUpdateInterface;
   };
-  [Command.ENTITY_DELETE_RECIPE_INGREDIENT]: { id: number };
-  [Command.ENTITY_LIST_RECIPE_INGREDIENT]: {
-    filter: RecipeIngredientFilter;
+  [Command.ENTITY_DELETE_RECIPE_STEP_INGREDIENT]: { id: number };
+  [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT]: {
+    filter: RecipeStepIngredientFilter;
   };
-  [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: {
-    condition?: RecipeIngredientCondition;
+  [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT]: {
+    condition?: RecipeStepIngredientCondition;
   };
 
-  [Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT]: {
-    create: RecipeIngredientDraftCreateInterface;
+  [Command.ENTITY_CREATE_RECIPE_STEP_INGREDIENT_DRAFT]: {
+    create: RecipeStepIngredientDraftCreateInterface;
   };
-  [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: { id: number };
-  [Command.ENTITY_UPDATE_RECIPE_INGREDIENT_DRAFT]: {
-    update: RecipeIngredientDraftUpdateInterface;
+  [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT]: { id: number };
+  [Command.ENTITY_UPDATE_RECIPE_STEP_INGREDIENT_DRAFT]: {
+    update: RecipeStepIngredientDraftUpdateInterface;
   };
-  [Command.ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT]: { id: number };
-  [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {
-    filter: RecipeIngredientDraftFilter;
+  [Command.ENTITY_DELETE_RECIPE_STEP_INGREDIENT_DRAFT]: { id: number };
+  [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT]: {
+    filter: RecipeStepIngredientDraftFilter;
   };
-  [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {
-    condition?: RecipeIngredientDraftCondition;
+  [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT]: {
+    condition?: RecipeStepIngredientDraftCondition;
   };
 
   [Command.ENTITY_CREATE_RECIPE_STEP]: { create: RecipeStepCreateInterface };

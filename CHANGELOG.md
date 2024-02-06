@@ -20,13 +20,13 @@ Types of changes:
 
 - Implement recipe editing
 - Implement recipe files (image/video/audio) with optical character recognition
-- Add field "quality" to recipe ingredients
+- Add field "quality" to recipe step ingredients
 - Implement getting external recipes
 - Implement unit conversion
 
 ### Changed
 
-- Improve user experience of adding multiple recipe ingredients
+- Improve user experience of adding multiple recipe step ingredients
 - **BREAKING**: Refactor database migrations to only be one per major version
 
 ## [0.0.2] - 2023-02-15

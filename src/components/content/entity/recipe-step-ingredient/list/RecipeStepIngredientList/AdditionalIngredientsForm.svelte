@@ -1,24 +1,24 @@
 <!--
 @component
-This component provides a form to prompt the user to create a list of recipe ingredients.
+This component provides a form to prompt the user to create a list of recipe step ingredients.
 
-The list of recipe ingredients is provided as list of parsed recipe ingredient objects.
-This component automatically creates the recipe ingredients with the supplied recipe step id.
+The list of recipe step ingredients is provided as list of parsed recipe ingredient objects.
+This component automatically creates the recipe step ingredients with the supplied recipe step id.
 
 # Events
 
-The event `done` is emitted either on creation or cancellation. This can be used to clean up the supplied list of recipe ingredients.
+The event `done` is emitted either on creation or cancellation. This can be used to clean up the supplied list of recipe step ingredients.
 -->
 
 <script>
   import { createEventDispatcher } from "svelte";
-  import { recipeIngredientRepository } from "../../../../../../services/store/repository/recipe-ingredient-repository.ts";
+  import { recipeStepIngredientRepository } from "../../../../../../services/store/repository/recipe-step-ingredient-repository.ts";
   import { messages } from "../../../../../../services/translation/en.ts";
   import SvelteButton from "../../../../../element/SvelteButton.svelte";
   import FieldListItem from "../../../../../element/form/FieldListItem.svelte";
   import SvelteFieldset from "../../../../../element/form/SvelteFieldset.svelte";
   import SvelteForm from "../../../../../element/form/SvelteForm.svelte";
-  import RecipeIngredientEdit from "../../edit/RecipeIngredientEdit.svelte";
+  import RecipeStepIngredientEdit from "../../edit/RecipeStepIngredientEdit.svelte";
 
   /**
    * @type {number}
@@ -50,7 +50,7 @@ The event `done` is emitted either on creation or cancellation. This can be used
   on:submit="{({ detail: { values } }) => {
     for (let i = 0; i < values.ingredients.length; i++) {
       const ingredient = values.ingredients[i];
-      recipeIngredientRepository.create({
+      recipeStepIngredientRepository.create({
         order: numIngredients + 1 + i,
         quantity: ingredient.quantity || null,
         unit: ingredient.unit || null,
@@ -67,7 +67,7 @@ The event `done` is emitted either on creation or cancellation. This can be used
       {#each parsedRecipeIngredients as parsedRecipeIngredient, i (parsedRecipeIngredient)}
         <li>
           <FieldListItem index="{i}">
-            <RecipeIngredientEdit
+            <RecipeStepIngredientEdit
               on:edit="{({
                 detail: {
                   quantity,

@@ -1,4 +1,4 @@
-//! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_ingredient`].
+//! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_step_ingredient`].
 
 use sea_orm::{
     sea_query::IntoCondition,
@@ -8,17 +8,17 @@ use sea_orm::{
 use serde::Deserialize;
 
 use crate::{
-    entity::recipe_ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
+    entity::recipe_step_ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
     entity_crud::{EntityCrudTrait, Filter, Order, OrderBy},
     event::channel::{
-        ENTITY_ACTION_CREATED_RECIPE_INGREDIENT, ENTITY_ACTION_DELETED_RECIPE_INGREDIENT,
-        ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT,
+        ENTITY_ACTION_CREATED_RECIPE_STEP_INGREDIENT, ENTITY_ACTION_DELETED_RECIPE_STEP_INGREDIENT,
+        ENTITY_ACTION_UPDATED_RECIPE_STEP_INGREDIENT,
     },
 };
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeIngredientCreate {
+pub struct RecipeStepIngredientCreate {
     pub order: i64,
     pub quantity: Option<f64>,
     pub unit: Option<String>,
@@ -29,7 +29,7 @@ pub struct RecipeIngredientCreate {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeIngredientUpdate {
+pub struct RecipeStepIngredientUpdate {
     pub id: i64,
     pub order: Option<i64>,
     #[serde(default, with = "::serde_with::rust::double_option")]
@@ -41,7 +41,7 @@ pub struct RecipeIngredientUpdate {
     pub ingredient_id: Option<i64>,
 }
 
-impl IntoActiveModel<ActiveModel> for RecipeIngredientUpdate {
+impl IntoActiveModel<ActiveModel> for RecipeStepIngredientUpdate {
     fn into_active_model(self) -> ActiveModel {
         ActiveModel {
             id: Unchanged(self.id),
@@ -70,16 +70,17 @@ impl IntoActiveModel<ActiveModel> for RecipeIngredientUpdate {
     }
 }
 
-pub type RecipeIngredientFilter = Filter<RecipeIngredientCondition, RecipeIngredientOrderBy>;
+pub type RecipeStepIngredientFilter =
+    Filter<RecipeStepIngredientCondition, RecipeStepIngredientOrderBy>;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeIngredientCondition {
+pub struct RecipeStepIngredientCondition {
     pub recipe_step_id: Option<i64>,
     pub ingredient_id: Option<i64>,
 }
 
-impl IntoCondition for RecipeIngredientCondition {
+impl IntoCondition for RecipeStepIngredientCondition {
     fn into_condition(self) -> Condition {
         Condition::all()
             .add_option(
@@ -95,33 +96,35 @@ impl IntoCondition for RecipeIngredientCondition {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum RecipeIngredientOrderBy {
+pub enum RecipeStepIngredientOrderBy {
     Order(Order),
 }
 
-impl OrderBy for RecipeIngredientOrderBy {
+impl OrderBy for RecipeStepIngredientOrderBy {
     type Entity = Entity;
 
     fn add(self, select: Select<Self::Entity>) -> Select<Self::Entity> {
         match self {
-            RecipeIngredientOrderBy::Order(order) => select.order_by(Column::Order, order.into()),
+            RecipeStepIngredientOrderBy::Order(order) => {
+                select.order_by(Column::Order, order.into())
+            }
         }
     }
 }
 
-pub struct RecipeIngredientCrud {}
+pub struct RecipeStepIngredientCrud {}
 
-impl EntityCrudTrait for RecipeIngredientCrud {
+impl EntityCrudTrait for RecipeStepIngredientCrud {
     type Entity = Entity;
     type Model = Model;
     type ActiveModel = ActiveModel;
     type Column = Column;
     type Relation = Relation;
     type PrimaryKey = PrimaryKey;
-    type EntityCreate = RecipeIngredientCreate;
-    type EntityUpdate = RecipeIngredientUpdate;
-    type EntityCondition = RecipeIngredientCondition;
-    type EntityOrderBy = RecipeIngredientOrderBy;
+    type EntityCreate = RecipeStepIngredientCreate;
+    type EntityUpdate = RecipeStepIngredientUpdate;
+    type EntityCondition = RecipeStepIngredientCondition;
+    type EntityOrderBy = RecipeStepIngredientOrderBy;
 
     fn primary_key_value(model: &Model) -> i64 {
         model.id
@@ -132,14 +135,14 @@ impl EntityCrudTrait for RecipeIngredientCrud {
     }
 
     fn entity_action_created_channel() -> &'static str {
-        ENTITY_ACTION_CREATED_RECIPE_INGREDIENT
+        ENTITY_ACTION_CREATED_RECIPE_STEP_INGREDIENT
     }
 
     fn entity_action_updated_channel() -> &'static str {
-        ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT
+        ENTITY_ACTION_UPDATED_RECIPE_STEP_INGREDIENT
     }
 
     fn entity_action_deleted_channel() -> &'static str {
-        ENTITY_ACTION_DELETED_RECIPE_INGREDIENT
+        ENTITY_ACTION_DELETED_RECIPE_STEP_INGREDIENT
     }
 }

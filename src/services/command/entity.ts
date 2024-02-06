@@ -9,20 +9,20 @@ import type {
   RecipeFileUpdateInterface,
 } from "../../types/entity/recipe-file-interface.ts";
 import type {
-  RecipeIngredientDraftCreateInterface,
-  RecipeIngredientDraftInterface,
-  RecipeIngredientDraftUpdateInterface,
-} from "../../types/entity/recipe-ingredient-draft-interface.ts";
-import type {
-  RecipeIngredientCreateInterface,
-  RecipeIngredientInterface,
-  RecipeIngredientUpdateInterface,
-} from "../../types/entity/recipe-ingredient-interface.ts";
-import type {
   RecipeCreateInterface,
   RecipeInterface,
   RecipeUpdateInterface,
 } from "../../types/entity/recipe-interface.ts";
+import type {
+  RecipeStepIngredientDraftCreateInterface,
+  RecipeStepIngredientDraftInterface,
+  RecipeStepIngredientDraftUpdateInterface,
+} from "../../types/entity/recipe-step-ingredient-draft-interface.ts";
+import type {
+  RecipeStepIngredientCreateInterface,
+  RecipeStepIngredientInterface,
+  RecipeStepIngredientUpdateInterface,
+} from "../../types/entity/recipe-step-ingredient-interface.ts";
 import type {
   RecipeStepCreateInterface,
   RecipeStepInterface,
@@ -46,17 +46,17 @@ import type {
   RecipeFilter,
 } from "../../types/filter/recipe-filter.ts";
 import type {
-  RecipeIngredientDraftCondition,
-  RecipeIngredientDraftFilter,
-} from "../../types/filter/recipe-ingredient-draft-filter.ts";
-import type {
-  RecipeIngredientCondition,
-  RecipeIngredientFilter,
-} from "../../types/filter/recipe-ingredient-filter.ts";
-import type {
   RecipeStepCondition,
   RecipeStepFilter,
 } from "../../types/filter/recipe-step-filter.ts";
+import type {
+  RecipeStepIngredientDraftCondition,
+  RecipeStepIngredientDraftFilter,
+} from "../../types/filter/recipe-step-ingredient-draft-filter.ts";
+import type {
+  RecipeStepIngredientCondition,
+  RecipeStepIngredientFilter,
+} from "../../types/filter/recipe-step-ingredient-filter.ts";
 import type {
   UnitNameCondition,
   UnitNameFilter,
@@ -71,8 +71,8 @@ type CommandEntityRead =
   | Command.ENTITY_READ_INGREDIENT
   | Command.ENTITY_READ_RECIPE
   | Command.ENTITY_READ_RECIPE_FILE
-  | Command.ENTITY_READ_RECIPE_INGREDIENT
-  | Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT
+  | Command.ENTITY_READ_RECIPE_STEP_INGREDIENT
+  | Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT
   | Command.ENTITY_READ_RECIPE_STEP
   | Command.ENTITY_READ_UNIT_NAME;
 
@@ -80,8 +80,8 @@ type CommandEntityList =
   | Command.ENTITY_LIST_INGREDIENT
   | Command.ENTITY_LIST_RECIPE
   | Command.ENTITY_LIST_RECIPE_FILE
-  | Command.ENTITY_LIST_RECIPE_INGREDIENT
-  | Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT
+  | Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT
+  | Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT
   | Command.ENTITY_LIST_RECIPE_STEP
   | Command.ENTITY_LIST_UNIT_NAME;
 
@@ -89,8 +89,8 @@ type CommandEntityCount =
   | Command.ENTITY_COUNT_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE
   | Command.ENTITY_COUNT_RECIPE_FILE
-  | Command.ENTITY_COUNT_RECIPE_INGREDIENT
-  | Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT
+  | Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT
+  | Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT
   | Command.ENTITY_COUNT_RECIPE_STEP
   | Command.ENTITY_COUNT_UNIT_NAME;
 
@@ -102,8 +102,8 @@ const entityReadPromiseCollector: {
   [Command.ENTITY_READ_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE]: {},
   [Command.ENTITY_READ_RECIPE_FILE]: {},
-  [Command.ENTITY_READ_RECIPE_INGREDIENT]: {},
-  [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: {},
+  [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT]: {},
+  [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_READ_RECIPE_STEP]: {},
   [Command.ENTITY_READ_UNIT_NAME]: {},
 };
@@ -116,8 +116,8 @@ const entityListPromiseCollector: {
   [Command.ENTITY_LIST_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE]: {},
   [Command.ENTITY_LIST_RECIPE_FILE]: {},
-  [Command.ENTITY_LIST_RECIPE_INGREDIENT]: {},
-  [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {},
+  [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT]: {},
+  [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_LIST_RECIPE_STEP]: {},
   [Command.ENTITY_LIST_UNIT_NAME]: {},
 };
@@ -130,8 +130,8 @@ const entityCountPromiseCollector: {
   [Command.ENTITY_COUNT_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE]: {},
   [Command.ENTITY_COUNT_RECIPE_FILE]: {},
-  [Command.ENTITY_COUNT_RECIPE_INGREDIENT]: {},
-  [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {},
+  [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT]: {},
+  [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP]: {},
   [Command.ENTITY_COUNT_UNIT_NAME]: {},
 };
@@ -284,73 +284,76 @@ export function countRecipeFile(
   return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, condition);
 }
 
-export function createRecipeIngredient(
-  create: RecipeIngredientCreateInterface,
+export function createRecipeStepIngredient(
+  create: RecipeStepIngredientCreateInterface,
 ): Promise<number> {
-  return invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT, { create });
+  return invoke(Command.ENTITY_CREATE_RECIPE_STEP_INGREDIENT, { create });
 }
 
-export function readRecipeIngredient(
+export function readRecipeStepIngredient(
   id: number,
-): Promise<RecipeIngredientInterface> {
-  return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT, id);
+): Promise<RecipeStepIngredientInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_STEP_INGREDIENT, id);
 }
 
-export function updateRecipeIngredient(
-  update: RecipeIngredientUpdateInterface,
+export function updateRecipeStepIngredient(
+  update: RecipeStepIngredientUpdateInterface,
 ): Promise<void> {
-  return invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT, { update });
+  return invoke(Command.ENTITY_UPDATE_RECIPE_STEP_INGREDIENT, { update });
 }
 
-export function deleteRecipeIngredient(id: number): Promise<void> {
-  return invoke(Command.ENTITY_DELETE_RECIPE_INGREDIENT, { id });
+export function deleteRecipeStepIngredient(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_STEP_INGREDIENT, { id });
 }
 
-export function listRecipeIngredient(
-  filter: RecipeIngredientFilter,
+export function listRecipeStepIngredient(
+  filter: RecipeStepIngredientFilter,
 ): Promise<number[]> {
-  return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT, filter);
+  return listCollected(Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT, filter);
 }
 
-export function countRecipeIngredient(
-  condition?: RecipeIngredientCondition,
+export function countRecipeStepIngredient(
+  condition?: RecipeStepIngredientCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE_INGREDIENT, condition);
+  return countCollected(Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT, condition);
 }
 
-export function createRecipeIngredientDraft(
-  create: RecipeIngredientDraftCreateInterface,
+export function createRecipeStepIngredientDraft(
+  create: RecipeStepIngredientDraftCreateInterface,
 ): Promise<number> {
-  return invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT, { create });
+  return invoke(Command.ENTITY_CREATE_RECIPE_STEP_INGREDIENT_DRAFT, { create });
 }
 
-export function readRecipeIngredientDraft(
+export function readRecipeStepIngredientDraft(
   id: number,
-): Promise<RecipeIngredientDraftInterface> {
-  return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT, id);
+): Promise<RecipeStepIngredientDraftInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT, id);
 }
 
-export function updateRecipeIngredientDraft(
-  update: RecipeIngredientDraftUpdateInterface,
+export function updateRecipeStepIngredientDraft(
+  update: RecipeStepIngredientDraftUpdateInterface,
 ): Promise<void> {
-  return invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT_DRAFT, { update });
+  return invoke(Command.ENTITY_UPDATE_RECIPE_STEP_INGREDIENT_DRAFT, { update });
 }
 
-export function deleteRecipeIngredientDraft(id: number): Promise<void> {
-  return invoke(Command.ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT, { id });
+export function deleteRecipeStepIngredientDraft(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_STEP_INGREDIENT_DRAFT, { id });
 }
 
-export function listRecipeIngredientDraft(
-  filter: RecipeIngredientDraftFilter,
+export function listRecipeStepIngredientDraft(
+  filter: RecipeStepIngredientDraftFilter,
 ): Promise<number[]> {
-  return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT, filter);
+  return listCollected(
+    Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT,
+    filter,
+  );
 }
 
-export function countRecipeIngredientDraft(
-  condition?: RecipeIngredientDraftCondition,
+export function countRecipeStepIngredientDraft(
+  condition?: RecipeStepIngredientDraftCondition,
 ): Promise<number> {
   return countCollected(
-    Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT,
+    Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT,
     condition,
   );
 }

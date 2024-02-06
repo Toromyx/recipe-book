@@ -28,14 +28,14 @@ type Translations<T> = {
         name: T;
         path: T;
       };
-      recipeIngredient: {
+      recipeStep: {
+        description: T;
+      };
+      recipeStepIngredient: {
         quantity: T;
         unit: T;
         ingredient: T;
         quality: T;
-      };
-      recipeStep: {
-        description: T;
       };
     };
     descriptions: {

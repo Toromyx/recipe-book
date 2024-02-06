@@ -50,14 +50,23 @@ export const ingredientRepository: EntityRepository<
     });
   },
   (reactFunction) => {
-    void listen(EventChannel.ENTITY_ACTION_UPDATED_RECIPE_INGREDIENT, () => {
-      reactFunction();
-    });
-    void listen(EventChannel.ENTITY_ACTION_CREATED_RECIPE_INGREDIENT, () => {
-      reactFunction();
-    });
-    void listen(EventChannel.ENTITY_ACTION_DELETED_RECIPE_INGREDIENT, () => {
-      reactFunction();
-    });
+    void listen(
+      EventChannel.ENTITY_ACTION_UPDATED_RECIPE_STEP_INGREDIENT,
+      () => {
+        reactFunction();
+      },
+    );
+    void listen(
+      EventChannel.ENTITY_ACTION_CREATED_RECIPE_STEP_INGREDIENT,
+      () => {
+        reactFunction();
+      },
+    );
+    void listen(
+      EventChannel.ENTITY_ACTION_DELETED_RECIPE_STEP_INGREDIENT,
+      () => {
+        reactFunction();
+      },
+    );
   },
 );

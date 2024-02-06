@@ -9,7 +9,7 @@ This component displays the content of a recipe step.
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import Editable from "../../../../layout/Editable.svelte";
   import RecipeFileList from "../../recipe-file/list/RecipeFileList.svelte";
-  import RecipeIngredientList from "../../recipe-ingredient/list/RecipeIngredientList.svelte";
+  import RecipeStepIngredientList from "../../recipe-step-ingredient/list/RecipeStepIngredientList.svelte";
   import RecipeStepEdit from "../edit/RecipeStepEdit.svelte";
 
   /**
@@ -31,7 +31,7 @@ This component displays the content of a recipe step.
     {messages.headings.recipeStep.format({ number: $recipeStep.order })}
   </h2>
   <h3>{messages.headings.ingredients.format()}</h3>
-  <RecipeIngredientList recipeStepId="{id}" factor="{factor}" />
+  <RecipeStepIngredientList recipeStepId="{id}" factor="{factor}" />
   <h3>{messages.headings.description.format()}</h3>
   <Editable
     on:edit="{async ({ detail: { values, changed } }) => {

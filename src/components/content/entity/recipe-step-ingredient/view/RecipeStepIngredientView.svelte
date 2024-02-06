@@ -1,15 +1,15 @@
 <!--
 @component
-This component displays the content of recipe ingredient.
+This component displays the content of recipe step ingredient.
 
-The recipe ingredient is editable.
+The recipe step ingredient is editable.
 It also takes care of the unit conversion.
 -->
 
 <script>
   import { invoke } from "../../../../../services/command/client.ts";
   import { Command } from "../../../../../services/command/command.ts";
-  import { recipeIngredientRepository } from "../../../../../services/store/repository/recipe-ingredient-repository.ts";
+  import { recipeStepIngredientRepository } from "../../../../../services/store/repository/recipe-step-ingredient-repository.ts";
   import { unitNameRepository } from "../../../../../services/store/repository/unit-name-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import {
@@ -19,10 +19,10 @@ It also takes care of the unit conversion.
   import { Unit } from "../../../../../types/entity/unit-name-interface.ts";
   import Editable from "../../../../layout/Editable.svelte";
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
-  import RecipeIngredientEdit from "../edit/RecipeIngredientEdit.svelte";
+  import RecipeStepIngredientEdit from "../edit/RecipeStepIngredientEdit.svelte";
 
   /**
-   * the recipe ingredient id
+   * the recipe step ingredient id
    * @type {number}
    */
   export let id;
@@ -33,8 +33,8 @@ It also takes care of the unit conversion.
     maximumSignificantDigits: 3,
   });
 
-  /** @type {Readable<Loadable<RecipeIngredientInterface>>} */
-  let recipeIngredient;
+  /** @type {Readable<Loadable<RecipeStepIngredientInterface>>} */
+  let recipeStepIngredient;
   /** @type {Readable<Loadable<number[]> | null>} */
   let unitNameList;
   /** @type {Readable<Loadable<UnitNameInterface> | null> } */
@@ -56,18 +56,18 @@ It also takes care of the unit conversion.
   /** @type {ConvertedValue | undefined} */
   let mostReadableConvertedValue;
 
-  $: recipeIngredient = recipeIngredientRepository.createStore(id);
+  $: recipeStepIngredient = recipeStepIngredientRepository.createStore(id);
   $: quantity = whenLoadedValue(
-    $recipeIngredient,
-    (recipeIngredient) => recipeIngredient.quantity,
+    $recipeStepIngredient,
+    (recipeStepIngredient) => recipeStepIngredient.quantity,
   );
   $: safeFactor = !isNaN(factor) ? factor : 1;
   $: factoredQuantity = whenLoadedValue(quantity, (quantity) =>
     quantity !== null ? quantity * safeFactor : null,
   );
   $: unit = whenLoadedValue(
-    $recipeIngredient,
-    (recipeIngredient) => recipeIngredient.unit,
+    $recipeStepIngredient,
+    (recipeStepIngredient) => recipeStepIngredient.unit,
   );
   $: unitNameList = whenLoadedValue(unit, (unit) =>
     unit
@@ -158,7 +158,7 @@ It also takes care of the unit conversion.
   }
 </script>
 
-{#if isLoaded($recipeIngredient)}
+{#if isLoaded($recipeStepIngredient)}
   <Editable
     on:edit="{({ detail: { values, changed } }) => {
       const update = { id };
@@ -174,7 +174,7 @@ It also takes care of the unit conversion.
       if (changed.ingredientId) {
         update.ingredientId = values.ingredientId[0];
       }
-      recipeIngredientRepository.update(id, () => update);
+      recipeStepIngredientRepository.update(id, () => update);
     }}"
   >
     <span
@@ -183,15 +183,15 @@ It also takes care of the unit conversion.
         ? `${originalQuantifiers}\xa0⨉\xa0${safeFactor}`
         : undefined}"
       >{#if quantifiers}{quantifiers}&nbsp;{/if}<IngredientViewName
-        id="{$recipeIngredient.ingredientId}"
-      />{#if $recipeIngredient.quality}{` (${$recipeIngredient.quality})`}{/if}</span
+        id="{$recipeStepIngredient.ingredientId}"
+      />{#if $recipeStepIngredient.quality}{` (${$recipeStepIngredient.quality})`}{/if}</span
     >
-    <RecipeIngredientEdit
+    <RecipeStepIngredientEdit
       slot="edit"
-      quantity="{$recipeIngredient.quantity}"
-      unit="{$recipeIngredient.unit}"
-      ingredientId="{$recipeIngredient.ingredientId}"
-      quality="{$recipeIngredient.quality}"
+      quantity="{$recipeStepIngredient.quantity}"
+      unit="{$recipeStepIngredient.unit}"
+      ingredientId="{$recipeStepIngredient.ingredientId}"
+      quality="{$recipeStepIngredient.quality}"
     />
   </Editable>
 {/if}

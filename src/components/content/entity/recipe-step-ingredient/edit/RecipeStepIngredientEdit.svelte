@@ -1,6 +1,6 @@
 <!--
 @component
-This component implements form fields for editing an recipe ingredient.
+This component implements form fields for editing an recipe step ingredient.
 
 # Events
 
@@ -19,27 +19,27 @@ The event `edit` is fired when the user makes a change to any field. The event d
   import IngredientViewName from "../../ingredient/view/IngredientViewName.svelte";
 
   /**
-   * the existing recipe ingredient's quantity
+   * the existing recipe step ingredient's quantity
    * @type {?number}
    */
   export let quantity = undefined;
   /**
-   * the existing recipe ingredient's unit
+   * the existing recipe step ingredient's unit
    * @type {?string}
    */
   export let unit = undefined;
   /**
-   * the existing recipe ingredient's ingredient id
+   * the existing recipe step ingredient's ingredient id
    * @type {?number}
    */
   export let ingredientId = undefined;
   /**
-   * the existing recipe ingredient's ingredient name
+   * the existing recipe step ingredient's ingredient name
    * @type {string}
    */
   export let ingredientName = "";
   /**
-   * the existing recipe ingredient's quality
+   * the existing recipe step ingredient's quality
    * @type {?string}
    */
   export let quality = undefined;
@@ -123,7 +123,7 @@ The event `edit` is fired when the user makes a change to any field. The event d
   name="quantity"
   type="number"
   value="{innerQuantity}"
-  label="{messages.labels.entityFields.recipeIngredient.quantity.format()}"
+  label="{messages.labels.entityFields.recipeStepIngredient.quantity.format()}"
   min="0"
 />
 <SvelteInput
@@ -132,7 +132,7 @@ The event `edit` is fired when the user makes a change to any field. The event d
   on:paste
   name="unit"
   value="{innerUnit}"
-  label="{messages.labels.entityFields.recipeIngredient.unit.format()}"
+  label="{messages.labels.entityFields.recipeStepIngredient.unit.format()}"
   list="{UNIT_LIST_ID}"
 />
 <Autocomplete
@@ -146,7 +146,7 @@ The event `edit` is fired when the user makes a change to any field. The event d
   value="{innerIngredientId ? [innerIngredientId] : []}"
   userInput="{innerIngredientName}"
   excludedValues="{usedIngredientIds}"
-  label="{messages.labels.entityFields.recipeIngredient.ingredient.format()}"
+  label="{messages.labels.entityFields.recipeStepIngredient.ingredient.format()}"
   callback="{async (userInput) => (ingredientIdUserInput = userInput)}"
   results="{whenLoadingDefault($ingredientIdResults, [])}"
   createCallback="{(userInput) =>
@@ -161,5 +161,5 @@ The event `edit` is fired when the user makes a change to any field. The event d
   on:paste
   name="quality"
   value="{innerQuality}"
-  label="{messages.labels.entityFields.recipeIngredient.quality.format()}"
+  label="{messages.labels.entityFields.recipeStepIngredient.quality.format()}"
 />

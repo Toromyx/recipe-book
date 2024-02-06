@@ -30,8 +30,8 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Recipe,
-    #[sea_orm(has_many = "super::recipe_ingredient::Entity")]
-    RecipeIngredient,
+    #[sea_orm(has_many = "super::recipe_step_ingredient::Entity")]
+    RecipeStepIngredient,
     #[sea_orm(has_many = "super::recipe_file::Entity")]
     RecipeFile,
 }
@@ -42,9 +42,9 @@ impl Related<super::recipe::Entity> for Entity {
     }
 }
 
-impl Related<super::recipe_ingredient::Entity> for Entity {
+impl Related<super::recipe_step_ingredient::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::RecipeIngredient.def()
+        Relation::RecipeStepIngredient.def()
     }
 }
 

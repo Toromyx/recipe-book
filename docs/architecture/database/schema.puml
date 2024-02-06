@@ -16,7 +16,7 @@ entity "Recipe Step" as recipe_step {
 }
 recipe_step }o--|| "recipe_id" recipe
 
-entity "Recipe Ingredient" as recipe_ingredient {
+entity "Recipe Step Ingredient" as recipe_step_ingredient {
   id: INTEGER
   --
   order: INTEGER
@@ -24,22 +24,22 @@ entity "Recipe Ingredient" as recipe_ingredient {
   unit: ?TEXT
   quality: ?TEXT
 }
-recipe_ingredient }o--|| "step_id" recipe_step
+recipe_step_ingredient }o--|| "recipe_id" recipe
 
-entity "Recipe Ingredient Draft" as recipe_ingredient_draft {
+entity "Recipe Step Ingredient Draft" as recipe_step_ingredient_draft {
   id: INTEGER
   --
   order: INTEGER
   text: TEXT
 }
-recipe_ingredient_draft }o--|| "step_id" recipe_step
+recipe_step_ingredient_draft }o--|| "step_id" recipe_step
 
 entity "Ingredient" as ingredient {
   id: INTEGER
   --
   name: TEXT
 }
-ingredient "ingredient_id" ||--o{ recipe_ingredient
+ingredient "ingredient_id" ||--o{ recipe_step_ingredient
 
 entity "Recipe File" as recipe_file {
   id: INTEGER
