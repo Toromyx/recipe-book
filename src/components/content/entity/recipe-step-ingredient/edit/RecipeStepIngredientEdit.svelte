@@ -4,7 +4,7 @@ This component implements form fields for editing an recipe ingredient.
 
 # Events
 
-The event `edit` is fired when the user makes yn change to any field. The event detail is all the form values.
+The event `edit` is fired when the user makes a change to any field. The event detail is all the form values.
 -->
 
 <script>
