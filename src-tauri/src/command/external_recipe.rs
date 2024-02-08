@@ -3,6 +3,7 @@ use crate::{
     entity_crud::{
         recipe::{RecipeCreate, RecipeCrud},
         recipe_file::{RecipeFileCreate, RecipeFileCreateUri, RecipeFileCrud},
+        recipe_ingredient_draft::{RecipeIngredientDraftCreate, RecipeIngredientDraftCrud},
         recipe_step::{RecipeStepCreate, RecipeStepCrud},
         recipe_step_ingredient_draft::{
             RecipeStepIngredientDraftCreate, RecipeStepIngredientDraftCrud,
@@ -18,6 +19,17 @@ pub async fn external_recipe(url: String) -> Result<i64, CommandError> {
         name: external_recipe.name,
     })
     .await?;
+    for (i, ingredient) in external_recipe.ingredients.into_iter().enumerate() {
+        tokio::spawn(async move {
+            RecipeIngredientDraftCrud::create(RecipeIngredientDraftCreate {
+                order: (i + 1) as i64,
+                text: ingredient,
+                recipe_id,
+            })
+            .await
+            .unwrap();
+        });
+    }
     for (i, step) in external_recipe.steps.into_iter().enumerate() {
         tokio::spawn(async move {
             let recipe_step_id = RecipeStepCrud::create(RecipeStepCreate {

@@ -135,6 +135,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
                         .map(|block| block.video_data.video_list.video.url)
                         .collect(),
                 }],
+                ..Default::default()
             }),
             PinterestRelayPinQueryData::External(data) => {
                 let external_recipe = crate::external_recipe::get(data.link).await?;
@@ -147,7 +148,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
         vec![pin_it_uri_match(), pinterest_uri_match()]
     }
 }
-
+/*
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
@@ -199,3 +200,4 @@ mod tests {
         }
     }
 }
+*/

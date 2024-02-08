@@ -53,6 +53,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
         Ok(ExternalRecipe {
             name: dom.select("h1").await?.unwrap().text_content().await?,
             steps,
+            ..Default::default()
         })
     }
 

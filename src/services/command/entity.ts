@@ -9,6 +9,11 @@ import type {
   RecipeFileUpdateInterface,
 } from "../../types/entity/recipe-file-interface.ts";
 import type {
+  RecipeIngredientDraftCreateInterface,
+  RecipeIngredientDraftInterface,
+  RecipeIngredientDraftUpdateInterface,
+} from "../../types/entity/recipe-ingredient-draft-interface.ts";
+import type {
   RecipeCreateInterface,
   RecipeInterface,
   RecipeUpdateInterface,
@@ -46,6 +51,10 @@ import type {
   RecipeFilter,
 } from "../../types/filter/recipe-filter.ts";
 import type {
+  RecipeIngredientDraftCondition,
+  RecipeIngredientDraftFilter,
+} from "../../types/filter/recipe-ingredient-draft-filter.ts";
+import type {
   RecipeStepCondition,
   RecipeStepFilter,
 } from "../../types/filter/recipe-step-filter.ts";
@@ -70,6 +79,7 @@ import { Command } from "./command.ts";
 type CommandEntityRead =
   | Command.ENTITY_READ_INGREDIENT
   | Command.ENTITY_READ_RECIPE
+  | Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT
   | Command.ENTITY_READ_RECIPE_FILE
   | Command.ENTITY_READ_RECIPE_STEP_INGREDIENT
   | Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT
@@ -79,6 +89,7 @@ type CommandEntityRead =
 type CommandEntityList =
   | Command.ENTITY_LIST_INGREDIENT
   | Command.ENTITY_LIST_RECIPE
+  | Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT
   | Command.ENTITY_LIST_RECIPE_FILE
   | Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT
   | Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT
@@ -88,6 +99,7 @@ type CommandEntityList =
 type CommandEntityCount =
   | Command.ENTITY_COUNT_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE
+  | Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT
   | Command.ENTITY_COUNT_RECIPE_FILE
   | Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT
@@ -101,6 +113,7 @@ const entityReadPromiseCollector: {
 } = {
   [Command.ENTITY_READ_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE]: {},
+  [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_READ_RECIPE_FILE]: {},
   [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT]: {},
@@ -115,6 +128,7 @@ const entityListPromiseCollector: {
 } = {
   [Command.ENTITY_LIST_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE]: {},
+  [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_LIST_RECIPE_FILE]: {},
   [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT]: {},
@@ -129,6 +143,7 @@ const entityCountPromiseCollector: {
 } = {
   [Command.ENTITY_COUNT_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE]: {},
+  [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_COUNT_RECIPE_FILE]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT]: {},
@@ -252,6 +267,43 @@ export function listRecipe(filter: RecipeFilter): Promise<number[]> {
 
 export function countRecipe(condition?: RecipeCondition): Promise<number> {
   return countCollected(Command.ENTITY_COUNT_RECIPE, condition);
+}
+
+export function createRecipeIngredientDraft(
+  create: RecipeIngredientDraftCreateInterface,
+): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT, { create });
+}
+
+export function readRecipeIngredientDraft(
+  id: number,
+): Promise<RecipeIngredientDraftInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT, id);
+}
+
+export function updateRecipeIngredientDraft(
+  update: RecipeIngredientDraftUpdateInterface,
+): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_RECIPE_INGREDIENT_DRAFT, { update });
+}
+
+export function deleteRecipeIngredientDraft(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT, { id });
+}
+
+export function listRecipeIngredientDraft(
+  filter: RecipeIngredientDraftFilter,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT, filter);
+}
+
+export function countRecipeIngredientDraft(
+  condition?: RecipeIngredientDraftCondition,
+): Promise<number> {
+  return countCollected(
+    Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT,
+    condition,
+  );
 }
 
 export function createRecipeFile(

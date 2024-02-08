@@ -36,6 +36,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
                     description: String::from(""),
                     files: vec![pdf_anchor_element.get_attribute("href").await?],
                 }],
+                ..Default::default()
             }),
             Some(recipe_element) => {
                 let name_element = recipe_element.select(".ERSName").await?.unwrap();
@@ -67,6 +68,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
                             pdf_anchor_element.get_attribute("href").await?,
                         ],
                     }],
+                    ..Default::default()
                 })
             }
         }
@@ -95,12 +97,12 @@ mod tests {
                 external_recipe: ExternalRecipe {
                     name: String::from("Apfel-Mazarin-Kuchen"),
                     steps: vec![ExternalRecipeStep {
-                        ingredients: vec![],
-                        description: String::from(""),
                         files: vec![String::from(
                             "https://knusperstuebchen.net/wp-content/uploads/2014/09/Apfel-Mazarin-Kuchen.pdf",
                         )],
+                        ..Default::default()
                     }],
+                    ..Default::default()
                 },
             },
             ExpectedGet {
@@ -150,6 +152,7 @@ mod tests {
                             ),
                         ],
                     }],
+                    ..Default::default()
                 },
             },
             ExpectedGet {
@@ -197,6 +200,7 @@ mod tests {
                             ),
                         ],
                     }],
+                    ..Default::default()
                 },
             },
         ]

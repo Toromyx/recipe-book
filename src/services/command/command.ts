@@ -13,6 +13,13 @@ export const enum Command {
   ENTITY_LIST_RECIPE = "entity_list_recipe",
   ENTITY_COUNT_RECIPE = "entity_count_recipe",
 
+  ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT = "entity_create_recipe_ingredient_draft",
+  ENTITY_READ_RECIPE_INGREDIENT_DRAFT = "entity_read_recipe_ingredient_draft",
+  ENTITY_UPDATE_RECIPE_INGREDIENT_DRAFT = "entity_update_recipe_ingredient_draft",
+  ENTITY_DELETE_RECIPE_INGREDIENT_DRAFT = "entity_delete_recipe_ingredient_draft",
+  ENTITY_LIST_RECIPE_INGREDIENT_DRAFT = "entity_list_recipe_ingredient_draft",
+  ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT = "entity_count_recipe_ingredient_draft",
+
   ENTITY_CREATE_RECIPE_FILE = "entity_create_recipe_file",
   ENTITY_READ_RECIPE_FILE = "entity_read_recipe_file",
   ENTITY_UPDATE_RECIPE_FILE = "entity_update_recipe_file",
