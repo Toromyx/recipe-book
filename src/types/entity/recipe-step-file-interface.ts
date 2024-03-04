@@ -4,7 +4,7 @@ import type {
   SortableUpdateInterface,
 } from "../sortable-interface.ts";
 
-export interface RecipeFileInterface
+export interface RecipeStepFileInterface
   extends IdentifiableInterface,
     SortableInterface {
   name: string;
@@ -13,15 +13,15 @@ export interface RecipeFileInterface
   recipeStepId: number;
 }
 
-type RecipeFileCreateUri = { path: string } | { url: string };
+type RecipeStepFileCreateUri = { path: string } | { url: string };
 
-export interface RecipeFileCreateInterface extends SortableInterface {
+export interface RecipeStepFileCreateInterface extends SortableInterface {
   name: string;
-  uri: RecipeFileCreateUri;
+  uri: RecipeStepFileCreateUri;
   recipeStepId: number;
 }
 
-export interface RecipeFileUpdateInterface
+export interface RecipeStepFileUpdateInterface
   extends IdentifiableInterface,
     SortableUpdateInterface {
   name?: string;

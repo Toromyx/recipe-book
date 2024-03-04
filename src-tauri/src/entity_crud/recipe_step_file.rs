@@ -1,4 +1,4 @@
-//! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_file`].
+//! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_step_file`].
 
 use std::{fs, str::FromStr};
 
@@ -17,43 +17,43 @@ use tempfile::NamedTempFile;
 use url::Url;
 
 use crate::{
-    entity::recipe_file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
+    entity::recipe_step_file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
     entity_crud::{EntityCrudTrait, Filter, Order, OrderBy, TryIntoActiveModel},
     event::channel::{
-        ENTITY_ACTION_CREATED_RECIPE_FILE, ENTITY_ACTION_DELETED_RECIPE_FILE,
-        ENTITY_ACTION_UPDATED_RECIPE_FILE,
+        ENTITY_ACTION_CREATED_RECIPE_STEP_FILE, ENTITY_ACTION_DELETED_RECIPE_STEP_FILE,
+        ENTITY_ACTION_UPDATED_RECIPE_STEP_FILE,
     },
-    recipe_file_storage,
+    recipe_step_file_storage,
 };
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum RecipeFileCreateUri {
+pub enum RecipeStepFileCreateUri {
     Path(String),
     Url(String),
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeFileCreate {
+pub struct RecipeStepFileCreate {
     pub name: String,
     pub order: i64,
-    pub uri: RecipeFileCreateUri,
+    pub uri: RecipeStepFileCreateUri,
     pub recipe_step_id: i64,
 }
 
 #[async_trait]
-impl TryIntoActiveModel<ActiveModel> for RecipeFileCreate {
-    /// Transform [`RecipeFileCreate`] into an [`ActiveModel`] by guessing the mime of and maybe downloading the file.
+impl TryIntoActiveModel<ActiveModel> for RecipeStepFileCreate {
+    /// Transform [`RecipeStepFileCreate`] into an [`ActiveModel`] by guessing the mime of and maybe downloading the file.
     async fn try_into_active_model(self) -> Result<ActiveModel> {
         let (mime, path) = match self.uri {
-            RecipeFileCreateUri::Path(path) => {
+            RecipeStepFileCreateUri::Path(path) => {
                 let mime = mime_guess::from_path(&path)
                     .first_or(mime::APPLICATION_OCTET_STREAM)
                     .to_string();
                 (Set(mime), Set(path))
             }
-            RecipeFileCreateUri::Url(url) => {
+            RecipeStepFileCreateUri::Url(url) => {
                 let url = Url::from_str(&url)?;
                 let response = reqwest::get(url).await?;
                 let mime = response
@@ -83,13 +83,13 @@ impl TryIntoActiveModel<ActiveModel> for RecipeFileCreate {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeFileUpdate {
+pub struct RecipeStepFileUpdate {
     pub id: i64,
     pub name: Option<String>,
     pub order: Option<i64>,
 }
 
-impl IntoActiveModel<ActiveModel> for RecipeFileUpdate {
+impl IntoActiveModel<ActiveModel> for RecipeStepFileUpdate {
     fn into_active_model(self) -> ActiveModel {
         ActiveModel {
             id: Unchanged(self.id),
@@ -108,15 +108,15 @@ impl IntoActiveModel<ActiveModel> for RecipeFileUpdate {
     }
 }
 
-pub type RecipeFileFilter = Filter<RecipeFileCondition, RecipeFileOrderBy>;
+pub type RecipeStepFileFilter = Filter<RecipeStepFileCondition, RecipeStepFileOrderBy>;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecipeFileCondition {
+pub struct RecipeStepFileCondition {
     pub recipe_step_id: Option<i64>,
 }
 
-impl IntoCondition for RecipeFileCondition {
+impl IntoCondition for RecipeStepFileCondition {
     fn into_condition(self) -> Condition {
         Condition::all().add_option(
             self.recipe_step_id
@@ -127,37 +127,37 @@ impl IntoCondition for RecipeFileCondition {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum RecipeFileOrderBy {
+pub enum RecipeStepFileOrderBy {
     Order(Order),
 }
 
-impl OrderBy for RecipeFileOrderBy {
+impl OrderBy for RecipeStepFileOrderBy {
     type Entity = Entity;
 
     fn add(self, select: Select<Self::Entity>) -> Select<Self::Entity> {
         match self {
-            RecipeFileOrderBy::Order(order) => select.order_by(Column::Order, order.into()),
+            RecipeStepFileOrderBy::Order(order) => select.order_by(Column::Order, order.into()),
         }
     }
 }
 
-pub struct RecipeFileCrud {}
+pub struct RecipeStepFileCrud {}
 
 #[async_trait]
-impl EntityCrudTrait for RecipeFileCrud {
+impl EntityCrudTrait for RecipeStepFileCrud {
     type Entity = Entity;
     type Model = Model;
     type ActiveModel = ActiveModel;
     type Column = Column;
     type Relation = Relation;
     type PrimaryKey = PrimaryKey;
-    type EntityCreate = RecipeFileCreate;
-    type EntityUpdate = RecipeFileUpdate;
-    type EntityCondition = RecipeFileCondition;
-    type EntityOrderBy = RecipeFileOrderBy;
+    type EntityCreate = RecipeStepFileCreate;
+    type EntityUpdate = RecipeStepFileUpdate;
+    type EntityCondition = RecipeStepFileCondition;
+    type EntityOrderBy = RecipeStepFileOrderBy;
 
     async fn post_create(model: Model, txn: &DatabaseTransaction) -> Result<Model> {
-        let path = recipe_file_storage::create(&model).await?;
+        let path = recipe_step_file_storage::create(&model).await?;
         let mut active_model = model.into_active_model();
         active_model.path = Set(path.to_string_lossy().to_string());
         let model = active_model.update(txn).await?;
@@ -173,14 +173,14 @@ impl EntityCrudTrait for RecipeFileCrud {
     }
 
     fn entity_action_created_channel() -> &'static str {
-        ENTITY_ACTION_CREATED_RECIPE_FILE
+        ENTITY_ACTION_CREATED_RECIPE_STEP_FILE
     }
 
     fn entity_action_updated_channel() -> &'static str {
-        ENTITY_ACTION_UPDATED_RECIPE_FILE
+        ENTITY_ACTION_UPDATED_RECIPE_STEP_FILE
     }
 
     fn entity_action_deleted_channel() -> &'static str {
-        ENTITY_ACTION_DELETED_RECIPE_FILE
+        ENTITY_ACTION_DELETED_RECIPE_STEP_FILE
     }
 }

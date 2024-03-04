@@ -24,7 +24,7 @@ type Translations<T> = {
       recipe: {
         name: T;
       };
-      recipeFile: {
+      recipeStepFile: {
         name: T;
         path: T;
       };

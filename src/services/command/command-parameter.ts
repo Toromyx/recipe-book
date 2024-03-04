@@ -3,10 +3,6 @@ import type {
   IngredientUpdateInterface,
 } from "../../types/entity/ingredient-interface.ts";
 import type {
-  RecipeFileCreateInterface,
-  RecipeFileUpdateInterface,
-} from "../../types/entity/recipe-file-interface.ts";
-import type {
   RecipeIngredientDraftCreateInterface,
   RecipeIngredientDraftUpdateInterface,
 } from "../../types/entity/recipe-ingredient-draft-interface.ts";
@@ -14,6 +10,10 @@ import type {
   RecipeCreateInterface,
   RecipeUpdateInterface,
 } from "../../types/entity/recipe-interface.ts";
+import type {
+  RecipeStepFileCreateInterface,
+  RecipeStepFileUpdateInterface,
+} from "../../types/entity/recipe-step-file-interface.ts";
 import type {
   RecipeStepIngredientDraftCreateInterface,
   RecipeStepIngredientDraftUpdateInterface,
@@ -36,10 +36,6 @@ import type {
   IngredientFilter,
 } from "../../types/filter/ingredient-filter.ts";
 import type {
-  RecipeFileCondition,
-  RecipeFileFilter,
-} from "../../types/filter/recipe-file-filter.ts";
-import type {
   RecipeCondition,
   RecipeFilter,
 } from "../../types/filter/recipe-filter.ts";
@@ -47,6 +43,10 @@ import type {
   RecipeIngredientDraftCondition,
   RecipeIngredientDraftFilter,
 } from "../../types/filter/recipe-ingredient-draft-filter.ts";
+import type {
+  RecipeStepFileCondition,
+  RecipeStepFileFilter,
+} from "../../types/filter/recipe-step-file-filter.ts";
 import type {
   RecipeStepCondition,
   RecipeStepFilter,
@@ -95,19 +95,19 @@ type CommandParameterMap = {
     condition?: RecipeIngredientDraftCondition;
   };
 
-  [Command.ENTITY_CREATE_RECIPE_FILE]: {
-    create: RecipeFileCreateInterface;
+  [Command.ENTITY_CREATE_RECIPE_STEP_FILE]: {
+    create: RecipeStepFileCreateInterface;
   };
-  [Command.ENTITY_READ_RECIPE_FILE]: { id: number };
-  [Command.ENTITY_UPDATE_RECIPE_FILE]: {
-    update: RecipeFileUpdateInterface;
+  [Command.ENTITY_READ_RECIPE_STEP_FILE]: { id: number };
+  [Command.ENTITY_UPDATE_RECIPE_STEP_FILE]: {
+    update: RecipeStepFileUpdateInterface;
   };
-  [Command.ENTITY_DELETE_RECIPE_FILE]: { id: number };
-  [Command.ENTITY_LIST_RECIPE_FILE]: {
-    filter: RecipeFileFilter;
+  [Command.ENTITY_DELETE_RECIPE_STEP_FILE]: { id: number };
+  [Command.ENTITY_LIST_RECIPE_STEP_FILE]: {
+    filter: RecipeStepFileFilter;
   };
-  [Command.ENTITY_COUNT_RECIPE_FILE]: {
-    condition?: RecipeFileCondition;
+  [Command.ENTITY_COUNT_RECIPE_STEP_FILE]: {
+    condition?: RecipeStepFileCondition;
   };
 
   [Command.ENTITY_CREATE_RECIPE_STEP_INGREDIENT]: {
@@ -156,7 +156,7 @@ type CommandParameterMap = {
 
   [Command.EXTERNAL_RECIPE]: { url: string };
 
-  [Command.OCR]: { recipeFileId: number };
+  [Command.OCR]: { recipeStepFileId: number };
 
   [Command.UNIT_CONVERT]: { value: number; unit: Unit };
 

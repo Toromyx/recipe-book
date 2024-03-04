@@ -19,7 +19,7 @@ Types of changes:
 ### Added
 
 - Implement recipe editing
-- Implement recipe files (image/video/audio) with optical character recognition
+- Implement recipe step files (image/video/audio) with optical character recognition
 - Add field "quality" to recipe step ingredients
 - Implement getting external recipes
 - Implement unit conversion

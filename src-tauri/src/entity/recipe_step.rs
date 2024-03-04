@@ -32,8 +32,8 @@ pub enum Relation {
     Recipe,
     #[sea_orm(has_many = "super::recipe_step_ingredient::Entity")]
     RecipeStepIngredient,
-    #[sea_orm(has_many = "super::recipe_file::Entity")]
-    RecipeFile,
+    #[sea_orm(has_many = "super::recipe_step_file::Entity")]
+    RecipeStepFile,
 }
 
 impl Related<super::recipe::Entity> for Entity {
@@ -48,9 +48,9 @@ impl Related<super::recipe_step_ingredient::Entity> for Entity {
     }
 }
 
-impl Related<super::recipe_file::Entity> for Entity {
+impl Related<super::recipe_step_file::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::RecipeFile.def()
+        Relation::RecipeStepFile.def()
     }
 }
 
@@ -61,12 +61,15 @@ impl ActiveModelBehavior for ActiveModel {
         C: ConnectionTrait,
     {
         let model = self.clone().try_into_model()?;
-        let recipe_files = model
-            .find_related(super::recipe_file::Entity)
+        let recipe_step_files = model
+            .find_related(super::recipe_step_file::Entity)
             .all(db)
             .await?;
-        for recipe_file in recipe_files {
-            recipe_file.into_active_model().before_delete(db).await?;
+        for recipe_step_file in recipe_step_files {
+            recipe_step_file
+                .into_active_model()
+                .before_delete(db)
+                .await?;
         }
         Ok(self)
     }

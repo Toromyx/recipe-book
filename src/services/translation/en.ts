@@ -25,7 +25,7 @@ const translationStrings: TranslationStrings = {
       recipe: {
         name: "Recipe Name",
       },
-      recipeFile: {
+      recipeStepFile: {
         name: "Name",
         path: "File",
       },

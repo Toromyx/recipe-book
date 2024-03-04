@@ -1,21 +1,21 @@
 <!--
-This component display a recipe file.
+This component display a recipe step file.
 
-It includes functionality to optically recognize characters in the recipe file.
+It includes functionality to optically recognize characters in the recipe step file.
 -->
 
 <script>
   import { convertFileSrc } from "@tauri-apps/api/tauri";
   import { invoke } from "../../../../../services/command/client.ts";
   import { Command } from "../../../../../services/command/command.ts";
-  import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
+  import { recipeStepFileRepository } from "../../../../../services/store/repository/recipe-step-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { createId } from "../../../../../services/util/create-id.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
 
   /**
-   * the id of the recipe file
+   * the id of the recipe step file
    */
   export let id;
 
@@ -23,15 +23,15 @@ It includes functionality to optically recognize characters in the recipe file.
   const buttonId = `${uuid}-button`;
 
   /**
-   * @type {Readable<Loadable<RecipeFileInterface>>}
+   * @type {Readable<Loadable<RecipeStepFileInterface>>}
    */
-  let recipeFile;
+  let recipeStepFile;
   let output;
   let iframe;
 
-  $: recipeFile = recipeFileRepository.createStore(id);
-  $: mimeType = $recipeFile?.mime.split("/")[0];
-  $: src = convertFileSrc($recipeFile?.path);
+  $: recipeStepFile = recipeStepFileRepository.createStore(id);
+  $: mimeType = $recipeStepFile?.mime.split("/")[0];
+  $: src = convertFileSrc($recipeStepFile?.path);
   $: {
     if (iframe) {
       iframe.srcdoc = `<!DOCTYPE html>${output}`;
@@ -40,12 +40,12 @@ It includes functionality to optically recognize characters in the recipe file.
   $: iframeDisplay = output ? "block" : "none";
 </script>
 
-{#if isLoaded($recipeFile)}
+{#if isLoaded($recipeStepFile)}
   {#if mimeType === "image"}
-    <img src="{src}" alt="{$recipeFile.name}" />
+    <img src="{src}" alt="{$recipeStepFile.name}" />
   {:else if mimeType === "video"}
     <video muted controls>
-      <source src="{src}" type="{$recipeFile.mime}" />
+      <source src="{src}" type="{$recipeStepFile.mime}" />
     </video>
   {:else if mimeType === "audio"}
     <audio src="{src}"></audio>
@@ -55,7 +55,7 @@ It includes functionality to optically recognize characters in the recipe file.
   <SvelteButton
     id="{buttonId}"
     on:click="{() =>
-      void invoke(Command.OCR, { recipeFileId: id }).then((result) => {
+      void invoke(Command.OCR, { recipeStepFileId: id }).then((result) => {
         output = result;
       })}">{messages.labels.actions.ocr.format()}</SvelteButton
   >

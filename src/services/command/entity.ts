@@ -4,11 +4,6 @@ import type {
   IngredientUpdateInterface,
 } from "../../types/entity/ingredient-interface.ts";
 import type {
-  RecipeFileCreateInterface,
-  RecipeFileInterface,
-  RecipeFileUpdateInterface,
-} from "../../types/entity/recipe-file-interface.ts";
-import type {
   RecipeIngredientDraftCreateInterface,
   RecipeIngredientDraftInterface,
   RecipeIngredientDraftUpdateInterface,
@@ -18,6 +13,11 @@ import type {
   RecipeInterface,
   RecipeUpdateInterface,
 } from "../../types/entity/recipe-interface.ts";
+import type {
+  RecipeStepFileCreateInterface,
+  RecipeStepFileInterface,
+  RecipeStepFileUpdateInterface,
+} from "../../types/entity/recipe-step-file-interface.ts";
 import type {
   RecipeStepIngredientDraftCreateInterface,
   RecipeStepIngredientDraftInterface,
@@ -43,10 +43,6 @@ import type {
   IngredientFilter,
 } from "../../types/filter/ingredient-filter.ts";
 import type {
-  RecipeFileCondition,
-  RecipeFileFilter,
-} from "../../types/filter/recipe-file-filter.ts";
-import type {
   RecipeCondition,
   RecipeFilter,
 } from "../../types/filter/recipe-filter.ts";
@@ -54,6 +50,10 @@ import type {
   RecipeIngredientDraftCondition,
   RecipeIngredientDraftFilter,
 } from "../../types/filter/recipe-ingredient-draft-filter.ts";
+import type {
+  RecipeStepFileCondition,
+  RecipeStepFileFilter,
+} from "../../types/filter/recipe-step-file-filter.ts";
 import type {
   RecipeStepCondition,
   RecipeStepFilter,
@@ -80,7 +80,7 @@ type CommandEntityRead =
   | Command.ENTITY_READ_INGREDIENT
   | Command.ENTITY_READ_RECIPE
   | Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT
-  | Command.ENTITY_READ_RECIPE_FILE
+  | Command.ENTITY_READ_RECIPE_STEP_FILE
   | Command.ENTITY_READ_RECIPE_STEP_INGREDIENT
   | Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT
   | Command.ENTITY_READ_RECIPE_STEP
@@ -90,7 +90,7 @@ type CommandEntityList =
   | Command.ENTITY_LIST_INGREDIENT
   | Command.ENTITY_LIST_RECIPE
   | Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT
-  | Command.ENTITY_LIST_RECIPE_FILE
+  | Command.ENTITY_LIST_RECIPE_STEP_FILE
   | Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT
   | Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT
   | Command.ENTITY_LIST_RECIPE_STEP
@@ -100,7 +100,7 @@ type CommandEntityCount =
   | Command.ENTITY_COUNT_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE
   | Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT
-  | Command.ENTITY_COUNT_RECIPE_FILE
+  | Command.ENTITY_COUNT_RECIPE_STEP_FILE
   | Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT
   | Command.ENTITY_COUNT_RECIPE_STEP
@@ -114,7 +114,7 @@ const entityReadPromiseCollector: {
   [Command.ENTITY_READ_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE]: {},
   [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: {},
-  [Command.ENTITY_READ_RECIPE_FILE]: {},
+  [Command.ENTITY_READ_RECIPE_STEP_FILE]: {},
   [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE_STEP_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_READ_RECIPE_STEP]: {},
@@ -129,7 +129,7 @@ const entityListPromiseCollector: {
   [Command.ENTITY_LIST_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE]: {},
   [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {},
-  [Command.ENTITY_LIST_RECIPE_FILE]: {},
+  [Command.ENTITY_LIST_RECIPE_STEP_FILE]: {},
   [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE_STEP_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_LIST_RECIPE_STEP]: {},
@@ -144,7 +144,7 @@ const entityCountPromiseCollector: {
   [Command.ENTITY_COUNT_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE]: {},
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {},
-  [Command.ENTITY_COUNT_RECIPE_FILE]: {},
+  [Command.ENTITY_COUNT_RECIPE_STEP_FILE]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP_INGREDIENT_DRAFT]: {},
   [Command.ENTITY_COUNT_RECIPE_STEP]: {},
@@ -306,34 +306,38 @@ export function countRecipeIngredientDraft(
   );
 }
 
-export function createRecipeFile(
-  create: RecipeFileCreateInterface,
+export function createRecipeStepFile(
+  create: RecipeStepFileCreateInterface,
 ): Promise<number> {
-  return invoke(Command.ENTITY_CREATE_RECIPE_FILE, { create });
+  return invoke(Command.ENTITY_CREATE_RECIPE_STEP_FILE, { create });
 }
 
-export function readRecipeFile(id: number): Promise<RecipeFileInterface> {
-  return readCollected(Command.ENTITY_READ_RECIPE_FILE, id);
+export function readRecipeStepFile(
+  id: number,
+): Promise<RecipeStepFileInterface> {
+  return readCollected(Command.ENTITY_READ_RECIPE_STEP_FILE, id);
 }
 
-export function updateRecipeFile(
-  update: RecipeFileUpdateInterface,
+export function updateRecipeStepFile(
+  update: RecipeStepFileUpdateInterface,
 ): Promise<void> {
-  return invoke(Command.ENTITY_UPDATE_RECIPE_FILE, { update });
+  return invoke(Command.ENTITY_UPDATE_RECIPE_STEP_FILE, { update });
 }
 
-export function deleteRecipeFile(id: number): Promise<void> {
-  return invoke(Command.ENTITY_DELETE_RECIPE_FILE, { id });
+export function deleteRecipeStepFile(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_RECIPE_STEP_FILE, { id });
 }
 
-export function listRecipeFile(filter: RecipeFileFilter): Promise<number[]> {
-  return listCollected(Command.ENTITY_LIST_RECIPE_FILE, filter);
+export function listRecipeStepFile(
+  filter: RecipeStepFileFilter,
+): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_RECIPE_STEP_FILE, filter);
 }
 
-export function countRecipeFile(
-  condition?: RecipeFileCondition,
+export function countRecipeStepFile(
+  condition?: RecipeStepFileCondition,
 ): Promise<number> {
-  return countCollected(Command.ENTITY_COUNT_RECIPE_FILE, condition);
+  return countCollected(Command.ENTITY_COUNT_RECIPE_STEP_FILE, condition);
 }
 
 export function createRecipeStepIngredient(

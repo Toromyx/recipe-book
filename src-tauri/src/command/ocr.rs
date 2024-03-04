@@ -7,10 +7,11 @@ use crate::{
     entity_crud::EntityCrudTrait,
 };
 
-/// Get the optically recognized characters from the specified recipe file.
+/// Get the optically recognized characters from the specified recipe step file.
 #[tauri::command]
-pub async fn ocr(recipe_file_id: i64) -> Result<String, CommandError> {
-    let model_option = entity_crud::recipe_file::RecipeFileCrud::read(recipe_file_id).await?;
+pub async fn ocr(recipe_step_file_id: i64) -> Result<String, CommandError> {
+    let model_option =
+        entity_crud::recipe_step_file::RecipeStepFileCrud::read(recipe_step_file_id).await?;
     let Some(model) = model_option else {
         return Err(CommandError::NotFound);
     };

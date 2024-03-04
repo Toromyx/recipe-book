@@ -1,4 +1,4 @@
-//! This module implements the creation of [`crate::entity::recipe_file`].
+//! This module implements the creation of [`crate::entity::recipe_step_file`].
 
 use sea_orm_migration::prelude::*;
 
@@ -8,33 +8,33 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
         .create_table(
             Table::create()
-                .table(RecipeFile::Table)
+                .table(RecipeStepFile::Table)
                 .col(
-                    ColumnDef::new(RecipeFile::Id)
+                    ColumnDef::new(RecipeStepFile::Id)
                         .integer()
                         .not_null()
                         .auto_increment()
                         .primary_key(),
                 )
-                .col(ColumnDef::new(RecipeFile::Name).string().not_null())
-                .col(ColumnDef::new(RecipeFile::Order).integer().not_null())
-                .col(ColumnDef::new(RecipeFile::Mime).string().not_null())
-                .col(ColumnDef::new(RecipeFile::Path).string().not_null())
+                .col(ColumnDef::new(RecipeStepFile::Name).string().not_null())
+                .col(ColumnDef::new(RecipeStepFile::Order).integer().not_null())
+                .col(ColumnDef::new(RecipeStepFile::Mime).string().not_null())
+                .col(ColumnDef::new(RecipeStepFile::Path).string().not_null())
                 .col(
-                    ColumnDef::new(RecipeFile::RecipeStepId)
+                    ColumnDef::new(RecipeStepFile::RecipeStepId)
                         .integer()
                         .not_null(),
                 )
                 .foreign_key(
                     ForeignKey::create()
-                        .from(RecipeFile::Table, RecipeFile::RecipeStepId)
+                        .from(RecipeStepFile::Table, RecipeStepFile::RecipeStepId)
                         .to(RecipeStep::Table, RecipeStep::Id)
                         .on_delete(ForeignKeyAction::Cascade),
                 )
                 .index(
                     Index::create()
-                        .col(RecipeFile::Order)
-                        .col(RecipeFile::RecipeStepId)
+                        .col(RecipeStepFile::Order)
+                        .col(RecipeStepFile::RecipeStepId)
                         .unique(),
                 )
                 .to_owned(),
@@ -43,18 +43,21 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
         .create_index(
             Index::create()
-                .name(&index_name(&RecipeFile::Table, &RecipeFile::Order))
-                .table(RecipeFile::Table)
-                .col(RecipeFile::Order)
+                .name(&index_name(&RecipeStepFile::Table, &RecipeStepFile::Order))
+                .table(RecipeStepFile::Table)
+                .col(RecipeStepFile::Order)
                 .to_owned(),
         )
         .await?;
     manager
         .create_index(
             Index::create()
-                .name(&index_name(&RecipeFile::Table, &RecipeFile::RecipeStepId))
-                .table(RecipeFile::Table)
-                .col(RecipeFile::RecipeStepId)
+                .name(&index_name(
+                    &RecipeStepFile::Table,
+                    &RecipeStepFile::RecipeStepId,
+                ))
+                .table(RecipeStepFile::Table)
+                .col(RecipeStepFile::RecipeStepId)
                 .to_owned(),
         )
         .await?;
@@ -62,7 +65,7 @@ pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
 }
 
 #[derive(Iden)]
-enum RecipeFile {
+enum RecipeStepFile {
     Table,
     Id,
     Name,
@@ -79,11 +82,11 @@ pub mod tests {
 
     use crate::database::tests::{get_table_indices, get_table_schema};
 
-    pub async fn assert_recipe_file_schema(db: &DatabaseConnection) {
-        let table_schema = get_table_schema("recipe_file", db).await;
+    pub async fn assert_recipe_step_file_schema(db: &DatabaseConnection) {
+        let table_schema = get_table_schema("recipe_step_file", db).await;
         assert_str_eq!(
             table_schema,
-            "CREATE TABLE \"recipe_file\" ( \
+            "CREATE TABLE \"recipe_step_file\" ( \
         \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
         \"name\" text NOT NULL, \
         \"order\" integer NOT NULL, \
@@ -96,16 +99,16 @@ pub mod tests {
         );
     }
 
-    pub async fn assert_recipe_file_indices(db: &DatabaseConnection) {
-        let indices = get_table_indices("recipe_file", db).await;
+    pub async fn assert_recipe_step_file_indices(db: &DatabaseConnection) {
+        let indices = get_table_indices("recipe_step_file", db).await;
         assert_eq!(
             indices,
             vec![
                 String::from(
-                    "CREATE INDEX \"idx-recipe_file-order\" ON \"recipe_file\" (\"order\")"
+                    "CREATE INDEX \"idx-recipe_step_file-order\" ON \"recipe_step_file\" (\"order\")"
                 ),
                 String::from(
-                    "CREATE INDEX \"idx-recipe_file-recipe_step_id\" ON \"recipe_file\" (\"recipe_step_id\")"
+                    "CREATE INDEX \"idx-recipe_step_file-recipe_step_id\" ON \"recipe_step_file\" (\"recipe_step_id\")"
                 ),
             ]
         )

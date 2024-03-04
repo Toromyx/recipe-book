@@ -1,4 +1,4 @@
-//! This module implements the recipe file entity.
+//! This module implements the recipe step file entity.
 //!
 //! See [`Model`] for more information.
 
@@ -7,12 +7,12 @@ use log;
 use sea_orm::{entity::prelude::*, TryIntoModel};
 use serde::Serialize;
 
-/// This struct represents a recipe file.
+/// This struct represents a recipe step file.
 ///
-/// A recipe file is a supplementary binary file to a recipe.
+/// A recipe step file is a supplementary binary file to a recipe step.
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
 #[serde(rename_all = "camelCase")]
-#[sea_orm(table_name = "recipe_file")]
+#[sea_orm(table_name = "recipe_step_file")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
@@ -48,9 +48,9 @@ impl ActiveModelBehavior for ActiveModel {
         C: ConnectionTrait,
     {
         let model = self.clone().try_into_model()?;
-        if let Err(err) = crate::recipe_file_storage::delete(&model).await {
+        if let Err(err) = crate::recipe_step_file_storage::delete(&model).await {
             log::warn!(
-                "Could not delete recipe file from storage while deleting entity: {}",
+                "Could not delete recipe step file from storage while deleting entity: {}",
                 err
             );
         };

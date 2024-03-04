@@ -2,9 +2,9 @@ use crate::{
     command::error::CommandError,
     entity_crud::{
         recipe::{RecipeCreate, RecipeCrud},
-        recipe_file::{RecipeFileCreate, RecipeFileCreateUri, RecipeFileCrud},
         recipe_ingredient_draft::{RecipeIngredientDraftCreate, RecipeIngredientDraftCrud},
         recipe_step::{RecipeStepCreate, RecipeStepCrud},
+        recipe_step_file::{RecipeStepFileCreate, RecipeStepFileCreateUri, RecipeStepFileCrud},
         recipe_step_ingredient_draft::{
             RecipeStepIngredientDraftCreate, RecipeStepIngredientDraftCrud,
         },
@@ -52,10 +52,10 @@ pub async fn external_recipe(url: String) -> Result<i64, CommandError> {
             }
             for (i, file) in step.files.into_iter().enumerate() {
                 tokio::spawn(async move {
-                    RecipeFileCrud::create(RecipeFileCreate {
+                    RecipeStepFileCrud::create(RecipeStepFileCreate {
                         name: file.clone(),
                         order: (i + 1) as i64,
-                        uri: RecipeFileCreateUri::Url(file),
+                        uri: RecipeStepFileCreateUri::Url(file),
                         recipe_step_id,
                     })
                     .await

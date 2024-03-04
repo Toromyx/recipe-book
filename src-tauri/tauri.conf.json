@@ -53,7 +53,7 @@
       }
     },
     "security": {
-      "csp": "default-src 'self' recipe-file: https://recipe-file.localhost"
+      "csp": "default-src 'self'"
     },
     "updater": {
       "active": false

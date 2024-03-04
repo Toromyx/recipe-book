@@ -49,7 +49,7 @@ entity "Ingredient" as ingredient {
 }
 ingredient "ingredient_id" ||--o{ recipe_step_ingredient
 
-entity "Recipe File" as recipe_file {
+entity "Recipe Step File" as recipe_step_file {
   id: INTEGER
   --
   name: TEXT
@@ -57,7 +57,7 @@ entity "Recipe File" as recipe_file {
   mime: TEXT
   uri: TEXT
 }
-recipe_file }o--|| "recipe_step_id" recipe_step
+recipe_step_file }o--|| "recipe_step_id" recipe_step
 
 entity "Unit Name" as unit_name {
   name: TEXT

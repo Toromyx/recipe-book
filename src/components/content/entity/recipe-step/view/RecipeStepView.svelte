@@ -8,7 +8,7 @@ This component displays the content of a recipe step.
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import Editable from "../../../../layout/Editable.svelte";
-  import RecipeFileList from "../../recipe-file/list/RecipeFileList.svelte";
+  import RecipeStepFileList from "../../recipe-step-file/list/RecipeStepFileList.svelte";
   import RecipeStepIngredientList from "../../recipe-step-ingredient/list/RecipeStepIngredientList.svelte";
   import RecipeStepEdit from "../edit/RecipeStepEdit.svelte";
 
@@ -48,5 +48,5 @@ This component displays the content of a recipe step.
     <RecipeStepEdit slot="edit" description="{$recipeStep.description}" />
   </Editable>
   <h3>{messages.headings.files.format()}</h3>
-  <RecipeFileList recipeStepId="{id}" />
+  <RecipeStepFileList recipeStepId="{id}" />
 {/if}

@@ -1,17 +1,17 @@
 <!--
 @component
-This component display an ordered list of all recipe files of a recipe step.
+This component display an ordered list of all recipe step files of a recipe step.
 -->
 
 <script>
-  import { recipeFileRepository } from "../../../../../services/store/repository/recipe-file-repository.ts";
+  import { recipeStepFileRepository } from "../../../../../services/store/repository/recipe-step-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
-  import RecipeFileEdit from "../edit/RecipeFileEdit.svelte";
-  import RecipeFileView from "../view/RecipeFileView.svelte";
+  import RecipeStepFileEdit from "../edit/RecipeStepFileEdit.svelte";
+  import RecipeStepFileView from "../view/RecipeStepFileView.svelte";
 
   /**
    * the id of the recipe step
@@ -24,7 +24,7 @@ This component display an ordered list of all recipe files of a recipe step.
    */
   let list;
 
-  $: list = recipeFileRepository.createListFilteredStore({
+  $: list = recipeStepFileRepository.createListFilteredStore({
     condition: { recipeStepId },
     orderBy: [
       {
@@ -38,10 +38,11 @@ This component display an ordered list of all recipe files of a recipe step.
   <ol>
     {#each $list as id (id)}
       <li>
-        <RecipeFileView id="{id}" /><SvelteButton
+        <RecipeStepFileView id="{id}" />
+        <SvelteButton
           on:click="{async () => {
-            await recipeFileRepository.delete(id);
-            updateOrder(recipeFileRepository, $list, id);
+            await recipeStepFileRepository.delete(id);
+            updateOrder(recipeStepFileRepository, $list, id);
           }}"
           confirmation="{true}"
           >{messages.labels.actions.delete.format()}</SvelteButton
@@ -51,7 +52,7 @@ This component display an ordered list of all recipe files of a recipe step.
   </ol>
   <SvelteForm
     on:submit="{async ({ detail: { values, context } }) => {
-      await recipeFileRepository.create({
+      await recipeStepFileRepository.create({
         name: values.name,
         order: $list.length + 1,
         uri: { path: values.path },
@@ -60,7 +61,7 @@ This component display an ordered list of all recipe files of a recipe step.
       context.reset();
     }}"
   >
-    <RecipeFileEdit />
+    <RecipeStepFileEdit />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >

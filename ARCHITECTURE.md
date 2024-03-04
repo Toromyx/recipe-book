@@ -9,9 +9,11 @@ The source code for the backend lives in [src-tauri](./src-tauri) and is written
 
 ### Recipe Storage
 
-Recipes need to be stored locally. The solution chosen for this project is an embedded relational database. This is supported by simple file storage for binary files like images.
+Recipes need to be stored locally. The solution chosen for this project is an embedded relational database. This is
+supported by simple file storage for binary files like images.
 
-The database needs to implement the data schema outlined in the [PlantUML](https://plantuml.com/) file [schema.puml](docs/architecture/database/schema.puml).
+The database needs to implement the data schema outlined in the [PlantUML](https://plantuml.com/)
+file [schema.puml](docs/architecture/database/schema.puml).
 
 #### Database
 
@@ -27,15 +29,18 @@ The connection to the database is handled via the object-relational manager [Sea
 
 ###### Migrations
 
-SeaORM provides database migration functionality. This is implemented in the [migrator module](./src-tauri/src/migrator.rs).
+SeaORM provides database migration functionality. This is implemented in
+the [migrator module](./src-tauri/src/migrator.rs).
 
 #### File Storage
 
-Binary files are not stored in the database but separately. Recipe file storage is implemented in the [recipe_file_storage module](./src-tauri/src/recipe_file_storage.rs).
+Binary files are not stored in the database but separately. Recipe step file storage is implemented in
+the [recipe_step_file_storage module](./src-tauri/src/recipe_step_file_storage.rs).
 
 ### OCR
 
-Optical character recognition is integrated with [Tesseract](https://github.com/tesseract-ocr/tesseract) via the [tesseract-rs](https://github.com/antimatter15/tesseract-rs) crate.
+Optical character recognition is integrated with [Tesseract](https://github.com/tesseract-ocr/tesseract) via
+the [tesseract-rs](https://github.com/antimatter15/tesseract-rs) crate.
 
 ## Frontend
 

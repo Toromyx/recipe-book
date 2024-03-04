@@ -20,12 +20,12 @@ export const enum Command {
   ENTITY_LIST_RECIPE_INGREDIENT_DRAFT = "entity_list_recipe_ingredient_draft",
   ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT = "entity_count_recipe_ingredient_draft",
 
-  ENTITY_CREATE_RECIPE_FILE = "entity_create_recipe_file",
-  ENTITY_READ_RECIPE_FILE = "entity_read_recipe_file",
-  ENTITY_UPDATE_RECIPE_FILE = "entity_update_recipe_file",
-  ENTITY_DELETE_RECIPE_FILE = "entity_delete_recipe_file",
-  ENTITY_LIST_RECIPE_FILE = "entity_list_recipe_file",
-  ENTITY_COUNT_RECIPE_FILE = "entity_count_recipe_file",
+  ENTITY_CREATE_RECIPE_STEP_FILE = "entity_create_recipe_step_file",
+  ENTITY_READ_RECIPE_STEP_FILE = "entity_read_recipe_step_file",
+  ENTITY_UPDATE_RECIPE_STEP_FILE = "entity_update_recipe_step_file",
+  ENTITY_DELETE_RECIPE_STEP_FILE = "entity_delete_recipe_step_file",
+  ENTITY_LIST_RECIPE_STEP_FILE = "entity_list_recipe_step_file",
+  ENTITY_COUNT_RECIPE_STEP_FILE = "entity_count_recipe_step_file",
 
   ENTITY_CREATE_RECIPE_STEP_INGREDIENT = "entity_create_recipe_step_ingredient",
   ENTITY_READ_RECIPE_STEP_INGREDIENT = "entity_read_recipe_step_ingredient",
