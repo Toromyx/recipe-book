@@ -140,11 +140,15 @@ fn setup() -> tauri::Builder<Wry> {
 
 #[cfg(test)]
 mod tests {
-    use std::{sync::Once, thread};
+    use std::{cell::RefCell, sync::Once, thread};
 
     use super::*;
 
     static RUN_ONCE: Once = Once::new();
+
+    thread_local! {
+        pub static TEST_NAME: RefCell<Option<String>> = RefCell::new(None);
+    }
 
     /// Run the tauri app, but only once.
     pub fn run() {

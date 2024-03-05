@@ -32,13 +32,29 @@ pub fn app_data_dir() -> PathBuf {
     #[cfg(any(debug_assertions, test))]
     {
         #[cfg(test)]
-        let env = ".TEST";
+        {
+            dir.push(".TEST");
+            tests::CLEAR_DATA_DIR_ONCE.call_once(|| {
+                std::fs::remove_dir_all(&dir).unwrap();
+            });
+            crate::tests::TEST_NAME.with_borrow(|test_name_option| {
+                if let Some(test_name) = test_name_option {
+                    dir.push(test_name)
+                }
+            });
+        }
         #[cfg(not(test))]
-        let env = ".DEVELOPMENT";
-        dir.push(env);
+        dir.push(".DEVELOPMENT");
     }
     if let Err(err) = create_dir_all(&dir) {
         panic!("Could not create app data directory: {err}");
     }
     dir
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Once;
+
+    pub static CLEAR_DATA_DIR_ONCE: Once = Once::new();
 }
