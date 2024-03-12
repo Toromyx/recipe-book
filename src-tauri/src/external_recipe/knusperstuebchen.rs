@@ -22,7 +22,7 @@ pub struct ExternalRecipeGetter;
 impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
     /// The recipes on Knusperstuebchen can be only a pdf or a pdf and structured html.
     async fn get(&self, url: Url) -> anyhow::Result<ExternalRecipe, ExternalRecipeError> {
-        let response = reqwest::get(url).await?;
+        let response = super::client().get(url).send().await?;
         let text = response.text().await?;
         let dom = Dom::create(text).await?;
         let name_element = dom.select("h1").await?.unwrap();

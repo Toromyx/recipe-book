@@ -74,13 +74,13 @@ pub struct ExternalRecipeGetter;
 impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
     /// For `pin.it` URLs, we first need to find the canonical URL before trying to parse the HTML for the recipe data.
     async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError> {
-        let response = reqwest::get(url.clone()).await?;
+        let response = super::client().get(url.clone()).send().await?;
         let mut text = response.text().await?;
         if let Some(prepared_url) = UrlMatch::prepare_url(&url) {
             if pin_it_uri_match().is_match(&prepared_url) {
                 let dom = Dom::create(text).await?;
                 let canonical_link = dom.canonical_link().await?;
-                let response = reqwest::get(canonical_link).await?;
+                let response = super::client().get(canonical_link).send().await?;
                 text = response.text().await?;
             }
         }

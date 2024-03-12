@@ -22,7 +22,7 @@ pub struct ExternalRecipeGetter;
 #[async_trait]
 impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
     async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError> {
-        let response = reqwest::get(url).await?;
+        let response = super::client().get(url).send().await?;
         let text = response.text().await?;
         let dom = Arc::new(Dom::create(text).await?);
         let mut steps = vec![];

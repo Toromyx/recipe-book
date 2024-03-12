@@ -5,6 +5,7 @@ use std::str::FromStr;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
+use reqwest::Client;
 use url::Url;
 
 use crate::external_recipe::error::ExternalRecipeError;
@@ -13,6 +14,17 @@ pub mod error;
 pub mod knusperstuebchen;
 pub mod pinterest;
 pub mod sallys_welt;
+
+static CLIENT_ONCE_LOCK: OnceLock<Client> = OnceLock::new();
+
+fn client() -> &'static Client {
+    CLIENT_ONCE_LOCK.get_or_init(|| {
+        reqwest::ClientBuilder::new()
+            .timeout(Duration::from_secs(10))
+            .build()
+            .unwrap()
+    })
+}
 
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(test, derive(PartialEq))]
