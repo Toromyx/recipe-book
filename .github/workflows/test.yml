@@ -53,4 +53,4 @@ jobs:
         with:
           name: test-data-dir
           path: |
-            ${XDG_DATA_HOME}/com.github.toromyx.recipe-book/.TEST
+            ~/.local/share/com.github.toromyx.recipe-book/.TEST
