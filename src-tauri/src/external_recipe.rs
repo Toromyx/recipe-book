@@ -1,6 +1,6 @@
 //! This module handles getting data from external recipes in the world wide web.
 
-use std::str::FromStr;
+use std::{str::FromStr, sync::OnceLock, time::Duration};
 
 use anyhow::Result;
 use async_trait::async_trait;
