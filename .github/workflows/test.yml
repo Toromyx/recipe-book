@@ -48,3 +48,9 @@ jobs:
             src-tauri/target
             ~/.cargo
       - run: xvfb-run npm run test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-data-dir
+          path: |
+            ~/.local/share/com.github.toromyx.recipe-book/.TEST
