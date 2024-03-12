@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use entity_crud::file::FileCrud;
 use tesseract::Tesseract;
 
 use crate::{
@@ -9,9 +10,8 @@ use crate::{
 
 /// Get the optically recognized characters from the specified recipe step file.
 #[tauri::command]
-pub async fn ocr(recipe_step_file_id: i64) -> Result<String, CommandError> {
-    let model_option =
-        entity_crud::recipe_step_file::RecipeStepFileCrud::read(recipe_step_file_id).await?;
+pub async fn ocr(file_id: i64) -> Result<String, CommandError> {
+    let model_option = FileCrud::read(file_id).await?;
     let Some(model) = model_option else {
         return Err(CommandError::NotFound);
     };

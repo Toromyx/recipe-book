@@ -4,13 +4,14 @@ This component display an ordered list of all recipe step files of a recipe step
 -->
 
 <script>
+  import { fileRepository } from "../../../../../services/store/repository/file-repository.ts";
   import { recipeStepFileRepository } from "../../../../../services/store/repository/recipe-step-file-repository.ts";
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import { updateOrder } from "../../../../../services/util/update-order.ts";
   import SvelteButton from "../../../../element/SvelteButton.svelte";
   import SvelteForm from "../../../../element/form/SvelteForm.svelte";
-  import RecipeStepFileEdit from "../edit/RecipeStepFileEdit.svelte";
+  import FileEdit from "../../file/edit/FileEdit.svelte";
   import RecipeStepFileView from "../view/RecipeStepFileView.svelte";
 
   /**
@@ -52,16 +53,19 @@ This component display an ordered list of all recipe step files of a recipe step
   </ol>
   <SvelteForm
     on:submit="{async ({ detail: { values, context } }) => {
-      await recipeStepFileRepository.create({
+      const fileId = await fileRepository.create({
         name: values.name,
-        order: $list.length + 1,
         uri: { path: values.path },
+      });
+      await recipeStepFileRepository.create({
+        order: $list.length + 1,
         recipeStepId,
+        fileId,
       });
       context.reset();
     }}"
   >
-    <RecipeStepFileEdit />
+    <FileEdit />
     <SvelteButton type="submit"
       >{messages.labels.actions.create.format()}</SvelteButton
     >

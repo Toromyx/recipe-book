@@ -7,22 +7,15 @@ import type {
 export interface RecipeStepFileInterface
   extends IdentifiableInterface,
     SortableInterface {
-  name: string;
-  mime: string;
-  path: string;
   recipeStepId: number;
+  fileId: number;
 }
 
-type RecipeStepFileCreateUri = { path: string } | { url: string };
-
 export interface RecipeStepFileCreateInterface extends SortableInterface {
-  name: string;
-  uri: RecipeStepFileCreateUri;
   recipeStepId: number;
+  fileId: number;
 }
 
 export interface RecipeStepFileUpdateInterface
   extends IdentifiableInterface,
-    SortableUpdateInterface {
-  name?: string;
-}
+    SortableUpdateInterface {}

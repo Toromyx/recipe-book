@@ -2,8 +2,7 @@
 //!
 //! See [`Model`] for more information.
 
-use async_trait::async_trait;
-use sea_orm::{entity::prelude::*, IntoActiveModel, TryIntoModel};
+use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
 /// This struct represents a recipe step.
@@ -54,23 +53,4 @@ impl Related<super::recipe_step_file::Entity> for Entity {
     }
 }
 
-#[async_trait]
-impl ActiveModelBehavior for ActiveModel {
-    async fn before_delete<C>(self, db: &C) -> Result<Self, DbErr>
-    where
-        C: ConnectionTrait,
-    {
-        let model = self.clone().try_into_model()?;
-        let recipe_step_files = model
-            .find_related(super::recipe_step_file::Entity)
-            .all(db)
-            .await?;
-        for recipe_step_file in recipe_step_files {
-            recipe_step_file
-                .into_active_model()
-                .before_delete(db)
-                .await?;
-        }
-        Ok(self)
-    }
-}
+impl ActiveModelBehavior for ActiveModel {}

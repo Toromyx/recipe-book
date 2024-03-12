@@ -1,4 +1,8 @@
 import type {
+  FileCreateInterface,
+  FileUpdateInterface,
+} from "../../types/entity/file-interface.ts";
+import type {
   IngredientCreateInterface,
   IngredientUpdateInterface,
 } from "../../types/entity/ingredient-interface.ts";
@@ -31,6 +35,10 @@ import type {
   UnitNameCreateInterface,
   UnitNameUpdateInterface,
 } from "../../types/entity/unit-name-interface.ts";
+import type {
+  FileCondition,
+  FileFilter,
+} from "../../types/filter/file-filter.ts";
 import type {
   IngredientCondition,
   IngredientFilter,
@@ -66,6 +74,13 @@ import type {
 import type { Command } from "./command.ts";
 
 type CommandParameterMap = {
+  [Command.ENTITY_CREATE_FILE]: { create: FileCreateInterface };
+  [Command.ENTITY_READ_FILE]: { id: number };
+  [Command.ENTITY_UPDATE_FILE]: { update: FileUpdateInterface };
+  [Command.ENTITY_DELETE_FILE]: { id: number };
+  [Command.ENTITY_LIST_FILE]: { filter: FileFilter };
+  [Command.ENTITY_COUNT_FILE]: { condition?: FileCondition };
+
   [Command.ENTITY_CREATE_INGREDIENT]: { create: IngredientCreateInterface };
   [Command.ENTITY_READ_INGREDIENT]: { id: number };
   [Command.ENTITY_UPDATE_INGREDIENT]: { update: IngredientUpdateInterface };
@@ -156,7 +171,7 @@ type CommandParameterMap = {
 
   [Command.EXTERNAL_RECIPE]: { url: string };
 
-  [Command.OCR]: { recipeStepFileId: number };
+  [Command.OCR]: { fileId: number };
 
   [Command.UNIT_CONVERT]: { value: number; unit: Unit };
 

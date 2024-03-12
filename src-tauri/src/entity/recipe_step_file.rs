@@ -3,8 +3,7 @@
 //! See [`Model`] for more information.
 
 use async_trait::async_trait;
-use log;
-use sea_orm::{entity::prelude::*, TryIntoModel};
+use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
 /// This struct represents a recipe step file.
@@ -16,11 +15,9 @@ use serde::Serialize;
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
-    pub name: String,
     pub order: i64,
-    pub mime: String,
-    pub path: String,
     pub recipe_step_id: i64,
+    pub file_id: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -33,6 +30,14 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     RecipeStep,
+    #[sea_orm(
+        belongs_to = "super::file::Entity",
+        from = "Column::FileId",
+        to = "super::file::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Restrict"
+    )]
+    File,
 }
 
 impl Related<super::recipe_step::Entity> for Entity {
@@ -41,19 +46,19 @@ impl Related<super::recipe_step::Entity> for Entity {
     }
 }
 
+impl Related<super::file::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::File.def()
+    }
+}
+
 #[async_trait]
 impl ActiveModelBehavior for ActiveModel {
-    async fn before_delete<C>(self, _db: &C) -> Result<Self, DbErr>
+    async fn after_delete<C>(self, db: &C) -> Result<Self, DbErr>
     where
         C: ConnectionTrait,
     {
-        let model = self.clone().try_into_model()?;
-        if let Err(err) = crate::recipe_step_file_storage::delete(&model).await {
-            log::warn!(
-                "Could not delete recipe step file from storage while deleting entity: {}",
-                err
-            );
-        };
+        super::file::remove_orphans(db).await?;
         Ok(self)
     }
 }

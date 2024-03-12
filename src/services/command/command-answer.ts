@@ -1,3 +1,4 @@
+import type { FileInterface } from "../../types/entity/file-interface.ts";
 import type { IngredientInterface } from "../../types/entity/ingredient-interface.ts";
 import type { RecipeIngredientDraftInterface } from "../../types/entity/recipe-ingredient-draft-interface.ts";
 import type { RecipeInterface } from "../../types/entity/recipe-interface.ts";
@@ -10,6 +11,13 @@ import type { UnitConversion } from "../../types/unit-conversion.ts";
 import type { Command } from "./command.ts";
 
 type CommandAnswerMap = {
+  [Command.ENTITY_CREATE_FILE]: number;
+  [Command.ENTITY_READ_FILE]: FileInterface;
+  [Command.ENTITY_UPDATE_FILE]: void;
+  [Command.ENTITY_DELETE_FILE]: void;
+  [Command.ENTITY_LIST_FILE]: number[];
+  [Command.ENTITY_COUNT_FILE]: number;
+
   [Command.ENTITY_CREATE_INGREDIENT]: number;
   [Command.ENTITY_READ_INGREDIENT]: IngredientInterface;
   [Command.ENTITY_UPDATE_INGREDIENT]: void;

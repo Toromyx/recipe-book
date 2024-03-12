@@ -19,15 +19,15 @@ const translationStrings: TranslationStrings = {
       ocr: "OCR",
     },
     entityFields: {
+      file: {
+        name: "Name",
+        path: "File",
+      },
       ingredient: {
         name: "Ingredient Name",
       },
       recipe: {
         name: "Recipe Name",
-      },
-      recipeStepFile: {
-        name: "Name",
-        path: "File",
       },
       recipeStep: {
         description: "Description",

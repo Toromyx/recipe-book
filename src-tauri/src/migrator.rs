@@ -23,3 +23,17 @@ pub fn index_name<'a>(table: &'a dyn Iden, col: &'a dyn Iden) -> String {
         col_string = col.to_string()
     )
 }
+
+#[cfg(test)]
+pub mod tests {
+    use sea_orm::DatabaseConnection;
+
+    use super::*;
+    use crate::database::tests::get_memory_database;
+
+    pub async fn get_memory_database_migrated() -> DatabaseConnection {
+        let db = get_memory_database().await;
+        Migrator::up(&db, None).await.unwrap();
+        db
+    }
+}

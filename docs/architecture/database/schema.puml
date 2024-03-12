@@ -52,10 +52,7 @@ ingredient "ingredient_id" ||--o{ recipe_step_ingredient
 entity "Recipe Step File" as recipe_step_file {
   id: INTEGER
   --
-  name: TEXT
   order: INTEGER
-  mime: TEXT
-  uri: TEXT
 }
 recipe_step_file }o--|| "recipe_step_id" recipe_step
 
@@ -64,5 +61,14 @@ entity "Unit Name" as unit_name {
   --
   unit: TEXT
 }
+
+entity "File" as file {
+  id: INTEGER
+  --
+  name: TEXT
+  mime: TEXT
+  path: ?TEXT
+}
+recipe_step_file }o--|| "file_id" file
 
 @enduml

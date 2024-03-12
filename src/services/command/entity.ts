@@ -1,4 +1,9 @@
 import type {
+  FileCreateInterface,
+  FileInterface,
+  FileUpdateInterface,
+} from "../../types/entity/file-interface.ts";
+import type {
   IngredientCreateInterface,
   IngredientInterface,
   IngredientUpdateInterface,
@@ -39,6 +44,10 @@ import type {
   UnitNameUpdateInterface,
 } from "../../types/entity/unit-name-interface.ts";
 import type {
+  FileCondition,
+  FileFilter,
+} from "../../types/filter/file-filter.ts";
+import type {
   IngredientCondition,
   IngredientFilter,
 } from "../../types/filter/ingredient-filter.ts";
@@ -77,6 +86,7 @@ import type { CommandParameter } from "./command-parameter.ts";
 import { Command } from "./command.ts";
 
 type CommandEntityRead =
+  | Command.ENTITY_READ_FILE
   | Command.ENTITY_READ_INGREDIENT
   | Command.ENTITY_READ_RECIPE
   | Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT
@@ -87,6 +97,7 @@ type CommandEntityRead =
   | Command.ENTITY_READ_UNIT_NAME;
 
 type CommandEntityList =
+  | Command.ENTITY_LIST_FILE
   | Command.ENTITY_LIST_INGREDIENT
   | Command.ENTITY_LIST_RECIPE
   | Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT
@@ -97,6 +108,7 @@ type CommandEntityList =
   | Command.ENTITY_LIST_UNIT_NAME;
 
 type CommandEntityCount =
+  | Command.ENTITY_COUNT_FILE
   | Command.ENTITY_COUNT_INGREDIENT
   | Command.ENTITY_COUNT_RECIPE
   | Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT
@@ -111,6 +123,7 @@ const entityReadPromiseCollector: {
     [id: number]: Promise<CommandAnswer<T>>;
   };
 } = {
+  [Command.ENTITY_READ_FILE]: {},
   [Command.ENTITY_READ_INGREDIENT]: {},
   [Command.ENTITY_READ_RECIPE]: {},
   [Command.ENTITY_READ_RECIPE_INGREDIENT_DRAFT]: {},
@@ -126,6 +139,7 @@ const entityListPromiseCollector: {
     [filterKey: string]: Promise<CommandAnswer<T>>;
   };
 } = {
+  [Command.ENTITY_LIST_FILE]: {},
   [Command.ENTITY_LIST_INGREDIENT]: {},
   [Command.ENTITY_LIST_RECIPE]: {},
   [Command.ENTITY_LIST_RECIPE_INGREDIENT_DRAFT]: {},
@@ -141,6 +155,7 @@ const entityCountPromiseCollector: {
     [conditionKey: string]: Promise<CommandAnswer<T>>;
   };
 } = {
+  [Command.ENTITY_COUNT_FILE]: {},
   [Command.ENTITY_COUNT_INGREDIENT]: {},
   [Command.ENTITY_COUNT_RECIPE]: {},
   [Command.ENTITY_COUNT_RECIPE_INGREDIENT_DRAFT]: {},
@@ -213,6 +228,30 @@ function countCollected<Command extends CommandEntityCount>(
       );
   }
   return entityCountPromiseCollector[command][conditionKey];
+}
+
+export function createFile(create: FileCreateInterface): Promise<number> {
+  return invoke(Command.ENTITY_CREATE_FILE, { create });
+}
+
+export function readFile(id: number): Promise<FileInterface> {
+  return readCollected(Command.ENTITY_READ_FILE, id);
+}
+
+export function updateFile(update: FileUpdateInterface): Promise<void> {
+  return invoke(Command.ENTITY_UPDATE_FILE, { update });
+}
+
+export function deleteFile(id: number): Promise<void> {
+  return invoke(Command.ENTITY_DELETE_FILE, { id });
+}
+
+export function listFile(filter: FileFilter): Promise<number[]> {
+  return listCollected(Command.ENTITY_LIST_FILE, filter);
+}
+
+export function countFile(condition?: FileCondition): Promise<number> {
+  return countCollected(Command.ENTITY_COUNT_FILE, condition);
 }
 
 export function createIngredient(

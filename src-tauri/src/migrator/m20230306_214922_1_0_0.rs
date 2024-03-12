@@ -4,6 +4,7 @@
 
 use sea_orm_migration::prelude::*;
 
+mod file;
 mod ingredient;
 mod recipe;
 mod recipe_ingredient_draft;
@@ -19,6 +20,7 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        file::up(manager).await?;
         ingredient::up(manager).await?;
         recipe::up(manager).await?;
         recipe_ingredient_draft::up(manager).await?;
@@ -33,6 +35,7 @@ impl MigrationTrait for Migration {
 
 #[cfg(test)]
 mod tests {
+    use file::tests::{assert_file_indices, assert_file_schema};
     use ingredient::tests::{assert_ingredient_indices, assert_ingredient_schema};
     use recipe::tests::{assert_recipe_indices, assert_recipe_schema};
     use recipe_ingredient_draft::tests::{
@@ -62,6 +65,8 @@ mod tests {
         let schema_manager = SchemaManager::new(&db);
         let migration = Migration {};
         migration.up(&schema_manager).await.unwrap();
+        assert_file_schema(&db).await;
+        assert_file_indices(&db).await;
         assert_ingredient_schema(&db).await;
         assert_ingredient_indices(&db).await;
         assert_recipe_schema(&db).await;

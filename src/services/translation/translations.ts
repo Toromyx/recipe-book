@@ -18,15 +18,15 @@ type Translations<T> = {
       ocr: T;
     };
     entityFields: {
+      file: {
+        name: T;
+        path: T;
+      };
       ingredient: {
         name: T;
       };
       recipe: {
         name: T;
-      };
-      recipeStepFile: {
-        name: T;
-        path: T;
       };
       recipeStep: {
         description: T;

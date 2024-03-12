@@ -1,4 +1,11 @@
 export const enum Command {
+  ENTITY_CREATE_FILE = "entity_create_file",
+  ENTITY_READ_FILE = "entity_read_file",
+  ENTITY_UPDATE_FILE = "entity_update_file",
+  ENTITY_DELETE_FILE = "entity_delete_file",
+  ENTITY_LIST_FILE = "entity_list_file",
+  ENTITY_COUNT_FILE = "entity_count_file",
+
   ENTITY_CREATE_INGREDIENT = "entity_create_ingredient",
   ENTITY_READ_INGREDIENT = "entity_read_ingredient",
   ENTITY_UPDATE_INGREDIENT = "entity_update_ingredient",

@@ -1,3 +1,4 @@
+pub mod file;
 pub mod ingredient;
 pub mod recipe;
 pub mod recipe_ingredient_draft;

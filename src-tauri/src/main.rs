@@ -7,6 +7,10 @@ use tauri::Wry;
 
 use crate::command::{
     entity::{
+        file::{
+            entity_count_file, entity_create_file, entity_delete_file, entity_list_file,
+            entity_read_file, entity_update_file,
+        },
         ingredient::{
             entity_count_ingredient, entity_create_ingredient, entity_delete_ingredient,
             entity_list_ingredient, entity_read_ingredient, entity_update_ingredient,
@@ -58,11 +62,11 @@ mod entity;
 mod entity_crud;
 mod event;
 mod external_recipe;
+mod file_storage;
 mod fs;
 mod log;
 mod migrator;
 mod path;
-mod recipe_step_file_storage;
 mod scraper;
 mod unit_conversion;
 mod window;
@@ -83,6 +87,12 @@ fn setup() -> tauri::Builder<Wry> {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            entity_create_file,
+            entity_read_file,
+            entity_update_file,
+            entity_delete_file,
+            entity_list_file,
+            entity_count_file,
             entity_create_ingredient,
             entity_read_ingredient,
             entity_update_ingredient,
@@ -140,7 +150,7 @@ fn setup() -> tauri::Builder<Wry> {
 
 #[cfg(test)]
 mod tests {
-    use std::{cell::RefCell, sync::Once, thread};
+    use std::{cell::RefCell, path::PathBuf, sync::Once, thread};
 
     use super::*;
 
@@ -160,5 +170,18 @@ mod tests {
                     .unwrap();
             });
         });
+    }
+
+    pub fn create_temp_file<Contents>(name: &str, contents: Contents) -> PathBuf
+    where
+        Contents: AsRef<[u8]>,
+    {
+        let mut temp_path = std::env::temp_dir();
+        temp_path.push("recipe_book_tests");
+        std::fs::create_dir_all(&temp_path).unwrap();
+        temp_path.push(name);
+        std::fs::write(&temp_path, contents).unwrap();
+
+        temp_path
     }
 }
