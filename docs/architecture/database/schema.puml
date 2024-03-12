@@ -67,7 +67,7 @@ entity "File" as file {
   --
   name: TEXT
   mime: TEXT
-  path: ?TEXT
+  path: TEXT
 }
 recipe_step_file }o--|| "file_id" file
 
