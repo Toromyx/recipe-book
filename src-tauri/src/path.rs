@@ -35,7 +35,7 @@ pub fn app_data_dir() -> PathBuf {
         {
             dir.push(".TEST");
             tests::CLEAR_DATA_DIR_ONCE.call_once(|| {
-                std::fs::remove_dir_all(&dir).unwrap();
+                std::fs::remove_dir_all(&dir).ok();
             });
             crate::tests::TEST_NAME.with_borrow(|test_name_option| {
                 if let Some(test_name) = test_name_option {
