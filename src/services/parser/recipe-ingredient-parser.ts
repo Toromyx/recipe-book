@@ -422,7 +422,7 @@ function extractQuantity(string: string): ExtractedQuantity | null {
     );
     rangeMatches = [...string.matchAll(rangeRegExp)];
   }
-  let match = matches[0];
+  let match: RegExpExecArray | RegExpMatchArray = matches[0];
   let quantity = numberParser.parse(match[0]);
   if (fractionMatches.length) {
     match = fractionMatches[0];
