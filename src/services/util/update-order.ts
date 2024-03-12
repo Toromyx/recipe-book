@@ -5,7 +5,7 @@ import type { Loadable } from "./loadable.ts";
 import { isLoading } from "./loadable.ts";
 
 /**
- * Update the order of all entities of the repository in an identifier ist by their order in this identifier list.
+ * Update the order of all entities of the repository in an identifier list by their order in this identifier list.
  *
  * One id will be skipped.
  */
