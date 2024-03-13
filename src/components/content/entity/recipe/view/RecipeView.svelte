@@ -8,6 +8,7 @@ This component displays the content of a recipe.
   import { messages } from "../../../../../services/translation/en.ts";
   import { isLoaded } from "../../../../../services/util/loadable.ts";
   import SvelteInput from "../../../../element/form/SvelteInput.svelte";
+  import RecipeFileList from "../../recipe-file/list/RecipeFileList.svelte";
   import RecipeStepList from "../../recipe-step/list/RecipeStepList.svelte";
 
   /**
@@ -27,6 +28,7 @@ This component displays the content of a recipe.
 {#if isLoaded($recipe)}
   <div>
     <h1>{$recipe.name}</h1>
+    <RecipeFileList recipeId="{id}" />
     <SvelteInput
       on:input="{({ detail }) => (factor = detail)}"
       name="factor"
