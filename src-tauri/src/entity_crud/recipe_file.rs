@@ -2,9 +2,8 @@
 
 use async_trait::async_trait;
 use sea_orm::{
-    sea_query::IntoCondition,
-    ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel, QueryOrder, Select,
+    sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, DeriveIntoActiveModel,
+    IntoActiveModel, QueryOrder, Select,
 };
 use serde::Deserialize;
 
@@ -35,13 +34,13 @@ pub struct RecipeFileUpdate {
 impl IntoActiveModel<ActiveModel> for RecipeFileUpdate {
     fn into_active_model(self) -> ActiveModel {
         ActiveModel {
-            id: Unchanged(self.id),
+            id: ActiveValue::Unchanged(self.id),
             order: match self.order {
-                Some(order) => Set(order),
-                _ => NotSet,
+                Some(order) => ActiveValue::Set(order),
+                _ => ActiveValue::NotSet,
             },
-            recipe_id: NotSet,
-            file_id: NotSet,
+            recipe_id: ActiveValue::NotSet,
+            file_id: ActiveValue::NotSet,
         }
     }
 }

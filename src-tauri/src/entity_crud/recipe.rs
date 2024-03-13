@@ -1,9 +1,8 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe`].
 
 use sea_orm::{
-    sea_query::IntoCondition,
-    ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel, QueryOrder, Select,
+    sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, DeriveIntoActiveModel,
+    IntoActiveModel, QueryOrder, Select,
 };
 use serde::Deserialize;
 
@@ -31,10 +30,10 @@ pub struct RecipeUpdate {
 impl IntoActiveModel<ActiveModel> for RecipeUpdate {
     fn into_active_model(self) -> ActiveModel {
         ActiveModel {
-            id: Unchanged(self.id),
+            id: ActiveValue::Unchanged(self.id),
             name: match self.name {
-                Some(name) => Set(name),
-                _ => NotSet,
+                Some(name) => ActiveValue::Set(name),
+                _ => ActiveValue::NotSet,
             },
         }
     }

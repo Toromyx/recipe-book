@@ -1,9 +1,8 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_step_ingredient`].
 
 use sea_orm::{
-    sea_query::IntoCondition,
-    ActiveValue::{NotSet, Set, Unchanged},
-    ColumnTrait, Condition, DeriveIntoActiveModel, IntoActiveModel, QueryOrder, Select,
+    sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, DeriveIntoActiveModel,
+    IntoActiveModel, QueryOrder, Select,
 };
 use serde::Deserialize;
 
@@ -44,27 +43,27 @@ pub struct RecipeStepIngredientUpdate {
 impl IntoActiveModel<ActiveModel> for RecipeStepIngredientUpdate {
     fn into_active_model(self) -> ActiveModel {
         ActiveModel {
-            id: Unchanged(self.id),
+            id: ActiveValue::Unchanged(self.id),
             order: match self.order {
-                Some(order) => Set(order),
-                _ => NotSet,
+                Some(order) => ActiveValue::Set(order),
+                _ => ActiveValue::NotSet,
             },
             quantity: match self.quantity {
-                Some(quantity) => Set(quantity),
-                _ => NotSet,
+                Some(quantity) => ActiveValue::Set(quantity),
+                _ => ActiveValue::NotSet,
             },
             unit: match self.unit {
-                Some(unit) => Set(unit),
-                _ => NotSet,
+                Some(unit) => ActiveValue::Set(unit),
+                _ => ActiveValue::NotSet,
             },
             quality: match self.quality {
-                Some(quality) => Set(quality),
-                _ => NotSet,
+                Some(quality) => ActiveValue::Set(quality),
+                _ => ActiveValue::NotSet,
             },
-            recipe_step_id: NotSet,
+            recipe_step_id: ActiveValue::NotSet,
             ingredient_id: match self.ingredient_id {
-                Some(ingredient_id) => Set(ingredient_id),
-                _ => NotSet,
+                Some(ingredient_id) => ActiveValue::Set(ingredient_id),
+                _ => ActiveValue::NotSet,
             },
         }
     }
