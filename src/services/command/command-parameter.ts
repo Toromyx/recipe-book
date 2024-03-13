@@ -7,6 +7,10 @@ import type {
   IngredientUpdateInterface,
 } from "../../types/entity/ingredient-interface.ts";
 import type {
+  RecipeFileCreateInterface,
+  RecipeFileUpdateInterface,
+} from "../../types/entity/recipe-file-interface.ts";
+import type {
   RecipeIngredientDraftCreateInterface,
   RecipeIngredientDraftUpdateInterface,
 } from "../../types/entity/recipe-ingredient-draft-interface.ts";
@@ -43,6 +47,10 @@ import type {
   IngredientCondition,
   IngredientFilter,
 } from "../../types/filter/ingredient-filter.ts";
+import type {
+  RecipeFileCondition,
+  RecipeFileFilter,
+} from "../../types/filter/recipe-file-filter.ts";
 import type {
   RecipeCondition,
   RecipeFilter,
@@ -94,6 +102,21 @@ type CommandParameterMap = {
   [Command.ENTITY_DELETE_RECIPE]: { id: number };
   [Command.ENTITY_LIST_RECIPE]: { filter: RecipeFilter };
   [Command.ENTITY_COUNT_RECIPE]: { condition?: RecipeCondition };
+
+  [Command.ENTITY_CREATE_RECIPE_FILE]: {
+    create: RecipeFileCreateInterface;
+  };
+  [Command.ENTITY_READ_RECIPE_FILE]: { id: number };
+  [Command.ENTITY_UPDATE_RECIPE_FILE]: {
+    update: RecipeFileUpdateInterface;
+  };
+  [Command.ENTITY_DELETE_RECIPE_FILE]: { id: number };
+  [Command.ENTITY_LIST_RECIPE_FILE]: {
+    filter: RecipeFileFilter;
+  };
+  [Command.ENTITY_COUNT_RECIPE_FILE]: {
+    condition?: RecipeFileCondition;
+  };
 
   [Command.ENTITY_CREATE_RECIPE_INGREDIENT_DRAFT]: {
     create: RecipeIngredientDraftCreateInterface;

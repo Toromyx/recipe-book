@@ -7,6 +7,7 @@ use sea_orm_migration::prelude::*;
 mod file;
 mod ingredient;
 mod recipe;
+mod recipe_file;
 mod recipe_ingredient_draft;
 mod recipe_step;
 mod recipe_step_file;
@@ -23,6 +24,7 @@ impl MigrationTrait for Migration {
         file::up(manager).await?;
         ingredient::up(manager).await?;
         recipe::up(manager).await?;
+        recipe_file::up(manager).await?;
         recipe_ingredient_draft::up(manager).await?;
         recipe_step::up(manager).await?;
         recipe_step_file::up(manager).await?;
@@ -57,7 +59,12 @@ mod tests {
     };
 
     use super::*;
-    use crate::database::tests::get_memory_database;
+    use crate::{
+        database::tests::get_memory_database,
+        migrator::m20230306_214922_1_0_0::recipe_file::tests::{
+            assert_recipe_file_indices, assert_recipe_file_schema,
+        },
+    };
 
     #[tokio::test]
     pub async fn test_up() {
@@ -71,6 +78,8 @@ mod tests {
         assert_ingredient_indices(&db).await;
         assert_recipe_schema(&db).await;
         assert_recipe_indices(&db).await;
+        assert_recipe_file_schema(&db).await;
+        assert_recipe_file_indices(&db).await;
         assert_recipe_ingredient_draft_schema(&db).await;
         assert_recipe_ingredient_draft_indices(&db).await;
         assert_recipe_step_schema(&db).await;

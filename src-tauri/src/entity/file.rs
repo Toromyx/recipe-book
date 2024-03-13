@@ -25,11 +25,19 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_many = "super::recipe_step_file::Entity")]
     RecipeStepFile,
+    #[sea_orm(has_many = "super::recipe_file::Entity")]
+    RecipeFile,
 }
 
 impl Related<super::recipe_step_file::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::RecipeStepFile.def()
+    }
+}
+
+impl Related<super::recipe_file::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::RecipeFile.def()
     }
 }
 
@@ -60,6 +68,8 @@ where
     let orphaned_files = Entity::find()
         .left_join(super::recipe_step_file::Entity)
         .filter(super::recipe_step_file::Column::Id.is_null())
+        .left_join(super::recipe_file::Entity)
+        .filter(super::recipe_file::Column::Id.is_null())
         .all(db)
         .await?;
     for orphaned_file in orphaned_files {
@@ -70,6 +80,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::future::Future;
+
     use mime_guess::mime;
     use sea_orm::{ActiveValue, Iterable};
     use tokio::fs;
@@ -114,7 +126,7 @@ mod tests {
         let db = get_memory_database_migrated().await;
         for relation in Relation::iter() {
             match relation {
-                Relation::RecipeStepFile => {
+                Relation::RecipeStepFile | Relation::RecipeFile => {
                     // known relation, add other known relations here if they are tested below or are irrelevant for orphan removal
                 }
             }
@@ -142,14 +154,15 @@ mod tests {
             .unwrap()
         }
 
-        // test recipe step file orphan removal, make this generic once there are more related file entities
-        {
-            let file_a = create_file(&db).await;
+        async fn recipe_step_file_create(
+            file_id: i64,
+            db: &DatabaseConnection,
+        ) -> super::super::recipe_step_file::Model {
             let recipe = super::super::recipe::ActiveModel {
                 name: ActiveValue::Set("Recipe".to_string()),
                 ..Default::default()
             }
-            .insert(&db)
+            .insert(db)
             .await
             .unwrap();
             let recipe_step = super::super::recipe_step::ActiveModel {
@@ -158,35 +171,102 @@ mod tests {
                 recipe_id: ActiveValue::Set(recipe.id),
                 ..Default::default()
             }
-            .insert(&db)
+            .insert(db)
             .await
             .unwrap();
-            let recipe_step_file = super::super::recipe_step_file::ActiveModel {
+            super::super::recipe_step_file::ActiveModel {
                 order: ActiveValue::Set(1),
                 recipe_step_id: ActiveValue::Set(recipe_step.id),
-                file_id: ActiveValue::Set(file_a.id),
+                file_id: ActiveValue::Set(file_id),
                 ..Default::default()
             }
-            .insert(&db)
+            .insert(db)
+            .await
+            .unwrap()
+        }
+
+        async fn recipe_step_file_update(
+            recipe_step_file: super::super::recipe_step_file::Model,
+            file_id: i64,
+            db: &DatabaseConnection,
+        ) -> super::super::recipe_step_file::Model {
+            let mut recipe_step_file_am = recipe_step_file.into_active_model();
+            recipe_step_file_am.file_id = ActiveValue::Set(file_id);
+            recipe_step_file_am.update(db).await.unwrap()
+        }
+
+        async fn recipe_file_create(
+            file_id: i64,
+            db: &DatabaseConnection,
+        ) -> super::super::recipe_file::Model {
+            let recipe = super::super::recipe::ActiveModel {
+                name: ActiveValue::Set("Recipe".to_string()),
+                ..Default::default()
+            }
+            .insert(db)
             .await
             .unwrap();
-            remove_orphans(&db).await.unwrap();
+            super::super::recipe_file::ActiveModel {
+                order: ActiveValue::Set(1),
+                recipe_id: ActiveValue::Set(recipe.id),
+                file_id: ActiveValue::Set(file_id),
+                ..Default::default()
+            }
+            .insert(db)
+            .await
+            .unwrap()
+        }
+
+        async fn recipe_file_update(
+            recipe_file: super::super::recipe_file::Model,
+            file_id: i64,
+            db: &DatabaseConnection,
+        ) -> super::super::recipe_file::Model {
+            let mut recipe_file_am = recipe_file.into_active_model();
+            recipe_file_am.file_id = ActiveValue::Set(file_id);
+            recipe_file_am.update(db).await.unwrap()
+        }
+
+        async fn test_related_entity_orphan_removal<
+            'db,
+            RelatedModel,
+            RelatedActiveModel,
+            RelatedEntity,
+            Create,
+            CreateReturn,
+            Update,
+            UpdateReturn,
+        >(
+            related_model_create: Create,
+            related_model_update: Update,
+            db: &'db DatabaseConnection,
+        ) where
+            RelatedModel: ModelTrait<Entity = RelatedEntity> + IntoActiveModel<RelatedActiveModel>,
+            RelatedActiveModel:
+                ActiveModelTrait<Entity = RelatedEntity> + ActiveModelBehavior + Send,
+            RelatedEntity: EntityTrait<Model = RelatedModel>,
+            Create: Fn(i64, &'db DatabaseConnection) -> CreateReturn,
+            CreateReturn: Future<Output = RelatedModel>,
+            Update: Fn(RelatedModel, i64, &'db DatabaseConnection) -> UpdateReturn,
+            UpdateReturn: Future<Output = RelatedModel>,
+        {
+            let file_a = create_file(db).await;
+            let related_model = related_model_create(file_a.id, db).await;
+            remove_orphans(db).await.unwrap();
             assert!(
                 Entity::find_by_id(file_a.id)
-                    .one(&db)
+                    .one(db)
                     .await
                     .unwrap()
                     .is_some()
             );
             assert!(fs::try_exists(&file_a.path).await.unwrap());
-            let file_b = create_file(&db).await;
-            let mut recipe_step_file_am = recipe_step_file.into_active_model();
-            recipe_step_file_am.file_id = ActiveValue::Set(file_b.id);
-            let recipe_step_file = recipe_step_file_am.update(&db).await.unwrap();
-            remove_orphans(&db).await.unwrap();
+            let file_b = create_file(db).await;
+            let related_model = related_model_update(related_model, file_b.id, db).await;
+            remove_orphans(db).await.unwrap();
             assert!(
                 Entity::find_by_id(file_b.id)
-                    .one(&db)
+                    .one(db)
                     .await
                     .unwrap()
                     .is_some()
@@ -194,22 +274,26 @@ mod tests {
             assert!(fs::try_exists(&file_b.path).await.unwrap());
             assert!(
                 Entity::find_by_id(file_a.id)
-                    .one(&db)
+                    .one(db)
                     .await
                     .unwrap()
                     .is_none()
             );
             assert!(!fs::try_exists(&file_a.path).await.unwrap());
-            recipe_step_file.delete(&db).await.unwrap();
+            related_model.delete(db).await.unwrap();
             assert!(
                 Entity::find_by_id(file_b.id)
-                    .one(&db)
+                    .one(db)
                     .await
                     .unwrap()
                     .is_none()
             );
             assert!(!fs::try_exists(&file_b.path).await.unwrap());
         }
+
+        test_related_entity_orphan_removal(recipe_step_file_create, recipe_step_file_update, &db)
+            .await;
+        test_related_entity_orphan_removal(recipe_file_create, recipe_file_update, &db).await;
 
         TEST_NAME.set(None);
     }
