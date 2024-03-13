@@ -31,6 +31,7 @@ fn client() -> &'static Client {
 pub struct ExternalRecipe {
     pub name: String,
     pub ingredients: Vec<String>,
+    pub files: Vec<String>,
     pub steps: Vec<ExternalRecipeStep>,
 }
 
