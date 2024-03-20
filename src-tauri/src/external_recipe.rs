@@ -189,11 +189,11 @@ fn get_file_urls(json_ld_store: &JsonLdStore, id: &Id) -> Vec<String> {
     let image_urls_iter = json_ld_store
         .get_image_property(id)
         .into_iter()
-        .filter_map(|object| get_content_url_of_object(object));
+        .filter_map(get_content_url_of_object);
     let video_urls_iter = json_ld_store
         .get_video_property(id)
         .into_iter()
-        .filter_map(|object| get_content_url_of_object(object));
+        .filter_map(get_content_url_of_object);
     image_urls_iter.chain(video_urls_iter).collect()
 }
 
