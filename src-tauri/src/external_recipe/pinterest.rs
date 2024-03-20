@@ -80,6 +80,7 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
         let elements = dom
             .select_all("script[data-relay-response=\"true\"][type=\"application/json\"]")
             .await?;
+        // This is done inside a for-loop because of the "await?". https://github.com/rust-lang/rust/issues/62290
         let mut relay_response_option: Option<PinterestRelayResponse> = None;
         for element in elements {
             let text_content = element.text_content().await?;
