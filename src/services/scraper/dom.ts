@@ -22,21 +22,6 @@ void answer(
 );
 
 void answer(
-  EventQuestionChannel.SCRAPER_DOM_CANONICAL_LINK_QUESTION,
-  EventAnswerChannel.SCRAPER_DOM_CANONICAL_LINK_ANSWER,
-  (id) => {
-    const document = documents[id];
-    const canonicalLinkElement = document.querySelector(
-      'link[rel="canonical"]',
-    );
-    if (!canonicalLinkElement) {
-      return "";
-    }
-    return canonicalLinkElement.getAttribute("href") ?? "";
-  },
-);
-
-void answer(
   EventQuestionChannel.SCRAPER_DOM_SELECT_QUESTION,
   EventAnswerChannel.SCRAPER_DOM_SELECT_ANSWER,
   ([id, selector]) => {
