@@ -141,42 +141,214 @@ impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
         vec![pin_it_uri_match(), pinterest_uri_match()]
     }
 }
-/*
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use pretty_assertions::assert_eq;
-
     use super::*;
-
-    #[derive(Debug, Clone)]
-    struct ExpectedGet {
-        input: String,
-        output: ExternalRecipe,
-    }
-
-    fn expected_roasted_pepper_pasta_sauce() -> ExternalRecipe {
-        ExternalRecipe {
-            name: String::from("Roasted Pepper Pasta Soße"),
-            steps: vec![ExternalRecipeStep {
-                ingredients: vec![],
-                description: String::from("Zutaten:\n\n- 3-4 Rote Paprika\n- 1 Zwiebel\n- 1 Knoblauchknolle\n- Olivenöl\n- 500g Pasta der Wahl\n- Handvoll Parmesan\n\nZubereitung:\n\n1. Um Zeit zu sparen schonmal vorab den Ofen auf 220 Grad Ober/Unter vorheizen\n2. Paprika waschen und Stiel entfernen. Anschliessend die Paprika, die geviertelte Zwiebel und die queer halbierte Knoblauchzehe in einer Auflaufform verteilen. Sparsam etwas Olivenöl verteilen und das Gemüse im Backofen für ca. 30-40 Minuten backen. (Solange bis sie aussehen wie im Video)\n3. Den Inhalt der Auflaufform etwas abkühlen lassen und dann in einen Mixbehälter geben und zusammen mit einer Handvoll Parmesan und etwas Olivenöl zu einer Creme mixen\n4. Pasta in sehr gut gesalzenem Wasser kochen (in der Sauce ist kein Salz)\n5. Sosse, in einer Pfanne kurz anbraten und zusammen mit 1-2 Kellen Pastawasser mit den gekochten Pasta zu einer Creme vermischen\n\nAm besten zusammen mit noch mehr Parmesan servieren.\n"),
-                files: vec![String::from("https://v1.pinimg.com/videos/mc/expMp4/a9/a2/66/a9a266243020587a931e459fa4fd9853_t1.mp4")],
-            }],
-        }
-    }
+    use crate::external_recipe::tests::{assert_expected_gets, ExpectedGet};
 
     fn expected_gets() -> Vec<ExpectedGet> {
         vec![
             ExpectedGet {
-                input: String::from("https://pin.it/3qVfEYG"),
-                output: expected_roasted_pepper_pasta_sauce(),
+                // pin to https://www.pinterest.de/pin/568227678004669298/
+                url: String::from("https://pin.it/17F496pQJ"),
+                external_recipe: ExternalRecipe {
+                    name: String::from("Roasted Pepper Pasta Soße"),
+                    steps: vec![ExternalRecipeStep {
+                        description: String::from(
+                            "Zutaten:\n\n- 3-4 Rote Paprika\n- 1 Zwiebel\n- 1 Knoblauchknolle\n- Olivenöl\n- 500g Pasta der Wahl\n- Handvoll Parmesan\n\nZubereitung:\n\n1. Um Zeit zu sparen schonmal vorab den Ofen auf 220 Grad Ober/Unter vorheizen\n2. Paprika waschen und Stiel entfernen. Anschliessend die Paprika, die geviertelte Zwiebel und die queer halbierte Knoblauchzehe in einer Auflaufform verteilen. Sparsam etwas Olivenöl verteilen und das Gemüse im Backofen für ca. 30-40 Minuten backen. (Solange bis sie aussehen wie im Video)\n3. Den Inhalt der Auflaufform etwas abkühlen lassen und dann in einen Mixbehälter geben und zusammen mit einer Handvoll Parmesan und etwas Olivenöl zu einer Creme mixen\n4. Pasta in sehr gut gesalzenem Wasser kochen (in der Sauce ist kein Salz)\n5. Sosse, in einer Pfanne kurz anbraten und zusammen mit 1-2 Kellen Pastawasser mit den gekochten Pasta zu einer Creme vermischen\n\nAm besten zusammen mit noch mehr Parmesan servieren.\n",
+                        ),
+                        files: vec![String::from(
+                            "https://v1.pinimg.com/videos/mc/expMp4/a9/a2/66/a9a266243020587a931e459fa4fd9853_t1.mp4",
+                        )],
+                        ..Default::default()
+                    }],
+                    ..Default::default()
+                },
             },
             ExpectedGet {
-                input: String::from("https://www.pinterest.de/pin/568227678004669298/"),
-                output: expected_roasted_pepper_pasta_sauce(),
+                // pin to https://knusperstuebchen.net/2019/03/14/blumenkohl-curry-vegetarisches-soulfood/
+                url: String::from("https://pin.it/3Zy729tUR"),
+                external_recipe: ExternalRecipe {
+                    name: String::from("Blumenkohl-Curry: Vegetarisches Soulfood"),
+                    steps: vec![ExternalRecipeStep {
+                        ingredients: vec![
+                            String::from("1 Blumenkohl (ca. 750-1000g)"),
+                            String::from("1 Zwiebel"),
+                            String::from("1 Knoblauchzehe"),
+                            String::from("3 EL Olivenöl"),
+                            String::from("400 ml Gemüsebrühe"),
+                            String::from("400 ml Kokosmilch"),
+                            String::from("2 TL gem. Paprikapulver"),
+                            String::from("1 TL gem. Kurkuma"),
+                            String::from("1 TL gem. Ingwer"),
+                            String::from("2 EL gem. Currypulver"),
+                            String::from("50 g Tomatenmark"),
+                            String::from("1 TL Oregano"),
+                            String::from("1 TL Thymian"),
+                            String::from("1-2 TL Salz"),
+                            String::from("1 TL schwarzen Pfeffer"),
+                            String::from("1 Msp. Chilipulver"),
+                            String::from("1 Msp. Kreuzkümmel"),
+                            String::from("150 g TK Erbsen"),
+                            String::from("Basmati Reis für 4 Personen"),
+                        ],
+                        description: String::from(
+                            "So wird's gemacht\nZunächst Blumenkohl waschen, Röschen vom Strunk befreien und klein schneiden. Derweil Zwiebel und Knoblauchzehe fein hacken. Öl in einer Pfanne erhitzen und Zwiebel und Knoblauch darin anschwitzen, Paprikapulver hinzugeben und leicht mitrösten. Blumenkohl hinzufügen und anbraten. Mit Gemüsebrühe und Kokosmilch ablöschen. Die restlichen Gewürze und Kräuter sowie das Tomatenmark hinzugeben, gut verrühren und 20 Minuten köcheln lassen, dabei immer mal wieder umrühren. Derweil den Reis kochen. Zum Schluss die Erbsen in das Curry rühren, nochmals abschmecken und 10 Minuten ziehen lassen. Mit Reis servieren.",
+                        ),
+                        files: vec![
+                            String::from(
+                                "https://knusperstuebchen.net/wp-content/uploads/2019/03/Blumenkohl-Curry-mit-Reis-Cauliflower-Curry-with-Rice-11.jpg",
+                            ),
+                            String::from(
+                                "https://knusperstuebchen.net/wp-content/uploads/2019/03/Blumenkohl-Curry-mit-Reis-Cauliflower-Curry-with-Rice-Rezept.pdf",
+                            ),
+                        ],
+                    }],
+                    ..Default::default()
+                },
             },
+            ExpectedGet {
+                // pin to https://instakoch.de/quiche-lorraine/
+                url: String::from("https://www.pinterest.de/pin/568227677997682303"),
+                external_recipe: ExternalRecipe {
+                    name: "Quiche Lorraine".to_string(),
+                    ingredients: vec![
+                        "250 g Mehl".to_string(),
+                        "125 g Butter".to_string(),
+                        "½ TL Salz".to_string(),
+                        "1  Eigelb".to_string(),
+                        "3-4 EL Wasser".to_string(),
+                        "300 g gekochter Schinken".to_string(),
+                        "1  Stange Lauch".to_string(),
+                        "3  Zwiebeln".to_string(),
+                        "200 ml Sahne".to_string(),
+                        "1 Becher Creme Fraiche".to_string(),
+                        "150 g Reibekäse".to_string(),
+                        "3  Eier".to_string(),
+                        "1 TL Salz".to_string(),
+                        "½ TL Schwarzer Pfeffer".to_string(),
+                        "1 Prise Muskatnuss".to_string(),
+                        "½ Bund Petersilie".to_string(),
+                        "Öl".to_string(),
+                    ],
+                    files: vec![
+                        "https://instakoch.de/wp-content/uploads/2019/03/00000PORTRAIT_00000_BURST20190307160523971-01.jpeg".to_string(),
+                        "https://instakoch.de/wp-content/uploads/2019/03/00000PORTRAIT_00000_BURST20190307160523971-01-500x500.jpeg".to_string(),
+                        "https://instakoch.de/wp-content/uploads/2019/03/00000PORTRAIT_00000_BURST20190307160523971-01-500x375.jpeg".to_string(),
+                        "https://instakoch.de/wp-content/uploads/2019/03/00000PORTRAIT_00000_BURST20190307160523971-01-480x270.jpeg".to_string(),
+                    ],
+                    steps: vec![
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Das Mehl sieben und mit der Butter in die Küchenmaschine geben. Kurz mixen. Ei und Wasser hinzufügen und kneten, bis ein glatter Teig entstanden ist. Herausnehmen und kurz von Hand kneten.".to_string(),
+                            files: vec![
+                                "https://instakoch.de/wp-content/uploads/2019/03/00100dPORTRAIT_00100_BURST20190307134048578_COVER-01-01.jpeg".to_string(),
+                            ],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Teig in Frischhaltefolie wickeln und 30 Minuten lang kühl stellen.".to_string(),
+                            files: vec![
+                                "https://instakoch.de/wp-content/uploads/2019/03/IMG_20190307_130210.jpg".to_string(),
+                            ],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Jetzt den Backofen auf 200 Grad Ober- und Unterhitze vorheizen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Die Tarteform leicht einfetten.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Die Zwiebeln und den Lauch klein schneiden.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "In einer Pfanne, mit wenig Öl, den Schinken kurz anbraten.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Die Zwiebeln und den Lauch hinzufügen und anschwitzen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "In einer Schüssel, die Eier mit Sahne und Crème fraîche miteinander vermischen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Mit Salz, schwarzem Pfeffer und Muskatnuss abschmecken.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Die gehackte Petersilie hinzugeben und alles gut miteinander vermischen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Den Teig auf bemehlter Fläche ausrollen, bis er 3 cm größer ist als die Tarteform.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Den Teig in die Tarteform geben, festdrücken und den Rand abschneiden.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Die Hälfte der Zwiebel-Lauch-Mischung in die Tarte Form geben.".to_string(),
+                            files: vec![
+                                "https://instakoch.de/wp-content/uploads/2019/03/00100dPORTRAIT_00100_BURST20190307144836120_COVER-01.jpeg".to_string(),
+                            ],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Dann den Reibekäse und die Hälfte der Sahne-Ei-Mischung hinzugeben.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Den Rest der Zwiebel-Lauch-Mischung hinzufügen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Etwas Reibekäse und den Rest der Sahne-Ei-Mischung hinzufügen und den übrigen Reibekäse obendrauf verteilen".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Dann etwa 45 Minuten lang im Backofen auf mittlerem Einschub backen, oder bis der Rand goldbraun ist.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Herausnehmen und 5 Minuten lang ruhen lassen. Dann aus der Form nehmen und portionsweise auf Tellern servieren.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Guten Appetit!".to_string(),
+                            files: vec![],
+                        },
+                    ],
+                },
+            },
+            /* ExpectedGet {
+                // pin to https://www.madamecuisine.de/gemuese-lasagne-mit-spinat/
+                url: String::from("https://www.pinterest.de/pin/568227677994153490"),
+                external_recipe: ExternalRecipe {
+                    ..Default::default()
+                },
+            }, */
         ]
     }
 
@@ -184,13 +356,6 @@ mod tests {
     async fn test_get() {
         crate::tests::run();
         let getter = ExternalRecipeGetter;
-        for expected_get in expected_gets() {
-            let actual = getter
-                .get(Url::from_str(&expected_get.input).unwrap())
-                .await
-                .unwrap();
-            assert_eq!(actual, expected_get.output);
-        }
+        assert_expected_gets(getter, expected_gets()).await;
     }
 }
-*/

@@ -20,6 +20,7 @@ use url::Url;
 use crate::external_recipe::error::ExternalRecipeError;
 
 pub mod error;
+pub mod instakoch_de;
 pub mod knusperstuebchen;
 pub mod pinterest;
 pub mod sallys_welt;
@@ -214,6 +215,7 @@ fn external_recipe_getters() -> Vec<Box<dyn ExternalRecipeGetterTrait>> {
         Box::new(pinterest::ExternalRecipeGetter),
         Box::new(sallys_welt::ExternalRecipeGetter),
         Box::new(knusperstuebchen::ExternalRecipeGetter),
+        Box::new(instakoch_de::ExternalRecipeGetter),
     ]
 }
 
