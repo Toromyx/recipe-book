@@ -9,6 +9,7 @@ on:
       - "package-lock.json"
       - "tsconfig.json"
       - "vite.config.js"
+      - "package.json"
       - ".github/workflows/test.yml"
 
 jobs:
