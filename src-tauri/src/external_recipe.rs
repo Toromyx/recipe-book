@@ -4,8 +4,17 @@ use std::{str::FromStr, sync::OnceLock, time::Duration};
 
 use anyhow::Result;
 use async_trait::async_trait;
+use rdf_types::{Id, Object};
 use regex::Regex;
 use reqwest::Client;
+use schema_org_constants::{
+    HOW_TO_SECTION_IRI_HTTP, HOW_TO_SECTION_IRI_HTTPS, HOW_TO_STEP_IRI_HTTP, HOW_TO_STEP_IRI_HTTPS,
+};
+use schema_org_traits::{
+    json_ld_0_15::JsonLdStore, FindRecipeIds, GetContentUrlProperty, GetImageProperty,
+    GetItemListElementProperty, GetNameProperty, GetRecipeIngredientProperty,
+    GetRecipeInstructionsProperty, GetTextProperty, GetVideoProperty,
+};
 use url::Url;
 
 use crate::external_recipe::error::ExternalRecipeError;
@@ -35,12 +44,156 @@ pub struct ExternalRecipe {
     pub steps: Vec<ExternalRecipeStep>,
 }
 
+impl ExternalRecipe {
+    /// Try to create an [`ExternalRecipe`] via [`FindRecipeIds`] inside a [`JsonLdStore`].
+    ///
+    /// Returns [`None`] if no subject of type [`schema_org_constants::RECIPE_IRI_HTTP`] can be found.
+    pub fn try_from_json_ld(json_ld_store: &JsonLdStore) -> Option<Self> {
+        let recipe_id_option = json_ld_store.find_recipe_ids().first().copied();
+        let Some(recipe_id) = recipe_id_option else {
+            return None;
+        };
+        Some(Self::from_schema_org_recipe_json_ld(
+            json_ld_store,
+            recipe_id,
+        ))
+    }
+
+    /// Create an [`ExternalRecipe`] from with a given [`schema_org_constants::RECIPE_IRI_HTTP`] id inside a [`JsonLdStore`].
+    ///
+    /// This roughly implements the logic outlined in <https://developers.google.com/search/docs/appearance/structured-data/recipe>,
+    /// but also changes it where necessary.
+    fn from_schema_org_recipe_json_ld(json_ld_store: &JsonLdStore, recipe_id: &Id) -> Self {
+        let name = json_ld_store
+            .get_name_property(recipe_id)
+            .first()
+            .copied()
+            .and_then(|object| object.as_literal())
+            .map(|literal| literal.as_str().to_string())
+            .unwrap_or_default();
+        let ingredients = json_ld_store
+            .get_recipe_ingredient_property(recipe_id)
+            .into_iter()
+            .filter_map(|object| object.as_literal())
+            .map(|literal| literal.as_str().to_string())
+            .collect();
+        let files = get_file_urls(json_ld_store, recipe_id);
+        let steps = json_ld_store
+            .get_recipe_instructions_property(recipe_id)
+            .into_iter()
+            .flat_map(
+                |recipe_instructions_property| match recipe_instructions_property {
+                    Object::Id(id) => {
+                        let Some(object_type_str) =
+                            (|| Some(json_ld_store.get_type(id)?.as_id()?.as_str()))()
+                        else {
+                            return vec![];
+                        };
+                        match object_type_str {
+                            HOW_TO_STEP_IRI_HTTP | HOW_TO_STEP_IRI_HTTPS => {
+                                vec![ExternalRecipeStep::from_schema_org_how_to_step_json_ld(
+                                    json_ld_store,
+                                    id,
+                                )]
+                            }
+                            HOW_TO_SECTION_IRI_HTTP | HOW_TO_SECTION_IRI_HTTPS => json_ld_store
+                                .get_item_list_element_property(id)
+                                .into_iter()
+                                .filter_map(|object| object.as_id())
+                                .map(|id| {
+                                    ExternalRecipeStep::from_schema_org_how_to_step_json_ld(
+                                        json_ld_store,
+                                        id,
+                                    )
+                                })
+                                .collect(),
+                            _ => vec![],
+                        }
+                    }
+                    Object::Literal(literal) => vec![ExternalRecipeStep {
+                        description: literal.as_str().to_string(),
+                        ..Default::default()
+                    }],
+                },
+            )
+            .collect();
+
+        Self {
+            name,
+            ingredients,
+            files,
+            steps,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(test, derive(PartialEq))]
 pub struct ExternalRecipeStep {
     pub ingredients: Vec<String>,
     pub description: String,
     pub files: Vec<String>,
+}
+
+impl ExternalRecipeStep {
+    /// Create an [`ExternalRecipeStep`] from with a given [`schema_org_constants::HOW_TO_STEP_IRI_HTTP`] id inside a [`JsonLdStore`].
+    ///
+    /// This roughly implements the logic outlined in <https://developers.google.com/search/docs/appearance/structured-data/recipe#how-to-step>,
+    /// but also changes it where necessary.
+    fn from_schema_org_how_to_step_json_ld(
+        json_ld_store: &JsonLdStore,
+        how_to_step_id: &Id,
+    ) -> Self {
+        let description = json_ld_store
+            .get_text_property(how_to_step_id)
+            .into_iter()
+            .filter_map(|object| object.as_literal())
+            .map(|literal| literal.as_str())
+            .collect::<Vec<_>>()
+            .join("\n");
+        let files = get_file_urls(json_ld_store, how_to_step_id);
+        ExternalRecipeStep {
+            description,
+            files,
+            ..Default::default()
+        }
+    }
+}
+
+/// Get images and videos from the [`schema_org_constants::IMAGE_PROPERTY_IRI_HTTP`] and [`schema_org_constants::VIDEO_PROPERTY_IRI_HTTP`] of a specified id in a [`JsonLdStore`].
+///
+/// This function tries to return the publicly available URLs of these objects:
+/// - the string directly if a [`Object::Literal`]
+/// - the [`schema_org_constants::CONTENT_URL_PROPERTY_IRI_HTTP`] if present in the [`JsonLdStore`]
+/// - or the IRI directly as URL.
+fn get_file_urls(json_ld_store: &JsonLdStore, id: &Id) -> Vec<String> {
+    let get_content_url_of_object = |object: &Object| -> Option<String> {
+        Some(
+            match object {
+                Object::Id(id) => {
+                    if let Some(content_url_property) =
+                        json_ld_store.get_content_url_property(id).first()
+                    {
+                        content_url_property.as_literal()?.as_str()
+                    } else {
+                        id.as_str()
+                    }
+                }
+                Object::Literal(literal) => literal.as_str(),
+            }
+            .to_string(),
+        )
+    };
+
+    let image_urls_iter = json_ld_store
+        .get_image_property(id)
+        .into_iter()
+        .filter_map(|object| get_content_url_of_object(object));
+    let video_urls_iter = json_ld_store
+        .get_video_property(id)
+        .into_iter()
+        .filter_map(|object| get_content_url_of_object(object));
+    image_urls_iter.chain(video_urls_iter).collect()
 }
 
 /// Get an external recipe from an URL.
