@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - "package-lock.json"
+      - "audit-resolve.json"
       - "package.json"
       - ".github/workflows/audit-frontend.yml"
 
