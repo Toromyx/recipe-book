@@ -30,6 +30,7 @@
     "audit:frontend:resolve": "resolve-audit",
     "audit:frontend": "check-audit",
     "audit": "concurrently -c yellow,blue \"npm:audit:*\"",
+    "cargo": "cd src-tauri && cargo",
     "tauri": "tauri"
   },
   "dependencies": {
