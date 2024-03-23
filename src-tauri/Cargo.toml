@@ -19,6 +19,9 @@ version = "^1.0"
 [dependencies.async-trait]
 version = "^0.1.72"
 
+[dependencies.indexmap]
+version = "^2.2.6"
+
 [dependencies.json-ld]
 version = "^0.15.0"
 features = ["reqwest"]

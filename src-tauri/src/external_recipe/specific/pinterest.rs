@@ -1,8 +1,7 @@
-//! This module implements [`ExternalRecipeGetterTrait`] for [Pinterest](https://www.pinterest.com/).
+//! This module implements [`SpecificExternalRecipeGetterTrait`] for [Pinterest](https://www.pinterest.com/).
 
 use std::sync::OnceLock;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
 use scraper::Dom;
@@ -14,11 +13,15 @@ static PINTEREST_PATH_REGEX: OnceLock<Regex> = OnceLock::new();
 
 use crate::{
     external_recipe::{
+        client,
         error::ExternalRecipeError,
-        pinterest::relay_response::{
-            PinterestRelay, PinterestRelayPinQueryData, PinterestRelayResponse,
+        specific::{
+            pinterest::relay_response::{
+                PinterestRelay, PinterestRelayPinQueryData, PinterestRelayResponse,
+            },
+            SpecificExternalRecipeGetterTrait, UrlMatch,
         },
-        ExternalRecipe, ExternalRecipeGetterTrait, ExternalRecipeStep, UrlMatch,
+        ExternalRecipe, ExternalRecipeStep,
     },
     scraper,
     scraper::ParentNode,
@@ -71,10 +74,10 @@ fn pinterest_uri_match() -> UrlMatch<'static> {
 pub struct ExternalRecipeGetter;
 
 #[async_trait]
-impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
+impl SpecificExternalRecipeGetterTrait for ExternalRecipeGetter {
     /// For `pin.it` URLs, we first need to find the canonical URL before trying to parse the HTML for the recipe data.
     async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError> {
-        let response = super::client().get(url.clone()).send().await?;
+        let response = client().get(url).send().await?;
         let text = response.text().await?;
         let dom = Dom::create(text).await?;
         let elements = dom
@@ -342,20 +345,128 @@ mod tests {
                     ],
                 },
             },
-            /* ExpectedGet {
+            ExpectedGet {
                 // pin to https://www.madamecuisine.de/gemuese-lasagne-mit-spinat/
                 url: String::from("https://www.pinterest.de/pin/568227677994153490"),
                 external_recipe: ExternalRecipe {
-                    ..Default::default()
+                    name: "Gemüse-Lasagne mit Spinat: Amore Italia".to_string(),
+                    ingredients: vec![
+                        "1 Zehe Knoblauch".to_string(),
+                        "2 EL Olivenöl".to_string(),
+                        "1/4 TL Chiliflocken".to_string(),
+                        "400 g stückige Tomaten aus der Dose".to_string(),
+                        "50 ml Weißwein".to_string(),
+                        "2 Zweige Thymian".to_string(),
+                        "2 Zweige Oregano".to_string(),
+                        "Salz (Pfeffer)".to_string(),
+                        "1  kleine rote Zwiebel".to_string(),
+                        "1  große Karotte".to_string(),
+                        "125 g frischer Baby-Blattspinat".to_string(),
+                        "1  Paprika (rot oder gelb)".to_string(),
+                        "1  Zucchini".to_string(),
+                        "2 EL Olivenöl".to_string(),
+                        "Salz &amp; Pfeffer".to_string(),
+                        "3 Zweige frisches Basilikum".to_string(),
+                        "150 g Ricotta".to_string(),
+                        "9  Platten Lasagne (ich habe grüne Spinatlasagne genommen)".to_string(),
+                        "100 g geriebenen Mozzarella".to_string(),
+                    ],
+                    files: vec![
+                        "https://www.madamecuisine.de/wp-content/uploads/2019/05/gemuese-lasagne-featured.jpg".to_string(),
+                        "https://www.madamecuisine.de/wp-content/uploads/2019/05/gemuese-lasagne-featured-500x500.jpg".to_string(),
+                        "https://www.madamecuisine.de/wp-content/uploads/2019/05/gemuese-lasagne-featured-500x375.jpg".to_string(),
+                        "https://www.madamecuisine.de/wp-content/uploads/2019/05/gemuese-lasagne-featured-480x270.jpg".to_string(),
+                    ],
+                    steps: vec![
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Knoblauch schälen und fein hacken.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "In einem Topf das Olivenöl erhitzen und den Knoblauch zusammen mit den Chiliflocken bei milder Hitze ca. 3-4 Min. andünsten.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Tomaten aus der Dose und Weißwein hinzufügen und bei mittlerer Hitze offen etwa 15 Min. kochen lassen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Thymian und Oregano waschen und trocken schütteln, die Blättchen abzupfen, fein hacken und zur Sauce geben. Mit Salz und Pfeffer würzen und für weitere 5 Min. köcheln.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Anschließend die Sauce in ein hohes Gefäß füllen und mit dem Pürierstab schön cremig pürieren.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Zwiebel und Karotte schälen und fein hacken. Paprika und Zucchini waschen, putzen und in feine Würfel schneiden. Den Spinat waschen und gut abtropfen lassen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "In einer großen Pfanne das Olivenöl erhitzen und das Gemüse – bis auf den Spinat – bei mittlerer Hitze etwa 5 Min. andünsten. Spinat hinzufügen und kräftig mit Salz und Pfeffer würzen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Basilikum waschen und trocken schütteln, die Blättchen abzupfen und fein hacken.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Ricotta und Basilikum unter das Gemüse rühren und alles noch einmal kräftig mit Salz und Pfeffer abschmecken.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Den Backofen auf 200 Grad Ober-/Unterhitze vorheizen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Ein Drittel der Tomatensauce auf dem Boden der Form glatt streichen. Drei Lasagneblätter darauf legen. Die Hälfte der Gemüsemischung auf die Nudeln geben und ebenfalls glatt streichen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Es folgt das zweite Drittel der Tomatensauce, sowie ein Drittel des geriebenen Mozzarellas.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Darauf drei Lasagneblätter, die zweite Hälfte der Gemüsemischung, sowie ein weiteres Drittel Mozzarella.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Noch einmal 3 Lasagneblätter und die restliche Tomatensauce.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Den übrigen Mozzarella mit 50 g geriebenem Parmesan vermischen und den Käse über der Lasagne verteilen.".to_string(),
+                            files: vec![],
+                        },
+                        ExternalRecipeStep {
+                            ingredients: vec![],
+                            description: "Die Lasagne mit Alufolie abdecken und in der Mitte des vorgeheizten Ofens für 20 Min. backen. Anschließend die Folie entfernen und die Lasagne für weitere 15-20 Min. backen, bis sie schön goldbraun ist und die Nudeln gar sind. Im ausgeschalteten Ofen etwa 5 Min. sitzen lassen und dann servieren.".to_string(),
+                            files: vec![],
+                        },
+                    ],
                 },
-            }, */
+            },
         ]
     }
 
     #[tokio::test]
     async fn test_get() {
         crate::tests::run();
-        let getter = ExternalRecipeGetter;
-        assert_expected_gets(getter, expected_gets()).await;
+        assert_expected_gets(expected_gets()).await;
     }
 }

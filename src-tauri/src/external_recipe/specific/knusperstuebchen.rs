@@ -1,4 +1,4 @@
-//! This module implements [`ExternalRecipeGetterTrait`] for [Knusperstübchen](https://knusperstuebchen.net/).
+//! This module implements [`SpecificExternalRecipeGetterTrait`] for [Knusperstübchen](https://knusperstuebchen.net/).
 
 use std::sync::OnceLock;
 
@@ -8,8 +8,10 @@ use url::Url;
 
 use crate::{
     external_recipe::{
-        error::ExternalRecipeError, ExternalRecipe, ExternalRecipeGetterTrait, ExternalRecipeStep,
-        UrlMatch,
+        client,
+        error::ExternalRecipeError,
+        specific::{SpecificExternalRecipeGetterTrait, UrlMatch},
+        ExternalRecipe, ExternalRecipeStep,
     },
     scraper::{Dom, ParentNode},
 };
@@ -19,10 +21,10 @@ static PATH_REGEX: OnceLock<Regex> = OnceLock::new();
 pub struct ExternalRecipeGetter;
 
 #[async_trait]
-impl ExternalRecipeGetterTrait for ExternalRecipeGetter {
+impl SpecificExternalRecipeGetterTrait for ExternalRecipeGetter {
     /// The recipes on Knusperstuebchen can be only a pdf or a pdf and structured html.
-    async fn get(&self, url: Url) -> anyhow::Result<ExternalRecipe, ExternalRecipeError> {
-        let response = super::client().get(url).send().await?;
+    async fn get(&self, url: Url) -> Result<ExternalRecipe, ExternalRecipeError> {
+        let response = client().get(url).send().await?;
         let text = response.text().await?;
         let dom = Dom::create(text).await?;
         let name_element = dom.select("h1").await?.unwrap();
@@ -209,7 +211,6 @@ mod tests {
     #[tokio::test]
     async fn test_get() {
         crate::tests::run();
-        let getter = ExternalRecipeGetter;
-        assert_expected_gets(getter, expected_gets()).await;
+        assert_expected_gets(expected_gets()).await;
     }
 }
