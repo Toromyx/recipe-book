@@ -18,6 +18,9 @@ const translationStrings: TranslationStrings = {
       },
       ocr: "OCR",
     },
+    entityNames: {
+      recipeStep: "Recipe Step",
+    },
     entityFields: {
       file: {
         name: "Name",

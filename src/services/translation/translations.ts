@@ -17,6 +17,9 @@ type Translations<T> = {
       };
       ocr: T;
     };
+    entityNames: {
+      recipeStep: T;
+    };
     entityFields: {
       file: {
         name: T;
