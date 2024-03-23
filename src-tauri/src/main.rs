@@ -167,7 +167,7 @@ mod tests {
     static RUN_ONCE: Once = Once::new();
 
     thread_local! {
-        pub static TEST_NAME: RefCell<Option<String>> = RefCell::new(None);
+        pub static TEST_NAME: RefCell<Option<String>> = const { RefCell::new(None) };
     }
 
     /// Run the tauri app, but only once.
