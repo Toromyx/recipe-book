@@ -55,42 +55,38 @@ export function parseHtml(
   const tables = document.querySelectorAll("table");
   recipeIngredients.push(
     // for each table ...
-    ...[...tables].flatMap(
-      (table): ParsedRecipeIngredient[] =>
-        // ... get the rows ...
-        [...table.rows]
-          .map((row): ParsedRecipeIngredient | null =>
-            // ... and for each row ...
-            fromParts(
-              unitList,
-              // ... interpret each cell as a part of an ingredient
-              ...[...row.cells]
-                .map((cell) => cell.innerText.trim())
-                .filter(Boolean),
-            ),
-          )
-          .filter(Boolean) as ParsedRecipeIngredient[],
+    ...[...tables].flatMap((table): ParsedRecipeIngredient[] =>
+      // ... get the rows ...
+      [...table.rows].map(
+        (row): ParsedRecipeIngredient =>
+          // ... and for each row ...
+          fromParts(
+            unitList,
+            // ... interpret each cell as a part of an ingredient
+            ...[...row.cells]
+              .map((cell) => cell.innerText.trim())
+              .filter(Boolean),
+          ),
+      ),
     ),
   );
   // try to parse ingredients from the lists in the html
   const lists = document.querySelectorAll("ol ul");
   recipeIngredients.push(
     // for each list ...
-    ...[...lists].flatMap(
-      (list): ParsedRecipeIngredient[] =>
-        // ... get the list items ...
-        [...list.querySelectorAll("li")]
-          .map((listItem): ParsedRecipeIngredient | null =>
-            fromParts(
-              unitList,
-              // ... and interpret each part of the item, split by whitespace, as part of an ingredient
-              ...listItem.innerText
-                .split(/\s+/)
-                .map((part) => part.trim())
-                .filter(Boolean),
-            ),
-          )
-          .filter(Boolean) as ParsedRecipeIngredient[],
+    ...[...lists].flatMap((list): ParsedRecipeIngredient[] =>
+      // ... get the list items ...
+      [...list.querySelectorAll("li")].map(
+        (listItem): ParsedRecipeIngredient =>
+          fromParts(
+            unitList,
+            // ... and interpret each part of the item, split by whitespace, as part of an ingredient
+            ...listItem.innerText
+              .split(/\s+/)
+              .map((part) => part.trim())
+              .filter(Boolean),
+          ),
+      ),
     ),
   );
   // if no ingredients are found in the structured html, fall back to just parsing the text
@@ -180,9 +176,7 @@ export function parseStrings(
   strings: string[],
   unitList: string[],
 ): ParsedRecipeIngredient[] {
-  return strings
-    .map((string) => parseString(string, unitList))
-    .filter(Boolean) as ParsedRecipeIngredient[];
+  return strings.map((string) => parseString(string, unitList));
 }
 
 /**
@@ -193,7 +187,7 @@ export function parseStrings(
 export function parseString(
   string: string,
   unitList: string[],
-): ParsedRecipeIngredient | null {
+): ParsedRecipeIngredient {
   return fromParts(
     unitList,
     ...string
@@ -209,9 +203,11 @@ export function parseString(
 function fromParts(
   unitList: string[],
   ...parts: string[]
-): ParsedRecipeIngredient | null {
+): ParsedRecipeIngredient {
   if (parts.length <= 0) {
-    return null;
+    return {
+      name: "",
+    };
   }
   // one part: interpret as name
   if (parts.length === 1) {

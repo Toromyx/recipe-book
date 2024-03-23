@@ -45,7 +45,7 @@ It also displays displays the ingredients recipes drafts.
   let draftList;
   /** @type {(ParsedRecipeIngredient & {id?: number})[]} */
   let pastedParsedRecipeIngredients = [];
-  /** @type {Promise<Array<ParsedRecipeIngredient|null>>} */
+  /** @type {Promise<ParsedRecipeIngredient[]>} */
   let draftedParsedRecipeIngredientsPromise = new Promise(() => {});
 
   $: list = recipeStepIngredientRepository.createListFilteredStore({
