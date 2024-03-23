@@ -182,14 +182,19 @@ mod tests {
         });
     }
 
-    pub fn create_temp_file<Contents>(name: &str, contents: Contents) -> PathBuf
-    where
-        Contents: AsRef<[u8]>,
-    {
+    pub fn temp_file_path(name: &str) -> PathBuf {
         let mut temp_path = std::env::temp_dir();
         temp_path.push("recipe_book_tests");
         std::fs::create_dir_all(&temp_path).unwrap();
         temp_path.push(name);
+        temp_path
+    }
+
+    pub fn create_temp_file<Contents>(name: &str, contents: Contents) -> PathBuf
+    where
+        Contents: AsRef<[u8]>,
+    {
+        let temp_path = temp_file_path(name);
         std::fs::write(&temp_path, contents).unwrap();
 
         temp_path
