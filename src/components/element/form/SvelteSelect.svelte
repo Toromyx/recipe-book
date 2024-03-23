@@ -14,7 +14,7 @@ The `input` or `change` events are fired when the user selects an option.
 
   /**
    * the selectable options
-   * @type {{value: unknown, label: string}[]}
+   * @type {unknown[]}
    */
   export let options;
   /**
@@ -65,7 +65,7 @@ The `input` or `change` events are fired when the user selects an option.
   $: setValue(innerValue);
 
   function onInputOrChange(event) {
-    innerValue = options[event.target.value].value;
+    innerValue = options[event.target.value];
     setChanged();
     dispatch(event.type, innerValue);
   }
@@ -86,6 +86,6 @@ The `input` or `change` events are fired when the user selects an option.
     >{placeholder}</option
   >
   {#each options as option, i}
-    <option value="{i}">{option.label}</option>
+    <option value="{i}"><slot option="{option}" /></option>
   {/each}
 </select>
