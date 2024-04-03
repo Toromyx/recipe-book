@@ -18,6 +18,7 @@ const baseConfig = {
     ecmaVersion: "latest",
     sourceType: "module",
     globals: {
+      ...globals.builtin,
       ...globals.browser,
       ...globals.node,
     },
