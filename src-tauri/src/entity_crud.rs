@@ -1,5 +1,7 @@
 //! This module implements create, read, update, delete, list, and count operations for the entities in [`crate::entity`].  
 
+use std::fmt::Debug;
+
 use anyhow::Result;
 use async_trait::async_trait;
 use sea_orm::{
