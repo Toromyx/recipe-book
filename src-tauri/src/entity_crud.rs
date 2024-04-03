@@ -4,9 +4,8 @@ use anyhow::Result;
 use async_trait::async_trait;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
-    DatabaseTransaction, EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait,
-    PrimaryKeyToColumn, PrimaryKeyTrait, QueryFilter, QuerySelect, RelationTrait, Select,
-    TransactionTrait,
+    EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait, PrimaryKeyToColumn, PrimaryKeyTrait,
+    QueryFilter, QuerySelect, RelationTrait, Select, TransactionTrait,
 };
 use serde::Deserialize;
 
@@ -140,41 +139,22 @@ pub trait EntityCrudTrait {
     /// the struct with which to order an entity list, implementing [`OrderBy`]
     type EntityOrderBy: OrderBy<Entity = Self::Entity> + Send;
 
-    /// Implement this to run code before creating the entity.
-    ///
-    /// see [`Self::create`]
-    async fn pre_create(
-        create: Self::EntityCreate,
-        _txn: &DatabaseTransaction,
-    ) -> Result<Self::ActiveModel> {
-        create.try_into_active_model().await
-    }
-
     /// Create an entity.
     ///
     /// # Errors
     ///
     /// - when there is any problem with the database
     /// - when the tauri window can't be messaged about the created entity
-    /// - when there is an error in [`Self::pre_create`] or [`Self::post_create`]
     async fn create(
         create: Self::EntityCreate,
     ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType> {
         let db = database::connect_writing().await;
         let txn = db.begin().await?;
-        let active_model = Self::pre_create(create, &txn).await?;
+        let active_model = create.try_into_active_model().await?;
         let model = active_model.insert(&txn).await?;
-        let model = Self::post_create(model, &txn).await?;
         txn.commit().await?;
         get_window().emit(Self::entity_action_created_channel(), ())?;
         Ok(Self::primary_key_value(&model))
-    }
-
-    /// Implement this to run code after creating the entity.
-    ///
-    /// see [`Self::create`]
-    async fn post_create(model: Self::Model, _txn: &DatabaseTransaction) -> Result<Self::Model> {
-        Ok(model)
     }
 
     /// Read an entity.
