@@ -35,8 +35,6 @@ It also takes care of the unit conversion.
 
   /** @type {Readable<Loadable<RecipeStepIngredientInterface>>} */
   let recipeStepIngredient;
-  /** @type {Readable<Loadable<number[]> | null>} */
-  let unitNameList;
   /** @type {Readable<Loadable<UnitNameInterface> | null> } */
   let unitName;
   /** @type {Loadable<number | null>} */
@@ -69,17 +67,8 @@ It also takes care of the unit conversion.
     $recipeStepIngredient,
     (recipeStepIngredient) => recipeStepIngredient.unit,
   );
-  $: unitNameList = whenLoadedValue(unit, (unit) =>
-    unit
-      ? unitNameRepository.createListFilteredStore({
-          condition: { nameExact: unit },
-        })
-      : null,
-  );
-  $: unitName = whenLoadedValue($unitNameList, (unitNameList) =>
-    unitNameList?.length
-      ? unitNameRepository.createStore(unitNameList[0])
-      : null,
+  $: unitName = whenLoadedValue(unit, (unit) =>
+    unitNameRepository.createStore(unit),
   );
   $: whenLoadedValue($unitName, (unitName) => {
     if (!unitName) {

@@ -75,11 +75,11 @@ type CommandAnswerMap = {
   [Command.ENTITY_LIST_RECIPE_STEP]: number[];
   [Command.ENTITY_COUNT_RECIPE_STEP]: number;
 
-  [Command.ENTITY_CREATE_UNIT_NAME]: number;
+  [Command.ENTITY_CREATE_UNIT_NAME]: string;
   [Command.ENTITY_READ_UNIT_NAME]: UnitNameInterface;
   [Command.ENTITY_UPDATE_UNIT_NAME]: void;
   [Command.ENTITY_DELETE_UNIT_NAME]: void;
-  [Command.ENTITY_LIST_UNIT_NAME]: number[];
+  [Command.ENTITY_LIST_UNIT_NAME]: string[];
   [Command.ENTITY_COUNT_UNIT_NAME]: number;
 
   [Command.EXTERNAL_RECIPE]: number;

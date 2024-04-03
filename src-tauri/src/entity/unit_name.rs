@@ -16,7 +16,6 @@ use crate::entity::unit_name::unit::Unit;
 #[sea_orm(table_name = "unit_name")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i64,
     pub name: String,
     pub unit: Unit,
 }

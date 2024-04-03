@@ -132,7 +132,7 @@ type CommandEntityCount =
 
 const entityReadPromiseCollector: {
   [T in CommandEntityRead]: {
-    [id: number]: Promise<CommandAnswer<T>>;
+    [id in CommandParameter<T>["id"]]: Promise<CommandAnswer<T>>;
   };
 } = {
   [Command.ENTITY_READ_FILE]: {},
@@ -182,15 +182,16 @@ const entityCountPromiseCollector: {
 };
 
 /**
- * Read an entity, returning the already existing promise if it already being read.
+ * Read an entity, returning the already existing promise if it is already being read.
  */
-function readCollected<T extends CommandEntityRead>(
-  command: T,
-  id: number,
-): Promise<CommandAnswer<T>> {
+function readCollected<Command extends CommandEntityRead>(
+  command: Command,
+  id: CommandParameter<Command>["id"],
+): Promise<CommandAnswer<Command>> {
   if (entityReadPromiseCollector[command][id] === undefined) {
+    // @ts-expect-error TypeScript gods help me
     entityReadPromiseCollector[command][id] = invoke(command, { id }).then(
-      (value: CommandAnswer<T>) => {
+      (value: CommandAnswer<Command>) => {
         delete entityReadPromiseCollector[command][id];
         return value;
       },
@@ -208,16 +209,15 @@ function listCollected<Command extends CommandEntityList>(
 ): Promise<CommandAnswer<typeof command>> {
   const filterKey = stringifyFilter(filter);
   if (entityListPromiseCollector[command][filterKey] === undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    entityListPromiseCollector[command as CommandEntityList][filterKey] =
-      invoke(command, {
-        filter,
-      } as CommandParameter<Command>).then(
-        (value: CommandAnswer<typeof command>) => {
-          delete entityListPromiseCollector[command][filterKey];
-          return value;
-        },
-      );
+    // @ts-expect-error TypeScript gods help me
+    entityListPromiseCollector[command][filterKey] = invoke(command, {
+      filter,
+    } as CommandParameter<Command>).then(
+      (value: CommandAnswer<typeof command>) => {
+        delete entityListPromiseCollector[command][filterKey];
+        return value;
+      },
+    );
   }
   return entityListPromiseCollector[command][filterKey];
 }
@@ -530,11 +530,11 @@ export function countRecipeStep(
 
 export function createUnitName(
   create: UnitNameCreateInterface,
-): Promise<number> {
+): Promise<string> {
   return invoke(Command.ENTITY_CREATE_UNIT_NAME, { create });
 }
 
-export function readUnitName(id: number): Promise<UnitNameInterface> {
+export function readUnitName(id: string): Promise<UnitNameInterface> {
   return readCollected(Command.ENTITY_READ_UNIT_NAME, id);
 }
 
@@ -542,11 +542,11 @@ export function updateUnitName(update: UnitNameUpdateInterface): Promise<void> {
   return invoke(Command.ENTITY_UPDATE_UNIT_NAME, { update });
 }
 
-export function deleteUnitName(id: number): Promise<void> {
+export function deleteUnitName(id: string): Promise<void> {
   return invoke(Command.ENTITY_DELETE_UNIT_NAME, { id });
 }
 
-export function listUnitName(filter: UnitNameFilter): Promise<number[]> {
+export function listUnitName(filter: UnitNameFilter): Promise<string[]> {
   return listCollected(Command.ENTITY_LIST_UNIT_NAME, filter);
 }
 

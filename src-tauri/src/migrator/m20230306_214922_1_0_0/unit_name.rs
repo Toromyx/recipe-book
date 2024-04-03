@@ -2,32 +2,18 @@
 
 use sea_orm_migration::prelude::*;
 
-use crate::migrator::index_name;
-
 pub async fn up(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
     manager
         .create_table(
             Table::create()
                 .table(UnitName::Table)
                 .col(
-                    ColumnDef::new(UnitName::Id)
-                        .integer()
+                    ColumnDef::new(UnitName::Name)
+                        .string()
                         .not_null()
-                        .auto_increment()
                         .primary_key(),
                 )
-                .col(ColumnDef::new(UnitName::Name).string().not_null())
                 .col(ColumnDef::new(UnitName::Unit).text().not_null())
-                .index(Index::create().col(UnitName::Name).unique())
-                .to_owned(),
-        )
-        .await?;
-    manager
-        .create_index(
-            Index::create()
-                .name(&index_name(&UnitName::Table, &UnitName::Unit))
-                .table(UnitName::Table)
-                .col(UnitName::Unit)
                 .to_owned(),
         )
         .await?;
@@ -64,7 +50,6 @@ async fn insert_data(manager: &SchemaManager<'_>) -> Result<(), DbErr> {
 #[derive(Iden)]
 pub enum UnitName {
     Table,
-    Id,
     Name,
     Unit,
 }
@@ -80,18 +65,13 @@ pub mod tests {
         let table_schema = get_table_schema("unit_name", db).await;
         assert_str_eq!(
             table_schema,
-            "CREATE TABLE \"unit_name\" ( \"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"name\" text NOT NULL, \"unit\" text NOT NULL, UNIQUE (\"name\") )"
+            "CREATE TABLE \"unit_name\" ( \"name\" text NOT NULL PRIMARY KEY, \"unit\" text NOT NULL )"
         );
     }
 
     pub async fn assert_unit_name_indices(db: &DatabaseConnection) {
         let indices = get_table_indices("unit_name", db).await;
-        assert_eq!(
-            indices,
-            vec![String::from(
-                "CREATE INDEX \"idx-unit_name-unit\" ON \"unit_name\" (\"unit\")"
-            ),]
-        )
+        assert!(indices.is_empty())
     }
 
     pub async fn assert_unit_name_content(db: &DatabaseConnection) {

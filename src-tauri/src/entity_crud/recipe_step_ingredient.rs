@@ -120,6 +120,7 @@ impl EntityCrudTrait for RecipeStepIngredientCrud {
     type Column = Column;
     type Relation = Relation;
     type PrimaryKey = PrimaryKey;
+    type PrimaryKeyValue = i64;
     type EntityCreate = RecipeStepIngredientCreate;
     type EntityUpdate = RecipeStepIngredientUpdate;
     type EntityCondition = RecipeStepIngredientCondition;

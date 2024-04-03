@@ -139,6 +139,7 @@ impl EntityCrudTrait for FileCrud {
     type Column = Column;
     type Relation = Relation;
     type PrimaryKey = PrimaryKey;
+    type PrimaryKeyValue = i64;
     type EntityCreate = FileCreate;
     type EntityUpdate = FileUpdate;
     type EntityCondition = FileCondition;

@@ -4,21 +4,23 @@ import type { IdentifiableInterface } from "../../../types/identifiable-interfac
 import { equalArray } from "../../util/compare.ts";
 import type { Loadable } from "../../util/loadable.ts";
 
-type ApiCreate<EntityCreate> = (entityCreate: EntityCreate) => Promise<number>;
+type ApiCreate<EntityCreate, PrimaryKey> = (
+  entityCreate: EntityCreate,
+) => Promise<PrimaryKey>;
 
-type ApiRead<Entity> = (identifier: number) => Promise<Entity>;
+type ApiRead<Entity, PrimaryKey> = (identifier: PrimaryKey) => Promise<Entity>;
 
 type ApiUpdate<EntityUpdate> = (entityUpdate: EntityUpdate) => Promise<void>;
 
-type ApiDelete = (identifier: number) => Promise<void>;
+type ApiDelete<PrimaryKey> = (identifier: PrimaryKey) => Promise<void>;
 
-type ApiList<Filter> = (filter: Filter) => Promise<number[]>;
+type ApiList<Filter, PrimaryKey> = (filter: Filter) => Promise<PrimaryKey[]>;
 
 type ApiCount<Condition> = (condition?: Condition) => Promise<number>;
 
-type EntityRepositorySubscriber<Entity> = (entity: Entity) => void;
+type EntityRepositorySubscriber<Entity> = (entity: Entity | undefined) => void;
 
-type EntityRepositoryListSubscriber = (list: number[]) => void;
+type EntityRepositoryListSubscriber<PrimaryKey> = (list: PrimaryKey[]) => void;
 
 type EntityRepositoryCountSubscriber = (count: number) => void;
 
@@ -58,18 +60,19 @@ export class EntityRepository<
   EntityUpdate extends IdentifiableInterface,
   Condition extends object,
   OrderBy extends object,
+  PrimaryKey extends number | string = number,
 > {
   /**
    * The state contains the entity data, keyed by their identifier.
    */
   state: {
-    [identifier: number]: Entity;
+    [identifier in PrimaryKey]?: Entity;
   } = {};
 
   /**
    * The list state contains a list of all entity identifiers.
    */
-  listState: number[] = [];
+  listState: PrimaryKey[] = [];
 
   /**
    * The count state contains the count of all entities.
@@ -80,7 +83,7 @@ export class EntityRepository<
    * The filtered list state contains multiple lists of entity identifiers, keyed by their corresponding filter.
    */
   filteredListState: {
-    [filterKey: string]: number[];
+    [filterKey: string]: PrimaryKey[];
   } = {};
 
   /**
@@ -108,13 +111,13 @@ export class EntityRepository<
    * This object contains a set of active subscriber functions for each entity, keyed by the entity identifier.
    */
   subscribers: {
-    [identifier: number]: Set<EntityRepositorySubscriber<Entity>>;
+    [identifier in PrimaryKey]?: Set<EntityRepositorySubscriber<Entity>>;
   } = {};
 
   /**
    * This set contains all active list subscriber functions.
    */
-  listSubscribers: Set<EntityRepositoryListSubscriber> = new Set();
+  listSubscribers: Set<EntityRepositoryListSubscriber<PrimaryKey>> = new Set();
 
   /**
    * This set contains all active count subscriber functions.
@@ -127,7 +130,7 @@ export class EntityRepository<
   filteredListSubscribers: {
     [filterKey: string]: {
       filter: FilterInterface<Condition, OrderBy>;
-      set: Set<EntityRepositoryListSubscriber>;
+      set: Set<EntityRepositoryListSubscriber<PrimaryKey>>;
     };
   } = {};
 
@@ -144,12 +147,12 @@ export class EntityRepository<
   /**
    * Read an entity via the API.
    */
-  apiRead: ApiRead<Entity>;
+  apiRead: ApiRead<Entity, PrimaryKey>;
 
   /**
    * Create an entity via the API.
    */
-  apiCreate: ApiCreate<EntityCreate>;
+  apiCreate: ApiCreate<EntityCreate, PrimaryKey>;
 
   /**
    * Update an entity via the API.
@@ -159,12 +162,12 @@ export class EntityRepository<
   /**
    * Delete an entity via the API.
    */
-  apiDelete: ApiDelete;
+  apiDelete: ApiDelete<PrimaryKey>;
 
   /**
    * List entities via the API.
    */
-  apiList: ApiList<FilterInterface<Condition, OrderBy>>;
+  apiList: ApiList<FilterInterface<Condition, OrderBy>, PrimaryKey>;
 
   /**
    * Count entities via the API.
@@ -204,17 +207,17 @@ export class EntityRepository<
    * @param registerFilterRelatedActions - register callbacks for reacting to related entity actions which might influence filtered lists and counts
    */
   constructor(
-    apiCreate: ApiCreate<EntityCreate>,
-    apiRead: ApiRead<Entity>,
+    apiCreate: ApiCreate<EntityCreate, PrimaryKey>,
+    apiRead: ApiRead<Entity, PrimaryKey>,
     apiUpdate: ApiUpdate<EntityUpdate>,
-    apiDelete: ApiDelete,
-    apiList: ApiList<FilterInterface<Condition, OrderBy>>,
+    apiDelete: ApiDelete<PrimaryKey>,
+    apiList: ApiList<FilterInterface<Condition, OrderBy>, PrimaryKey>,
     apiCount: ApiCount<Condition>,
     defaultCondition: Condition | undefined,
     defaultOrderBy: OrderBy[] | undefined,
-    registerUpdate: (reactFunction: (identifier: number) => void) => void,
+    registerUpdate: (reactFunction: (identifier: PrimaryKey) => void) => void,
     registerCreate: (reactFunction: () => void) => void,
-    registerDelete: (reactFunction: (identifier: number) => void) => void,
+    registerDelete: (reactFunction: (identifier: PrimaryKey) => void) => void,
     registerFilterRelatedActions?: (reactFunction: () => void) => void,
   ) {
     this.apiCreate = apiCreate;
@@ -230,7 +233,7 @@ export class EntityRepository<
       orderBy: this.defaultOrderBy,
     };
 
-    const react = async (identifier: number): Promise<void> => {
+    const react = async (identifier: PrimaryKey): Promise<void> => {
       if (!this.state[identifier]) {
         return;
       }
@@ -238,7 +241,7 @@ export class EntityRepository<
       this.run(identifier);
     };
 
-    const reactDelete = (identifier: number): void => {
+    const reactDelete = (identifier: PrimaryKey): void => {
       if (!this.state[identifier]) {
         return;
       }
@@ -295,7 +298,7 @@ export class EntityRepository<
       }
     };
 
-    registerUpdate((identifier: number) => {
+    registerUpdate((identifier: PrimaryKey) => {
       void react(identifier);
       void reactFilteredList();
       void reactFilteredCount();
@@ -308,7 +311,7 @@ export class EntityRepository<
       void reactFilteredCount();
     });
 
-    registerDelete((identifier: number) => {
+    registerDelete((identifier: PrimaryKey) => {
       reactDelete(identifier);
       void reactList();
       void reactCount();
@@ -335,7 +338,7 @@ export class EntityRepository<
    * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity changes
    */
   subscribe(
-    identifier: number,
+    identifier: PrimaryKey,
     subscriber: EntityRepositorySubscriber<Entity>,
   ): EntityRepositoryUnsubscriber {
     void this.read(identifier).then(() => {
@@ -362,7 +365,7 @@ export class EntityRepository<
   /**
    * Create a reactive store of a single entity.
    */
-  createStore(identifier: number): Readable<Loadable<Entity>> {
+  createStore(identifier: PrimaryKey): Readable<Loadable<Entity>> {
     return {
       subscribe: (subscriber) =>
         this.subscribe(identifier, (entity) => {
@@ -381,7 +384,7 @@ export class EntityRepository<
    * @return EntityRepositoryUnsubscriber - the returned function must be called to unsubscribe from entity list changes
    */
   subscribeList(
-    subscriber: EntityRepositoryListSubscriber,
+    subscriber: EntityRepositoryListSubscriber<PrimaryKey>,
   ): EntityRepositoryUnsubscriber {
     void this.list().then(() => {
       subscriber(this.listState);
@@ -396,7 +399,7 @@ export class EntityRepository<
   /**
    * Create a reactive store of the complete entity list.
    */
-  createListStore(): Readable<Loadable<number[]>> {
+  createListStore(): Readable<Loadable<PrimaryKey[]>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeList((list) => {
@@ -451,7 +454,7 @@ export class EntityRepository<
    */
   subscribeListFiltered(
     filter: FilterInterface<Condition, OrderBy>,
-    subscriber: EntityRepositoryListSubscriber,
+    subscriber: EntityRepositoryListSubscriber<PrimaryKey>,
   ): EntityRepositoryUnsubscriber {
     const filterKey = stringifyFilter(filter);
     void this.listFiltered(filter).then(() => {
@@ -491,7 +494,7 @@ export class EntityRepository<
    */
   createListFilteredStore(
     filter: FilterInterface<Condition, OrderBy>,
-  ): Readable<Loadable<number[]>> {
+  ): Readable<Loadable<PrimaryKey[]>> {
     return {
       subscribe: (subscriber) =>
         this.subscribeListFiltered(filter, (list) => {
@@ -564,7 +567,7 @@ export class EntityRepository<
    *
    * @param entityCreate - the entity data for creation
    */
-  async create(entityCreate: EntityCreate): Promise<number> {
+  async create(entityCreate: EntityCreate): Promise<PrimaryKey> {
     return this.apiCreate(entityCreate);
   }
 
@@ -577,7 +580,7 @@ export class EntityRepository<
    * @param updater - is called with the current entity
    */
   async update(
-    identifier: number,
+    identifier: PrimaryKey,
     updater: EntityRepositoryUpdater<Entity, EntityUpdate>,
   ): Promise<void> {
     const entity = this.state[identifier];
@@ -592,7 +595,7 @@ export class EntityRepository<
    *
    * @param identifier - identifies the entity
    */
-  async delete(identifier: number): Promise<void> {
+  async delete(identifier: PrimaryKey): Promise<void> {
     await this.apiDelete(identifier);
   }
 
@@ -601,7 +604,7 @@ export class EntityRepository<
    *
    * This method is called after the state of that entity has changed.
    */
-  run(identifier: number): void {
+  run(identifier: PrimaryKey): void {
     const entity = this.state[identifier];
     this.subscribers[identifier]?.forEach((subscriber) => subscriber(entity));
   }
@@ -655,9 +658,17 @@ export class EntityRepository<
   /**
    * Read the entity via the API and add it to the state if it is not already present.
    */
-  async read(identifier: number): Promise<void> {
+  async read(identifier: PrimaryKey): Promise<void> {
     if (!this.state[identifier]) {
-      this.state[identifier] = await this.apiRead(identifier);
+      this.state[identifier] = await this.apiRead(identifier).catch(
+        (reason) => {
+          if (reason === "NotFound") {
+            return undefined;
+          } else {
+            throw reason;
+          }
+        },
+      );
     }
   }
 

@@ -186,9 +186,9 @@ type CommandParameterMap = {
   [Command.ENTITY_COUNT_RECIPE_STEP]: { condition?: RecipeStepCondition };
 
   [Command.ENTITY_CREATE_UNIT_NAME]: { create: UnitNameCreateInterface };
-  [Command.ENTITY_READ_UNIT_NAME]: { id: number };
+  [Command.ENTITY_READ_UNIT_NAME]: { id: string };
   [Command.ENTITY_UPDATE_UNIT_NAME]: { update: UnitNameUpdateInterface };
-  [Command.ENTITY_DELETE_UNIT_NAME]: { id: number };
+  [Command.ENTITY_DELETE_UNIT_NAME]: { id: string };
   [Command.ENTITY_LIST_UNIT_NAME]: { filter: UnitNameFilter };
   [Command.ENTITY_COUNT_UNIT_NAME]: { condition?: UnitNameCondition };
 

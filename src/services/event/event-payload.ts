@@ -29,8 +29,8 @@ type EventPayloadMap = {
   [EventChannel.ENTITY_ACTION_UPDATED_RECIPE_STEP]: number;
   [EventChannel.ENTITY_ACTION_DELETED_RECIPE_STEP]: number;
   [EventChannel.ENTITY_ACTION_CREATED_UNIT_NAME]: void;
-  [EventChannel.ENTITY_ACTION_UPDATED_UNIT_NAME]: number;
-  [EventChannel.ENTITY_ACTION_DELETED_UNIT_NAME]: number;
+  [EventChannel.ENTITY_ACTION_UPDATED_UNIT_NAME]: string;
+  [EventChannel.ENTITY_ACTION_DELETED_UNIT_NAME]: string;
 
   [EventChannel.SCRAPER_DOM_DROP]: string;
   [EventChannel.SCRAPER_ELEMENT_DROP]: string;

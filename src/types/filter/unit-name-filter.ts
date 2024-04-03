@@ -1,10 +1,8 @@
-import type { FilterInterface, Order } from "../filter-interface.ts";
+import type { FilterInterface } from "../filter-interface.ts";
 
-export type UnitNameCondition = {
-  nameExact?: string;
-};
+export type UnitNameCondition = object;
 
-export type UnitNameOrderBy = { name: Order };
+export type UnitNameOrderBy = object;
 
 export type UnitNameFilter = FilterInterface<
   UnitNameCondition,

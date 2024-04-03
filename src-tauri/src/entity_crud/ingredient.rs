@@ -95,6 +95,7 @@ impl EntityCrudTrait for IngredientCrud {
     type Column = Column;
     type Relation = Relation;
     type PrimaryKey = PrimaryKey;
+    type PrimaryKeyValue = i64;
     type EntityCreate = IngredientCreate;
     type EntityUpdate = IngredientUpdate;
     type EntityCondition = IngredientCondition;

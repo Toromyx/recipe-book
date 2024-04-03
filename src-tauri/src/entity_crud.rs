@@ -5,9 +5,11 @@ use async_trait::async_trait;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
     EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait, PrimaryKeyToColumn, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, RelationTrait, Select, TransactionTrait,
+    QueryFilter, QuerySelect, RelationTrait, Select, TransactionTrait, TryFromU64, TryGetable,
+    TryGetableMany,
 };
-use serde::Deserialize;
+use sea_query::{FromValueTuple, IntoValueTuple};
+use serde::{Deserialize, Serialize};
 
 use crate::{database, window::get_window};
 
@@ -48,8 +50,11 @@ where
 ///
 /// This is needed for listing entity ids.
 #[derive(FromQueryResult)]
-pub struct IdColumn {
-    id: i64,
+pub struct IdColumn<T>
+where
+    T: TryGetable,
+{
+    id: T,
 }
 
 /// This enum is used to specify how to order results when listing an entity.
@@ -124,8 +129,22 @@ pub trait EntityCrudTrait {
     /// the entity's relation enum, implementing [`RelationTrait`]
     type Relation: RelationTrait;
 
-    /// the entity's primary key, its value type needs to be `i64`
-    type PrimaryKey: PrimaryKeyTrait<ValueType = i64> + PrimaryKeyToColumn<Column = Self::Column>;
+    /// the entity's primary key
+    type PrimaryKey: PrimaryKeyTrait<ValueType = Self::PrimaryKeyValue>
+        + PrimaryKeyToColumn<Column = Self::Column>;
+
+    /// the entity's primary key value
+    type PrimaryKeyValue: Sized
+        + Send
+        + Debug
+        + PartialEq
+        + IntoValueTuple
+        + FromValueTuple
+        + TryGetableMany
+        + TryFromU64
+        + TryGetable
+        + Serialize
+        + Clone;
 
     /// the struct with which to create an entity, implementing [`TryIntoActiveModel<Self::ActiveModel>`]
     type EntityCreate: TryIntoActiveModel<Self::ActiveModel> + Send;
@@ -198,7 +217,7 @@ pub trait EntityCrudTrait {
     async fn delete(id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType) -> Result<()> {
         let db = database::connect_writing().await;
         let txn = db.begin().await?;
-        let model_option = Self::Entity::find_by_id(id).one(&txn).await?;
+        let model_option = Self::Entity::find_by_id(id.clone()).one(&txn).await?;
         let Some(model) = model_option else {
             return Ok(());
         };
@@ -215,7 +234,7 @@ pub trait EntityCrudTrait {
     /// - when there is any problem with the database
     async fn list(
         filter: Filter<Self::EntityCondition, Self::EntityOrderBy>,
-    ) -> Result<Vec<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType>> {
+    ) -> Result<Vec<Self::PrimaryKeyValue>> {
         let db = database::connect().await;
         let mut select = Self::Entity::find()
             .select_only()
@@ -226,8 +245,11 @@ pub trait EntityCrudTrait {
         for order_by in filter.order_by.into_iter().flatten() {
             select = order_by.add(select);
         }
-        let models = select.into_model::<IdColumn>().all(db).await?;
-        Ok(models.iter().map(|id_column| id_column.id).collect())
+        let models = select
+            .into_model::<IdColumn<Self::PrimaryKeyValue>>()
+            .all(db)
+            .await?;
+        Ok(models.into_iter().map(|id_column| id_column.id).collect())
     }
 
     /// Count entities.
@@ -243,7 +265,7 @@ pub trait EntityCrudTrait {
         if let Some(condition) = condition {
             select = select.filter(condition);
         }
-        let count_option = select.into_model::<IdColumn>().one(db).await?;
+        let count_option = select.into_model::<IdColumn<i64>>().one(db).await?;
         let count = match count_option {
             Some(id_column) => id_column.id,
             _ => 0,

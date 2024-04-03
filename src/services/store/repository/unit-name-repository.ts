@@ -24,7 +24,8 @@ export const unitNameRepository: EntityRepository<
   UnitNameCreateInterface,
   UnitNameUpdateInterface,
   UnitNameCondition,
-  UnitNameOrderBy
+  UnitNameOrderBy,
+  string
 > = new EntityRepository(
   (entityCreate) => createUnitName(entityCreate),
   (identifier) => readUnitName(identifier),
