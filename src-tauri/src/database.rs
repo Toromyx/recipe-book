@@ -80,7 +80,7 @@ async fn get_path() -> String {
 /// - ...when no connection to the SQLite database cannot be established.
 async fn get_connection() -> DatabaseConnection {
     let path = get_path().await;
-    let database_url = String::from("sqlite://") + &path;
+    let database_url = String::from("sqlite://") + path.as_str();
     let mut opt = ConnectOptions::new(database_url);
     opt.max_connections(256)
         .acquire_timeout(Duration::from_secs(69420))
