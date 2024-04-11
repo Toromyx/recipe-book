@@ -68,7 +68,7 @@ It also takes care of the unit conversion.
     (recipeStepIngredient) => recipeStepIngredient.unit,
   );
   $: unitName = whenLoadedValue(unit, (unit) =>
-    unitNameRepository.createStore(unit),
+    unit ? unitNameRepository.createStore(unit) : undefined,
   );
   $: whenLoadedValue($unitName, (unitName) => {
     if (!unitName) {
