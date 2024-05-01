@@ -1,18 +1,23 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::unit_name`].
 
+use std::{collections::HashSet, sync::OnceLock};
+
+use milli::Index;
 use sea_orm::{
     sea_query::IntoCondition, ActiveValue, Condition, IntoActiveModel, IntoActiveValue, Select,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     entity::unit_name::{unit::Unit, ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-    entity_crud::{EntityCrudTrait, Filter, OrderBy},
+    entity_crud::{EntityCrudTrait, EntityDocumentTrait, Filter, OrderBy},
     event::channel::{
         ENTITY_ACTION_CREATED_UNIT_NAME, ENTITY_ACTION_DELETED_UNIT_NAME,
         ENTITY_ACTION_UPDATED_UNIT_NAME,
     },
 };
+
+static SEARCH_INDEX_ONCE: OnceLock<Index> = OnceLock::new();
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -46,6 +51,17 @@ impl IntoActiveModel<ActiveModel> for UnitNameUpdate {
                 _ => ActiveValue::NotSet,
             },
         }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct UnitNameDocument {}
+
+impl EntityDocumentTrait for UnitNameDocument {
+    type Model = Model;
+
+    fn from_model(_model: Self::Model) -> Self {
+        todo!()
     }
 }
 
@@ -85,6 +101,7 @@ impl EntityCrudTrait for UnitNameCrud {
     type PrimaryKeyValue = String;
     type EntityCreate = UnitNameCreate;
     type EntityUpdate = UnitNameUpdate;
+    type EntityDocument = UnitNameDocument;
     type EntityCondition = UnitNameCondition;
     type EntityOrderBy = UnitNameOrderBy;
 
@@ -106,5 +123,21 @@ impl EntityCrudTrait for UnitNameCrud {
 
     fn entity_action_deleted_channel() -> &'static str {
         ENTITY_ACTION_DELETED_UNIT_NAME
+    }
+
+    fn searchable_fields() -> Vec<String> {
+        vec![]
+    }
+
+    fn filterable_fields() -> HashSet<String> {
+        HashSet::from([])
+    }
+
+    fn sortable_fields() -> HashSet<String> {
+        HashSet::from([])
+    }
+
+    fn search_index_once() -> &'static OnceLock<Index> {
+        &SEARCH_INDEX_ONCE
     }
 }

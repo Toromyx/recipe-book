@@ -1,22 +1,28 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::ingredient`].
 
+use std::{collections::HashSet, sync::OnceLock};
+
+use milli::Index;
 use sea_orm::{
     sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, DeriveIntoActiveModel,
     EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, QuerySelect, QueryTrait, Select,
 };
-use serde::Deserialize;
+use sea_query::IntoIden;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     entity::{
         ingredient::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
         recipe_step_ingredient,
     },
-    entity_crud::{EntityCrudTrait, Filter, Order, OrderBy},
+    entity_crud::{EntityCrudTrait, EntityDocumentTrait, Filter, Order, OrderBy},
     event::channel::{
         ENTITY_ACTION_CREATED_INGREDIENT, ENTITY_ACTION_DELETED_INGREDIENT,
         ENTITY_ACTION_UPDATED_INGREDIENT,
     },
 };
+
+static SEARCH_INDEX_ONCE: OnceLock<Index> = OnceLock::new();
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
@@ -39,6 +45,23 @@ impl IntoActiveModel<ActiveModel> for IngredientUpdate {
                 Some(name) => ActiveValue::Set(name),
                 _ => ActiveValue::NotSet,
             },
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct IngredientDocument {
+    pub id: i64,
+    pub name: String,
+}
+
+impl EntityDocumentTrait for IngredientDocument {
+    type Model = Model;
+
+    fn from_model(model: Self::Model) -> Self {
+        Self {
+            id: model.id,
+            name: model.name,
         }
     }
 }
@@ -86,6 +109,8 @@ impl OrderBy for IngredientOrderBy {
     }
 }
 
+// TODO special indexing of recipe step IDs
+
 pub struct IngredientCrud {}
 
 impl EntityCrudTrait for IngredientCrud {
@@ -98,6 +123,7 @@ impl EntityCrudTrait for IngredientCrud {
     type PrimaryKeyValue = i64;
     type EntityCreate = IngredientCreate;
     type EntityUpdate = IngredientUpdate;
+    type EntityDocument = IngredientDocument;
     type EntityCondition = IngredientCondition;
     type EntityOrderBy = IngredientOrderBy;
 
@@ -119,5 +145,21 @@ impl EntityCrudTrait for IngredientCrud {
 
     fn entity_action_deleted_channel() -> &'static str {
         ENTITY_ACTION_DELETED_INGREDIENT
+    }
+
+    fn searchable_fields() -> Vec<String> {
+        vec![Column::Name.into_iden().to_string()]
+    }
+
+    fn filterable_fields() -> HashSet<String> {
+        HashSet::from(["recipe_step_id".to_string()])
+    }
+
+    fn sortable_fields() -> HashSet<String> {
+        HashSet::from([Column::Name.into_iden().to_string()])
+    }
+
+    fn search_index_once() -> &'static OnceLock<Index> {
+        &SEARCH_INDEX_ONCE
     }
 }

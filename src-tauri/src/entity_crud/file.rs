@@ -1,27 +1,33 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::file`].
 
-use std::{fs, str::FromStr};
+use std::{collections::HashSet, fs, str::FromStr, sync::OnceLock};
 
 use anyhow::Result;
 use async_trait::async_trait;
+use milli::Index;
 use mime_guess::mime;
 use reqwest::header;
 use sea_orm::{
     sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, IntoActiveModel, QueryOrder,
     Select,
 };
-use serde::Deserialize;
+use sea_query::IntoIden;
+use serde::{Deserialize, Serialize};
 use tempfile::NamedTempFile;
 use url::Url;
 
 use crate::{
     entity::file::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-    entity_crud::{EntityCrudTrait, Filter, Order, OrderBy, TryIntoActiveModel},
+    entity_crud::{
+        EntityCrudTrait, EntityDocumentTrait, Filter, Order, OrderBy, TryIntoActiveModel,
+    },
     event::channel::{
         ENTITY_ACTION_CREATED_FILE, ENTITY_ACTION_DELETED_FILE, ENTITY_ACTION_UPDATED_FILE,
     },
     file_storage,
 };
+
+static SEARCH_INDEX_ONCE: OnceLock<Index> = OnceLock::new();
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -99,6 +105,17 @@ impl IntoActiveModel<ActiveModel> for FileUpdate {
     }
 }
 
+#[derive(Debug, Serialize)]
+pub struct FileDocument {}
+
+impl EntityDocumentTrait for FileDocument {
+    type Model = Model;
+
+    fn from_model(_model: Self::Model) -> Self {
+        todo!()
+    }
+}
+
 pub type FileFilter = Filter<FileCondition, FileOrderBy>;
 
 #[derive(Debug, Deserialize)]
@@ -142,6 +159,7 @@ impl EntityCrudTrait for FileCrud {
     type PrimaryKeyValue = i64;
     type EntityCreate = FileCreate;
     type EntityUpdate = FileUpdate;
+    type EntityDocument = FileDocument;
     type EntityCondition = FileCondition;
     type EntityOrderBy = FileOrderBy;
 
@@ -163,6 +181,22 @@ impl EntityCrudTrait for FileCrud {
 
     fn entity_action_deleted_channel() -> &'static str {
         ENTITY_ACTION_DELETED_FILE
+    }
+
+    fn searchable_fields() -> Vec<String> {
+        vec![Column::Name.into_iden().to_string()]
+    }
+
+    fn filterable_fields() -> HashSet<String> {
+        HashSet::from([])
+    }
+
+    fn sortable_fields() -> HashSet<String> {
+        HashSet::from([Column::Name.into_iden().to_string()])
+    }
+
+    fn search_index_once() -> &'static OnceLock<Index> {
+        &SEARCH_INDEX_ONCE
     }
 }
 

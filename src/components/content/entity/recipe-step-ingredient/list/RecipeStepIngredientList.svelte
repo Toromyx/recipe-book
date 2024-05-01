@@ -56,6 +56,7 @@ It also displays displays the ingredients recipes drafts.
       },
     ],
   });
+  // TODO make this work with the list of recipe step ingredients, otherwise the search index of one entity is dependent on other entities
   $: usedIngredientsList = ingredientRepository.createListFilteredStore({
     condition: { recipeStepId },
   });

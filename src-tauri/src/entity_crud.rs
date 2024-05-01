@@ -1,19 +1,25 @@
 //! This module implements create, read, update, delete, list, and count operations for the entities in [`crate::entity`].  
 
-use std::fmt::Debug;
+use std::{collections::HashSet, fmt::Debug, sync::OnceLock};
 
 use anyhow::Result;
 use async_trait::async_trait;
+use milli::Index;
 use sea_orm::{
     sea_query, sea_query::IntoCondition, ActiveModelBehavior, ActiveModelTrait, ColumnTrait,
-    EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait, PrimaryKeyToColumn, PrimaryKeyTrait,
-    QueryFilter, QuerySelect, RelationTrait, Select, TransactionTrait, TryFromU64, TryGetable,
-    TryGetableMany,
+    EntityName, EntityTrait, FromQueryResult, IntoActiveModel, ModelTrait, PrimaryKeyToColumn,
+    PrimaryKeyTrait, QueryFilter, QuerySelect, RelationTrait, Select, TransactionTrait, TryFromU64,
+    TryGetable, TryGetableMany,
 };
-use sea_query::{FromValueTuple, IntoValueTuple};
+use sea_query::{FromValueTuple, Iden, IntoValueTuple};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
-use crate::{database, window::get_window};
+use crate::{
+    database,
+    search_index::{search_index_add, search_index_delete, search_index_init},
+    window::get_window,
+};
 
 pub mod file;
 pub mod ingredient;
@@ -45,6 +51,21 @@ where
 {
     async fn try_into_active_model(self) -> Result<A> {
         Ok(IntoActiveModel::into_active_model(self))
+    }
+}
+
+pub trait EntityDocumentTrait: Serialize + Sized {
+    type Model;
+
+    fn from_model(model: Self::Model) -> Self;
+
+    fn into_object(self) -> milli::Object {
+        let value = serde_json::to_value(self)
+            .expect("Serializing a struct to a serde_json::Value should not fail.");
+        match value {
+            Value::Object(map) => map,
+            _ => unreachable!("A struct converted to a serde_json::Value should always be a map."),
+        }
     }
 }
 
@@ -115,7 +136,7 @@ pub trait EntityCrudTrait {
             Column = Self::Column,
             Relation = Self::Relation,
             PrimaryKey = Self::PrimaryKey,
-        >;
+        > + Default;
 
     /// the entity's model, implementing [`ModelTrait`]
     type Model: ModelTrait<Entity = Self::Entity>
@@ -146,13 +167,17 @@ pub trait EntityCrudTrait {
         + TryFromU64
         + TryGetable
         + Serialize
-        + Clone;
+        + Clone
+        + ToString;
 
     /// the struct with which to create an entity, implementing [`TryIntoActiveModel<Self::ActiveModel>`]
     type EntityCreate: TryIntoActiveModel<Self::ActiveModel> + Send;
 
     /// the struct with which to update an entity, implementing [`TryIntoActiveModel<Self::ActiveModel>`]
     type EntityUpdate: TryIntoActiveModel<Self::ActiveModel> + Send;
+
+    /// the struct with which the search index is built, implementing [`EntityDocumentTrait`]
+    type EntityDocument: EntityDocumentTrait<Model = Self::Model> + Send;
 
     /// the struct with which to filter an entity list or count, implementing [`IntoCondition`]
     type EntityCondition: IntoCondition + Send;
@@ -166,6 +191,7 @@ pub trait EntityCrudTrait {
     ///
     /// - when there is any problem with the database
     /// - when the tauri window can't be messaged about the created entity
+    /// - when there is any problem with the search index
     async fn create(
         create: Self::EntityCreate,
     ) -> Result<<Self::PrimaryKey as PrimaryKeyTrait>::ValueType> {
@@ -174,6 +200,9 @@ pub trait EntityCrudTrait {
         let active_model = create.try_into_active_model().await?;
         let model = active_model.insert(&txn).await?;
         txn.commit().await?;
+        let search_index = Self::search_index();
+        let document = Self::EntityDocument::from_model(model.clone());
+        search_index_add(search_index, &document.into_object())?;
         get_window().emit(Self::entity_action_created_channel(), ())?;
         Ok(Self::primary_key_value(&model))
     }
@@ -197,11 +226,15 @@ pub trait EntityCrudTrait {
     ///
     /// - when there is any problem with the database
     /// - when the tauri window can't be messaged about the updated entity
+    /// - when there is any problem with the search index
     async fn update(update: Self::EntityUpdate) -> Result<Self::Model> {
         let db = database::connect_writing().await;
         let txn = db.begin().await?;
         let model = update.try_into_active_model().await?.update(&txn).await?;
         txn.commit().await?;
+        let search_index = Self::search_index();
+        let document = Self::EntityDocument::from_model(model.clone());
+        search_index_add(search_index, &document.into_object())?;
         get_window().emit(
             Self::entity_action_updated_channel(),
             Self::primary_key_value(&model),
@@ -215,7 +248,7 @@ pub trait EntityCrudTrait {
     ///
     /// - when there is any problem with the database
     /// - when the tauri window can't be messaged about the deleted entity
-    /// - when there is an error in [`Self::pre_delete`]
+    /// - when there is any problem with the search index
     async fn delete(id: <Self::PrimaryKey as PrimaryKeyTrait>::ValueType) -> Result<()> {
         let db = database::connect_writing().await;
         let txn = db.begin().await?;
@@ -223,8 +256,11 @@ pub trait EntityCrudTrait {
         let Some(model) = model_option else {
             return Ok(());
         };
+        let search_index_primary_key_value = Self::search_index_primary_key_value(&model);
         model.delete(&txn).await?;
         txn.commit().await?;
+        let search_index = Self::search_index();
+        search_index_delete(search_index, search_index_primary_key_value)?;
         get_window().emit(Self::entity_action_deleted_channel(), id)?;
         Ok(())
     }
@@ -275,6 +311,18 @@ pub trait EntityCrudTrait {
         Ok(count)
     }
 
+    /// Search the search index for entities.
+    ///
+    /// # Errors
+    ///
+    /// - when there is any problem with the search index
+    async fn search() -> Result<Vec<Self::PrimaryKeyValue>> {
+        // TODO search search_index, build parameters according to what milli can do
+        // https://www.meilisearch.com/docs/reference/api/search#customize-attributes-to-search-on-at-search-time
+        // https://www.meilisearch.com/docs/learn/fine_tuning_results/filtering
+        todo!()
+    }
+
     /// Get the primary key value from the entity model.
     fn primary_key_value(model: &Self::Model) -> <Self::PrimaryKey as PrimaryKeyTrait>::ValueType;
 
@@ -289,4 +337,51 @@ pub trait EntityCrudTrait {
 
     /// Get the tauri event channel for a deleted entity.
     fn entity_action_deleted_channel() -> &'static str;
+
+    /// Get the primary key name for the search index.
+    ///
+    /// This is used in [`milli::update::Settings::set_primary_key`].
+    fn search_index_primary_key_field() -> String {
+        Self::primary_key_colum().to_string()
+    }
+
+    /// Get the primary key value for the search index.
+    ///
+    /// This is used for [`milli::update::index_documents::IndexDocuments::remove_documents`].
+    fn search_index_primary_key_value(model: &Self::Model) -> String {
+        Self::primary_key_value(model).to_string()
+    }
+
+    /// Get the searchable fields for the search index.
+    ///
+    /// This is used in [`milli::update::Settings::set_searchable_fields`].
+    /// The order is the [attribute ranking order](https://www.meilisearch.com/docs/learn/core_concepts/relevancy#attribute-ranking-order).
+    /// TODO what fields should be searchable?
+    fn searchable_fields() -> Vec<String>;
+
+    /// Get the filterable fields for the search index.
+    ///
+    /// This is used in [`milli::update::Settings::set_filterable_fields`].
+    /// TODO what fields should be searchable?
+    fn filterable_fields() -> HashSet<String>;
+
+    /// Get the sortable fields for the search index.
+    ///
+    /// This is used in [`milli::update::Settings::set_sortable_fields`].
+    /// TODO what fields should be sortable?
+    fn sortable_fields() -> HashSet<String>;
+
+    fn search_index_once() -> &'static OnceLock<Index>;
+
+    fn search_index() -> &'static Index {
+        Self::search_index_once().get_or_init(|| {
+            search_index_init(
+                Self::Entity::default().table_name(),
+                Self::search_index_primary_key_field(),
+                Self::searchable_fields(),
+                Self::filterable_fields(),
+                Self::sortable_fields(),
+            )
+        })
+    }
 }

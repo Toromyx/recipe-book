@@ -72,6 +72,7 @@ mod log;
 mod migrator;
 mod path;
 mod scraper;
+mod search_index;
 mod unit_conversion;
 mod window;
 

@@ -1,18 +1,24 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe`].
 
+use std::{collections::HashSet, sync::OnceLock};
+
+use milli::Index;
 use sea_orm::{
     sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, DeriveIntoActiveModel,
     IntoActiveModel, QueryOrder, Select,
 };
-use serde::Deserialize;
+use sea_query::IntoIden;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     entity::recipe::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-    entity_crud::{EntityCrudTrait, Filter, Order, OrderBy},
+    entity_crud::{EntityCrudTrait, EntityDocumentTrait, Filter, Order, OrderBy},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE, ENTITY_ACTION_DELETED_RECIPE, ENTITY_ACTION_UPDATED_RECIPE,
     },
 };
+
+static SEARCH_INDEX_ONCE: OnceLock<Index> = OnceLock::new();
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
@@ -36,6 +42,17 @@ impl IntoActiveModel<ActiveModel> for RecipeUpdate {
                 _ => ActiveValue::NotSet,
             },
         }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct RecipeDocument {}
+
+impl EntityDocumentTrait for RecipeDocument {
+    type Model = Model;
+
+    fn from_model(_model: Self::Model) -> Self {
+        todo!()
     }
 }
 
@@ -81,6 +98,7 @@ impl EntityCrudTrait for RecipeCrud {
     type PrimaryKeyValue = i64;
     type EntityCreate = RecipeCreate;
     type EntityUpdate = RecipeUpdate;
+    type EntityDocument = RecipeDocument;
     type EntityCondition = RecipeCondition;
     type EntityOrderBy = RecipeOrderBy;
 
@@ -102,5 +120,21 @@ impl EntityCrudTrait for RecipeCrud {
 
     fn entity_action_deleted_channel() -> &'static str {
         ENTITY_ACTION_DELETED_RECIPE
+    }
+
+    fn searchable_fields() -> Vec<String> {
+        vec![Column::Name.into_iden().to_string()]
+    }
+
+    fn filterable_fields() -> HashSet<String> {
+        HashSet::from([])
+    }
+
+    fn sortable_fields() -> HashSet<String> {
+        HashSet::from([Column::Name.into_iden().to_string()])
+    }
+
+    fn search_index_once() -> &'static OnceLock<Index> {
+        &SEARCH_INDEX_ONCE
     }
 }

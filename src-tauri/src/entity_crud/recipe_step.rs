@@ -1,19 +1,25 @@
 //! This module implements [`EntityCrudTrait`] for [`crate::entity::recipe_step`].
 
+use std::{collections::HashSet, sync::OnceLock};
+
+use milli::Index;
 use sea_orm::{
     sea_query::IntoCondition, ActiveValue, ColumnTrait, Condition, DeriveIntoActiveModel,
     IntoActiveModel, QueryOrder, Select,
 };
-use serde::Deserialize;
+use sea_query::IntoIden;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     entity::recipe_step::{ActiveModel, Column, Entity, Model, PrimaryKey, Relation},
-    entity_crud::{EntityCrudTrait, Filter, Order, OrderBy},
+    entity_crud::{EntityCrudTrait, EntityDocumentTrait, Filter, Order, OrderBy},
     event::channel::{
         ENTITY_ACTION_CREATED_RECIPE_STEP, ENTITY_ACTION_DELETED_RECIPE_STEP,
         ENTITY_ACTION_UPDATED_RECIPE_STEP,
     },
 };
+
+static SEARCH_INDEX_ONCE: OnceLock<Index> = OnceLock::new();
 
 #[derive(Debug, Deserialize, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
@@ -45,6 +51,17 @@ impl IntoActiveModel<ActiveModel> for RecipeStepUpdate {
             },
             recipe_id: ActiveValue::NotSet,
         }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct RecipeStepDocument {}
+
+impl EntityDocumentTrait for RecipeStepDocument {
+    type Model = Model;
+
+    fn from_model(_model: Self::Model) -> Self {
+        todo!()
     }
 }
 
@@ -93,6 +110,7 @@ impl EntityCrudTrait for RecipeStepCrud {
     type PrimaryKeyValue = i64;
     type EntityCreate = RecipeStepCreate;
     type EntityUpdate = RecipeStepUpdate;
+    type EntityDocument = RecipeStepDocument;
     type EntityCondition = RecipeStepCondition;
     type EntityOrderBy = RecipeStepOrderBy;
 
@@ -114,5 +132,21 @@ impl EntityCrudTrait for RecipeStepCrud {
 
     fn entity_action_deleted_channel() -> &'static str {
         ENTITY_ACTION_DELETED_RECIPE_STEP
+    }
+
+    fn searchable_fields() -> Vec<String> {
+        vec![]
+    }
+
+    fn filterable_fields() -> HashSet<String> {
+        HashSet::from([Column::RecipeId.into_iden().to_string()])
+    }
+
+    fn sortable_fields() -> HashSet<String> {
+        HashSet::from([Column::Order.into_iden().to_string()])
+    }
+
+    fn search_index_once() -> &'static OnceLock<Index> {
+        &SEARCH_INDEX_ONCE
     }
 }
