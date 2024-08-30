@@ -37,7 +37,7 @@
     "@js-temporal/polyfill": "^0.4.3",
     "@tauri-apps/api": "^1.2.0",
     "messageformat": "next",
-    "svelte": "^4.1.1",
+    "svelte": "^4.2.19",
     "svelte-spa-router": "^4.0.0",
     "uuid": "^9.0.0"
   },
